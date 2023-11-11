@@ -22,8 +22,8 @@ void humanMove();
 void robotMove();
 
 void moveSelect();
-void legalCheck();
 void spinnerTop();
+bool legalCheck();
 void moveCalc();
 
 void reset();
@@ -62,7 +62,8 @@ void humanMove(int currentCol){
 	int choiceCol = 1;
 	do {
 		choiceCol = moveSelect(currentCol);
-	} while(legalCheck(choiceCol))
+	} while(!legalCheck(choiceCol))
+	
 	dropToken(currentCol, choiceCol, true);
 }
 
@@ -115,6 +116,11 @@ void moveSelect(int currentCol);
 	return selectCol;
 }
 
+bool legalCheck()
+{
+
+}
+
 void robotMove(){
 	void moveCalc();
 	void dropToken (int currentCol, int colWant, false ); // means robot is playing dummy
@@ -146,13 +152,13 @@ void displayAndWait(string message, int firstLine = DEFAULT_DISPLAY_LINE, TEV3Bu
 
 void configureMotors()
 {
-	nMotorEncoder[motorA]= nMotorEncoder[motorB]= nMotorEncoder[motorC]= nMotorEncoder[motorD] = 0;
+	nMotorEncoder[motorA] = nMotorEncoder[motorB] = nMotorEncoder[motorC] = nMotorEncoder[motorD] = 0;
 	motor[motorA] = motor[motorB] = motor[motorC] = motor[motorD]= 0 ;
 }
 
 void reset()
 {
-	nMotorEncoder[motorA]= nMotorEncoder[motorB]= nMotorEncoder[motorC]= nMotorEncoder[motorD] = 0;
+	nMotorEncoder[motorA] = nMotorEncoder[motorB]= nMotorEncoder[motorC]= nMotorEncoder[motorD] = 0;
 }
 
 void sensorConfig() {
