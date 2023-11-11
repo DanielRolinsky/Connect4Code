@@ -8,6 +8,8 @@ Motor C2 = spinner at the bottom (with sorter)
 Motor D = Right pulley
 */
 //Function Prototypes
+
+
 void sensorConfig();
 void configureMotors();
 void displayAndWait();
@@ -21,12 +23,13 @@ void robotMove();
 
 void moveSelect();
 void legalCheck();
+void spinnerTop();
 void moveCalc();
 
 void reset();
 int gameState(); //gameState() should return 0 if not won, 1 if red won, 2 if yellow won, 3 = draw
 //gameState() must check if game is won or board is full
-
+const int CONVEYOR_ANGLE = 5 / (180/PI);
 const int DEFAULT_DISPLAY_LINE = 3;
 const int DISTANCE_BETWEEN_TWO_COL = 3.5;
 //Main function
@@ -60,7 +63,7 @@ void humanMove(int currentCol){
 	do {
 		choiceCol = moveSelect(currentCol);
 	} while(legalCheck(choiceCol))
-	dropToken();
+	dropToken(currentCol, choiceCol, true);
 }
 
 void moveSelect(int currentCol);
@@ -114,7 +117,7 @@ void moveSelect(int currentCol);
 
 void robotMove(){
 	void moveCalc();
-	void dropToken();
+	void dropToken (int currentCol, int colWant, false ); // means robot is playing dummy
 }
 
 void sortTokens(){
@@ -167,13 +170,13 @@ bool gameState()
 
 }
 
-void dropToken(int currentCol, int colWant, int )
+void dropToken(int currentCol, int choiceCol, bool humanPlaying)
 {
 	float colDx= 0;
 	float colHyp = 0;
-	colDx = colWant-currentCol;
+	colDx = choiceCol-currentCol;
 	colDx *= DISTANCE_BETWEEN_TWO_COL;
-	colHyp = colDx / cos(0.08726646) // which is 5 deg angle is rad
+	colHyp = colDx / cos(CONVEYOR_ANGLE) // which is 5 deg angle is rad
 	float countsConversion = colHyp * 180 / (2.75*PI);
 	nMotorEncoder[motorA] = 0;
 	if (countsConversion < 0)
@@ -188,5 +191,5 @@ void dropToken(int currentCol, int colWant, int )
 	{} 
 	motor[motorA]=motor[motorD] = 0; 
 	// Theorectically we have the hole in the track lined up to  the specified col
-
+	spinnerTop();
 }
