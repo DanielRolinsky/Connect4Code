@@ -7,7 +7,8 @@ Motor C1 = spinner at the top
 Motor C2 = spinner at the bottom (with sorter)
 Motor D = Right pulley
 */
-//Function Prototypes miles the black one
+//Function Prototypes
+
 void sensorConfig();
 void configureMotors();
 void displayAndWait();
