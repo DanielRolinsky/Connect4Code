@@ -58,7 +58,7 @@ void sortTokens(){
 	if(SensorValue[S1] = ){}
 	}
 }
-// test
+// test2
 void spinnerMotor(bool state = false){
 	if(state) motor[motorC1] = 25;
 	else motor[motorC1] = 0;
