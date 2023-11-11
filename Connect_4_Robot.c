@@ -58,10 +58,6 @@ void sortToken(){
 //Sorting Function
 	//
 
-// WHATS UPP FUCKERSSS!!!!
-
-// helooo!!!
-
 void configureMotors()
 {
 nMotorEncoder[motorA]= nMotorEncoder[motorB]= 0;
