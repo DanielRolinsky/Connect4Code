@@ -29,6 +29,7 @@ void moveCalc();
 void dropTocken();
 void sortToken();
 void reset();
+void 
 //Main function
 task main()
 {
@@ -40,12 +41,12 @@ task main()
 
 void playGame(){
 	void humanMove();
-	void robotMove();
 	void moveSelect();
-	
+	void robotMove();
 }
 
-void sortToken(){
+void sortToken()
+{
 
 }
 
