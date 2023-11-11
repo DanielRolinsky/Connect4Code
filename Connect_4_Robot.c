@@ -8,7 +8,6 @@ Motor C2 = spinner at the bottom (with sorter)
 Motor D = Right pulley
 */
 //Function Prototypes
-
 void sensorConfig();
 void configureMotors();
 void displayAndWait();
