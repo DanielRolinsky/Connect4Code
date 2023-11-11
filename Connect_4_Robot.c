@@ -46,21 +46,25 @@ task main()
 
 void playGame(){
 	void humanMove();
+	void robotMove();
+}
+
+void humanMove(){
 	void moveSelect();
 	void legalCheck();
 	void dropToken();
+}
 
-	void robotMove();
+void robotMove(){
 	void moveCalc();
 	void dropToken();
 }
 
-void sortToken()
-{
 
 void sortToken(){
 	
 }
+
 
 void configureMotors()
 {
