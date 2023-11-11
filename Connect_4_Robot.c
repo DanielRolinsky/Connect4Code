@@ -20,14 +20,28 @@ void moveCalc();
 
 void dropTocken();
 
+void sortToken();
+
+
 //Main function
 task main()
 {
 	while(SensorValue[S1] = false){}
 
-
 }
 
+void playGame(){
+	void humanMove();
+	void moveSelect();
+	void legalCheck();
+	void sortToken();
+
+	void robotMove();
+}
+
+void sortToken(){
+
+}
 //Playing Function
 
 	//HumanMove Function
@@ -41,11 +55,3 @@ task main()
 
 //Sorting Function
 	//
-
-// WHATS UPP FUCKERSSS!!!!
-
-// helooo!!!
-
-
-
-// this is a test
