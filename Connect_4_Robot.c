@@ -149,13 +149,13 @@ void displayAndWait(string message, int firstLine = DEFAULT_DISPLAY_LINE, TEV3Bu
 
 void configureMotors()
 {
-	nMotorEncoder[motorA]= nMotorEncoder[motorB]= nMotorEncoder[motorC]= nMotorEncoder[motorD] = 0;
+	nMotorEncoder[motorA] = nMotorEncoder[motorB] = nMotorEncoder[motorC] = nMotorEncoder[motorD] = 0;
 	motor[motorA] = motor[motorB] = motor[motorC] = motor[motorD]= 0 ;
 }
 
 void reset()
 {
-	nMotorEncoder[motorA]= nMotorEncoder[motorB]= nMotorEncoder[motorC]= nMotorEncoder[motorD] = 0;
+	nMotorEncoder[motorA] = nMotorEncoder[motorB]= nMotorEncoder[motorC]= nMotorEncoder[motorD] = 0;
 }
 
 void sensorConfig() {
