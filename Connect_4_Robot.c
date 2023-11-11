@@ -1,11 +1,5 @@
 // Configure Sensors
-void sensorConfig() {
-	SensorType[S1] = sensorEV3_Touch;
-	SensorType[S3] = sensorEV3_Color;
-	wait1Msec(50);
-	SensorMode[S3] = modeEV3Color_Color;
-	wait1Msec(50);
-}
+
 
 /*
 
@@ -29,15 +23,12 @@ void moveCalc();
 void dropTocken();
 void sortToken();
 void reset();
-void 
-
-
-void spinner();
-
-
+void sensorConfig();
+void gameState();
 //Main function
 task main()
 {
+	sensorConfig();
 	configureMotors();
 	while(SensorValue[S1] = false){}
 	
@@ -45,29 +36,21 @@ task main()
 }
 
 void playGame(){
+	
 	void humanMove();
 	void moveSelect();
-	void legalCheck();
-	void dropToken();
-
 	void robotMove();
-	void moveCalc();
-	void dropToken();
 }
 
 void sortToken()
 {
 
-void sortToken(){
-	
 }
 
 void configureMotors()
 {
 	MotorEncoder[motorA]= nMotorEncoder[motorB]= nMotorEncoder[motorC]= nMotorEncoder[motorD] = 0;
 	motor[motorA] = motor[motorB] = motor[motorC] = motor[motorD]= 0 ;
-nMotorEncoder[motorA] = nMotorEncoder[motorB]= 0;
-motor[motorA] = motor[motorD]= 0 ;
 }
 
 void reset()
@@ -84,4 +67,17 @@ void humanMove()
 void robotMove()
 {
 	legalCheck();
+}
+
+void sensorConfig() {
+	SensorType[S1] = sensorEV3_Touch;
+	SensorType[S3] = sensorEV3_Color;
+	wait1Msec(50);
+	SensorMode[S3] = modeEV3Color_Color;
+	wait1Msec(50);
+}
+void gameState()
+{
+
+
 }
