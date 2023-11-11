@@ -1,4 +1,10 @@
 // Configure Sensors
+	SensorType[S1] = sensorEV3_Touch;
+	SensorType[S2] = sensorEV3_Ultrasonic;
+	SensorType[S3] = sensorEV3_Color;
+	wait1Msec(50);
+	SensorMode[S3] = modeEV3Color_Color;
+	wait1Msec(50);
 
 //Main function
 task main()
@@ -18,6 +24,9 @@ task main()
 
 //Sorting Function
 	//
+<<<<<<< HEAD
 // WHATS UPP FUCKERSSS!!!!
 
 // helooo!!!
+=======
+>>>>>>> 4e7afcd6cd195980e33e6d7349511c6f2dccda02
