@@ -29,7 +29,8 @@ void legalCheck();
 void moveCalc();
 
 void reset();
-bool gameState(); //gameState() should be used to assess if game is won or not & return a bool value
+int gameState(); //gameState() should return 0 if not won, 1 if red won, 2 if yellow won, 3 = draw
+//gameState() must check if game is won or board is full
 
 const int DEFAULT_DISPLAY_LINE = 3;
 
@@ -46,9 +47,9 @@ task main()
 
 }
 
-void playGame(){
+int playGame(){
 	
-	while(!gameState())
+	while(gameState() == 0)
 	{
 		humanMove();
 		robotMove();
