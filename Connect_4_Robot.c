@@ -27,23 +27,33 @@ void robotMove();
 void moveSelect();
 void legalCheck();
 void moveCalc();
+
 void reset();
-void gameState();
+bool gameState(); //gameState() should be used to assess if game is won or not & return a bool value
+
+const int DEFAULT_DISPLAY_LINE = 3;
 
 //Main function
 task main()
 {
 	sensorConfig();
 	configureMotors();
-	while(SensorValue[S1] = false){}
 	
+	displayString(DEFAULT_DISPLAY_LINE - 1, "First, place cartridges.");
+	displayAndWait("Then, press Enter to play!");
+
+	playGame();
 
 }
 
 void playGame(){
 	
-	void humanMove();
-	void robotMove();
+	while(!gameState())
+	{
+		humanMove();
+		robotMove();
+	}
+
 }
 
 void humanMove(){
@@ -69,7 +79,7 @@ void spinnerMotor(bool state = false){
 	else motor[motorC1] = 0;
 }
 
-void displayAndWait(TEV3Buttons buttonName, int firstLine, string message)
+void displayAndWait(string message, int firstLine = DEFAULT_DISPLAY_LINE, TEV3Buttons buttonName = buttonEnter)
 {
 	displayString(firstLine, message);
 
@@ -99,7 +109,8 @@ void sensorConfig() {
 	SensorMode[S3] = modeEV3Color_Color;
 	wait1Msec(50);
 }
-void gameState()
+
+bool gameState()
 {
 
 
