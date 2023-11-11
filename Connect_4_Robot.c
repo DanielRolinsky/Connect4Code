@@ -7,22 +7,28 @@ void sensorConfig() {
 	wait1Msec(50);
 }
 
+/*
+
+motor descriptions:
+
+motor A = left pulley
+Motor B = flipper
+Motor C1 = spinner at the top 
+Motor C2 = spinner at the bottom (with sorter)
+Motor D = Right pulley
+
+*/
 //Function Prototypes
 void playGame();
 void configureMotors();
 void humanMove();
 void moveSelect();
 void legalCheck();
-
 void robotMove();
 void moveCalc();
-
-
 void dropTocken();
-
 void sortToken();
-
-
+void reset();
 //Main function
 task main()
 {
@@ -34,33 +40,33 @@ task main()
 
 void playGame(){
 	void humanMove();
-	void moveSelect();
-	void legalCheck();
-	void sortToken();
-
 	void robotMove();
+	void moveSelect();
+	
 }
 
 void sortToken(){
 
 }
-//Playing Function
-
-	//HumanMove Function
-		//moveSelect
-		//Legal Move check function
-		//Drop Token Function
-
-	//RobotMove Function
-		//MiniMax Function
-		//Drop Token Function
-
-//Sorting Function
-	//
 
 void configureMotors()
 {
-nMotorEncoder[motorA]= nMotorEncoder[motorB]= 0;
-motor[motorA] = motor[motorD]= 0 ;
+	MotorEncoder[motorA]= nMotorEncoder[motorB]= nMotorEncoder[motorC]= nMotorEncoder[motorD] = 0;
+	motor[motorA] = motor[motorB] = motor[motorC] = motor[motorD]= 0 ;
 }
 
+void reset()
+{
+	MotorEncoder[motorA]= nMotorEncoder[motorB]= nMotorEncoder[motorC]= nMotorEncoder[motorD] = 0;
+}
+
+void humanMove()
+{
+	legalCheck();
+	
+}
+
+void robotMove()
+{
+	legalCheck();
+}
