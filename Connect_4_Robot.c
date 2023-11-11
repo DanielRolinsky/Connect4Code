@@ -5,7 +5,7 @@
 	wait1Msec(50);
 	SensorMode[S3] = modeEV3Color_Color;
 	wait1Msec(50);
-
+// testing for github
 //Main function
 task main()
 {
