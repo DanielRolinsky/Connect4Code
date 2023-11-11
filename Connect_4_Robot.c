@@ -18,15 +18,17 @@ task main()
 		//Legal Move check function
 		//Drop Token Function
 
-	//RobotMove Function
+	//RobotMove Function`
 		//MiniMax Function
 		//Drop Token Function
 
 //Sorting Function
 	//
-<<<<<<< HEAD
+
 // WHATS UPP FUCKERSSS!!!!
 
 // helooo!!!
-=======
->>>>>>> 4e7afcd6cd195980e33e6d7349511c6f2dccda02
+
+
+
+// this is a test
