@@ -20,7 +20,7 @@ void humanMove();
 void robotMove();
 
 void moveSelect();
-void legalCheck();
+bool legalCheck();
 void moveCalc();
 
 void reset();
@@ -59,7 +59,8 @@ void humanMove(int currentCol){
 	int choiceCol = 1;
 	do {
 		choiceCol = moveSelect(currentCol);
-	} while(legalCheck(choiceCol))
+	} while(!legalCheck(choiceCol))
+
 	dropToken();
 }
 
@@ -110,6 +111,11 @@ void moveSelect(int currentCol);
 	{}
 
 	return selectCol;
+}
+
+bool legalCheck()
+{
+
 }
 
 void robotMove(){
