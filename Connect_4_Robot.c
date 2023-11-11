@@ -23,6 +23,9 @@ void dropTocken();
 void sortToken();
 
 
+void spinner();
+
+
 //Main function
 task main()
 {
@@ -36,13 +39,16 @@ void playGame(){
 	void humanMove();
 	void moveSelect();
 	void legalCheck();
-	void sortToken();
+	void dropToken();
 
 	void robotMove();
+	void moveCalc();
+	void dropToken();
 }
 
-void sortToken(){
 
+void sortToken(){
+	
 }
 //Playing Function
 
@@ -60,7 +66,7 @@ void sortToken(){
 
 void configureMotors()
 {
-nMotorEncoder[motorA]= nMotorEncoder[motorB]= 0;
+nMotorEncoder[motorA] = nMotorEncoder[motorB]= 0;
 motor[motorA] = motor[motorD]= 0 ;
 }
 
