@@ -7,7 +7,7 @@ Motor C1 = spinner at the top
 Motor C2 = spinner at the bottom (with sorter)
 Motor D = Right pulley
 */
-//Function Prototypes
+//Function Prototypes miles the black one
 void sensorConfig();
 void configureMotors();
 void displayAndWait();
@@ -28,7 +28,7 @@ int gameState(); //gameState() should return 0 if not won, 1 if red won, 2 if ye
 //gameState() must check if game is won or board is full
 
 const int DEFAULT_DISPLAY_LINE = 3;
-
+const int DISTANCE_BETWEEN_TWO_COL = 
 //Main function
 task main()
 {
