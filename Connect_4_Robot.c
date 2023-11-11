@@ -45,18 +45,71 @@ task main()
 
 int playGame(){
 	
+	int currentCol = 1;
+
 	while(gameState() == 0)
 	{
-		humanMove();
+		humanMove(currentCol);
 		robotMove();
 	}
 
 }
 
-void humanMove(){
-	void moveSelect();
-	void legalCheck();
-	void dropToken();
+void humanMove(int currentCol){
+	int choiceCol = 1;
+	do {
+		choiceCol = moveSelect(currentCol);
+	} while(legalCheck(choiceCol))
+	dropToken();
+}
+
+void moveSelect(int currentCol);
+{
+	int selectCol = currentCol;
+	eraseDisplay();
+	displayString(DEFAULT_DISPLAY_LINE, "Current Column: %d", selectCol);
+
+	while(!getButtonPressed(buttonEnter))
+	{
+		if(getButtonPressed(buttonRight))
+		{
+			while(getButtonPressed(buttonRight))
+			{}
+			
+			if(selectCol == 7)
+			{
+				selectCol = 1;
+			}
+			else
+			{
+				selectCol++;
+			}
+
+			eraseDisplay();
+			displayString(DEFAULT_DISPLAY_LINE, "Current Column: %d", selectCol);
+		}
+		else if(getButtonPressed(buttonLeft))
+		{
+			while(getButtonPressed(buttonLeft))
+			{}
+			
+			if(selectCol == 1)
+			{
+				selectCol = 7;
+			}
+			else
+			{
+				selectCol++;
+			}
+
+			eraseDisplay();
+			displayString(DEFAULT_DISPLAY_LINE, "Current Column: %d", selectCol);
+		}
+	}
+	while(getButtonPressed(buttonEnter))
+	{}
+
+	return selectCol;
 }
 
 void robotMove(){
