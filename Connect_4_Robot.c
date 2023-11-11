@@ -52,9 +52,17 @@ void robotMove(){
 	void dropToken();
 }
 
-
+void sortTokens(){
+	spinnter(true);
+	while(tokensLeft && finishSignal){
+	if(SensorValue[S1] = ){}
+	}
 }
-
+// test
+void spinnerMotor(bool state = false){
+	if(state) motor[motorC1] = 25;
+	else motor[motorC1] = 0;
+}
 
 //
 
@@ -67,17 +75,6 @@ void configureMotors()
 void reset()
 {
 	MotorEncoder[motorA]= nMotorEncoder[motorB]= nMotorEncoder[motorC]= nMotorEncoder[motorD] = 0;
-}
-
-void humanMove()
-{
-	legalCheck();
-	
-}
-
-void robotMove()
-{
-	legalCheck();
 }
 
 void sensorConfig() {
