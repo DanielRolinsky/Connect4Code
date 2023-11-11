@@ -9,7 +9,7 @@ void sensorConfig() {
 
 //Function Prototypes
 void playGame();
-
+void configureMotors();
 void humanMove();
 void moveSelect();
 void legalCheck();
@@ -26,7 +26,9 @@ void sortToken();
 //Main function
 task main()
 {
+	configureMotors();
 	while(SensorValue[S1] = false){}
+	
 
 }
 
@@ -55,3 +57,14 @@ void sortToken(){
 
 //Sorting Function
 	//
+
+// WHATS UPP FUCKERSSS!!!!
+
+// helooo!!!
+
+void configureMotors()
+{
+nMotorEncoder[motorA]= nMotorEncoder[motorB]= 0;
+motor[motorA] = motor[motorD]= 0 ;
+}
+
