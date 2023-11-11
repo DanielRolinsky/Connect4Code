@@ -8,20 +8,25 @@ Motor C2 = spinner at the bottom (with sorter)
 Motor D = Right pulley
 */
 //Function Prototypes
-void playGame();
+void sensorConfig();
 void configureMotors();
-void humanMove();
-void moveSelect();
-void legalCheck();
-void robotMove();
-void moveCalc();
+void displayAndWait();
+
+void playGame();
 void dropToken();
 void sortToken();
+
+void humanMove();
+void robotMove();
+
+void moveSelect();
+void legalCheck();
+void moveCalc();
+
 void reset();
-void sensorConfig();
-void gameState();
+bool gameState(); //gameState() should be used to assess if game is won or not & return a bool value
 
-
+const int DEFAULT_DISPLAY_LINE = 3;
 
 //Main function
 task main()
@@ -29,21 +34,57 @@ task main()
 	int currentCol = 0;
 	sensorConfig();
 	configureMotors();
-	while(SensorValue[S1] = false){}
 	
+	displayString(DEFAULT_DISPLAY_LINE - 1, "First, place cartridges.");
+	displayAndWait("Then, press Enter to play!");
+
+	playGame();
 
 }
 
 void playGame(){
 	
-	void humanMove();
-	void moveSelect();
-	void robotMove();
+	while(!gameState())
+	{
+		humanMove();
+		robotMove();
+	}
+
 }
 
-void sortToken()
-{
+void humanMove(){
+	void moveSelect();
+	void legalCheck();
+	void dropToken();
+}
 
+void robotMove(){
+	void moveCalc();
+	void dropToken();
+}
+
+void sortTokens(){
+	spinnter(true);
+	while(tokensLeft && finishSignal){
+	if(SensorValue[S1] = ){}
+	}
+}
+
+void spinnerMotor(bool state = false){
+	if(state) motor[motorC1] = 25;
+	else motor[motorC1] = 0;
+}
+
+void displayAndWait(string message, int firstLine = DEFAULT_DISPLAY_LINE, TEV3Buttons buttonName = buttonEnter)
+{
+	displayString(firstLine, message);
+
+	while(!getButtonPressed(buttonName))
+	{}
+	while(getButtonPressed(buttonName))
+	{}
+
+	eraseDisplay();
 }
 
 void configureMotors()
@@ -57,17 +98,6 @@ void reset()
 	MotorEncoder[motorA]= nMotorEncoder[motorB]= nMotorEncoder[motorC]= nMotorEncoder[motorD] = 0;
 }
 
-void humanMove()
-{
-	legalCheck();
-	
-}
-
-void robotMove()
-{
-	legalCheck();
-}
-
 void sensorConfig() {
 	SensorType[S1] = sensorEV3_Touch;
 	SensorType[S3] = sensorEV3_Color;
@@ -76,7 +106,7 @@ void sensorConfig() {
 	wait1Msec(50);
 }
 
-void gameState()
+bool gameState()
 {
 
 
