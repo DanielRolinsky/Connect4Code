@@ -13,18 +13,23 @@ Motor D = Right pulley
 
 */
 //Function Prototypes
-void playGame();
+void sensorConfig();
 void configureMotors();
+void displayAndWait();
+
+void playGame();
+void dropToken();
+void sortToken();
+
 void humanMove();
+void robotMove();
+
 void moveSelect();
 void legalCheck();
-void robotMove();
 void moveCalc();
-void dropTocken();
-void sortToken();
 void reset();
-void sensorConfig();
 void gameState();
+
 //Main function
 task main()
 {
@@ -58,14 +63,23 @@ void sortTokens(){
 	if(SensorValue[S1] = ){}
 	}
 }
-// test2
-// test1
+
 void spinnerMotor(bool state = false){
 	if(state) motor[motorC1] = 25;
 	else motor[motorC1] = 0;
 }
 
-//
+void displayAndWait(TEV3Buttons buttonName, int firstLine, string message)
+{
+	displayString(firstLine, message);
+
+	while(!getButtonPressed(buttonName))
+	{}
+	while(getButtonPressed(buttonName))
+	{}
+
+	eraseDisplay();
+}
 
 void configureMotors()
 {
