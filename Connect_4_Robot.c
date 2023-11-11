@@ -90,13 +90,13 @@ void displayAndWait(string message, int firstLine = DEFAULT_DISPLAY_LINE, TEV3Bu
 
 void configureMotors()
 {
-	MotorEncoder[motorA]= nMotorEncoder[motorB]= nMotorEncoder[motorC]= nMotorEncoder[motorD] = 0;
+	nMotorEncoder[motorA]= nMotorEncoder[motorB]= nMotorEncoder[motorC]= nMotorEncoder[motorD] = 0;
 	motor[motorA] = motor[motorB] = motor[motorC] = motor[motorD]= 0 ;
 }
 
 void reset()
 {
-	MotorEncoder[motorA]= nMotorEncoder[motorB]= nMotorEncoder[motorC]= nMotorEncoder[motorD] = 0;
+	nMotorEncoder[motorA]= nMotorEncoder[motorB]= nMotorEncoder[motorC]= nMotorEncoder[motorD] = 0;
 }
 
 void sensorConfig() {
@@ -115,9 +115,15 @@ bool gameState()
 
 void dropToken(int currentCol, int colWant)
 {
-	int col_x_axis_Displacement= 0;
-	col_x_axis_Displacement = colWant-currentCol;
-	col_x_axis_Displacement*= DISTANCE_BETWEEN_TWO_COL;
-	col_hypotnuse_Displacement = col_x_axis_Displacement / cos(0.08726646) // which is angle is rad
-	m
+	float colDx= 0;
+	float colHyp = 0;
+	colDx = colWant-currentCol;
+	colDx *= DISTANCE_BETWEEN_TWO_COL;
+	colHyp = colDx / cos(0.08726646) // which is 5 deg angle is rad
+	float countsConversion = colHyp * 180 / (2.75*PI);
+	nMotorEncoder[motorA] = 0;
+	motor[MotorA] = motor[MotorD] = 20;
+	while (nMotorEncoder[motorA] < countsConversion)
+	{} 
+	motor[motorA]=motor[motorD] = 0; 
 }
