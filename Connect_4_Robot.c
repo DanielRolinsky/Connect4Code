@@ -64,6 +64,8 @@ void spinnerMotor(bool state = false){
 	else motor[motorC1] = 0;
 }
 
+//
+
 void configureMotors()
 {
 	MotorEncoder[motorA]= nMotorEncoder[motorB]= nMotorEncoder[motorC]= nMotorEncoder[motorD] = 0;
