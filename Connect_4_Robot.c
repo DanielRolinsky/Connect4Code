@@ -1,15 +1,16 @@
 // Configure Sensors
 	SensorType[S1] = sensorEV3_Touch;
-	SensorType[S2] = sensorEV3_Ultrasonic;
 	SensorType[S3] = sensorEV3_Color;
 	wait1Msec(50);
 	SensorMode[S3] = modeEV3Color_Color;
 	wait1Msec(50);
-// testing for github
-//Main function
+
+void configureMotors();
+
+
 task main()
 {
-
+configureMotors();
 }
 
 //Playing Function
@@ -24,11 +25,8 @@ task main()
 
 //Sorting Function
 	//
-
-// WHATS UPP FUCKERSSS!!!!
-
-// helooo!!!
-
-
-
-// this is a test
+void configureMotors()
+{
+nMotorEncoder[motorA]= nMotorEncoder[motorB]= 0;
+motor[motorA] = motor[motorD]= 0 ;
+}
