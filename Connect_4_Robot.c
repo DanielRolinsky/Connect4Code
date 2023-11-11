@@ -28,7 +28,7 @@ int gameState(); //gameState() should return 0 if not won, 1 if red won, 2 if ye
 //gameState() must check if game is won or board is full
 
 const int DEFAULT_DISPLAY_LINE = 3;
-const int DISTANCE_BETWEEN_TWO_COL = 
+const int DISTANCE_BETWEEN_TWO_COL = 3.5;
 //Main function
 task main()
 {
@@ -154,6 +154,7 @@ void reset()
 
 void sensorConfig() {
 	SensorType[S1] = sensorEV3_Touch;
+	wait1Msec(50);
 	SensorType[S3] = sensorEV3_Color;
 	wait1Msec(50);
 	SensorMode[S3] = modeEV3Color_Color;
@@ -166,7 +167,7 @@ bool gameState()
 
 }
 
-void dropToken(int currentCol, int colWant)
+void dropToken(int currentCol, int colWant, int )
 {
 	float colDx= 0;
 	float colHyp = 0;
@@ -175,8 +176,17 @@ void dropToken(int currentCol, int colWant)
 	colHyp = colDx / cos(0.08726646) // which is 5 deg angle is rad
 	float countsConversion = colHyp * 180 / (2.75*PI);
 	nMotorEncoder[motorA] = 0;
-	motor[MotorA] = motor[MotorD] = 20;
+	if (countsConversion < 0)
+	{
+		motor[MotorA] = motor[MotorD] = -20;
+	}
+	else
+	{
+		motor[MotorA] = motor[MotorD] = 20;
+	}
 	while (nMotorEncoder[motorA] < countsConversion)
 	{} 
 	motor[motorA]=motor[motorD] = 0; 
+	// Theorectically we have the hole in the track lined up to  the specified col
+
 }
