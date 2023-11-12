@@ -29,9 +29,13 @@ void moveCalc();
 void reset();
 int gameState(); //gameState() should return 0 if not won, 1 if red won, 2 if yellow won, 3 = draw
 //gameState() must check if game is won or board is full
+
 const int CONVEYOR_ANGLE = 5 / (180/PI);
 const int DEFAULT_DISPLAY_LINE = 3;
 const int DISTANCE_BETWEEN_TWO_COL = 3.5;
+
+int boardArray[6][7] = {0}; 
+
 //Main function
 task main()
 {
@@ -116,9 +120,14 @@ void moveSelect(int currentCol);
 	return selectCol;
 }
 
-bool legalCheck()
+bool legalCheck(int choiceCol)
 {
-
+	if(boardArray[0][choiceCol - 1] != 0)
+	{
+		return false
+	}
+	
+	return true
 }
 
 void robotMove(){
