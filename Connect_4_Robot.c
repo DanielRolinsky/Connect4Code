@@ -30,11 +30,19 @@ void reset();
 int gameState(); //gameState() should return 0 if not won, 1 if red won, 2 if yellow won, 3 = draw
 //gameState() must check if game is won or board is full
 
-const int CONVEYOR_ANGLE = 5 / (180/PI);
+const int CONVEYOR_ANGLE = 5 / (180/PI); // currently angle of slope of CONVEYOR
 const int DEFAULT_DISPLAY_LINE = 3;
 const int DISTANCE_BETWEEN_TWO_COL = 3.5;
 
-int boardArray[6][7] = {0}; 
+int boardArray[6][7] = 
+    {
+	{0,0,0,0,0,0,0},
+    {0,0,0,0,0,0,0},
+    {0,0,0,0,0,0,0},
+    {0,0,0,0,0,0,0},
+    {0,0,0,0,0,0,0},
+    {0,0,0,0,0,0,0}
+    }; 
 
 //Main function
 task main()
@@ -142,10 +150,32 @@ void sortTokens(){
 	}
 }
 
-void spinnerMotor(bool state = false){
-	if(state) motor[motorC1] = 25;
-	else motor[motorC1] = 0;
-}
+void spinnerMotor(bool isHumanPlaying) // at the top!!!!!!
+{ 
+/*
+assumption: the red = 1 = human, yellow = 2 = robot, also that the at the top view of the spinner,
+ the cartriage at 180 deg will be the red token and the cartirage at 270 deg will be the yellow cartirage
+ FRAME OF REFERENCE: counter clock with is -ve while clockwise is +ve
+*/ 
+
+	if(isHumanPlaying) 
+	{
+	
+		motor[motorC1] = 25;
+		while (nMotorEncoder[motorC1] < 45)
+		{} 
+		motor[motorC1] = 0; 
+	}
+	else 
+	{
+	
+		motor[motorC1] = -25;
+		while (nMotorEncoder[motorC1] < -45)
+		{} 
+		motor[motorC1] = 0; 
+	}
+
+	
 
 void displayAndWait(string message, int firstLine = DEFAULT_DISPLAY_LINE, TEV3Buttons buttonName = buttonEnter)
 {
@@ -185,7 +215,7 @@ bool gameState()
 
 }
 
-void dropToken(int currentCol, int choiceCol, bool humanPlaying)
+void dropToken(int currentCol, int choiceCol, bool isHumanPlaying)
 {
 	float colDx= 0;
 	float colHyp = 0;
@@ -202,9 +232,9 @@ void dropToken(int currentCol, int choiceCol, bool humanPlaying)
 	{
 		motor[MotorA] = motor[MotorD] = 20;
 	}
-	while (nMotorEncoder[motorA] < countsConversion)
+	while (nMotorEncoder[motorA] < countsConversion) // never leaves loop
 	{} 
 	motor[motorA]=motor[motorD] = 0; 
 	// Theorectically we have the hole in the track lined up to  the specified col
-	spinnerMotor();
+	spinnerMotor(isHumanPlaying);
 }
