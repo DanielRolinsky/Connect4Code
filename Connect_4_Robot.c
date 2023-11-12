@@ -77,6 +77,8 @@ void humanMove(int currentCol){
 	} while(!legalCheck(choiceCol))
 	
 	dropToken(currentCol, choiceCol, true);
+
+	return;
 }
 
 void moveSelect(int currentCol);
