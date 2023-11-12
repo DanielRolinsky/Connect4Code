@@ -9,10 +9,15 @@ Motor D = Right pulley
 */
 //Function Prototypes
 
+const int BOARD_ROWS = 6;
+const int BOARD_COLUMNS = 7;
+const int CONVEYOR_ANGLE = 5 / (180/PI); // currently angle of slope of CONVEYOR
+const int DEFAULT_DISPLAY_LINE = 3;
+const int DISTANCE_BETWEEN_TWO_COL = 3.5;
 
 void sensorConfig();
 void configureMotors();
-void displayAndWait(string message, int firstLine = DEFAULT_DISPLAY_LINE, TEV3Buttons buttonName = buttonEnter);
+void waitButton(TEV3Buttons buttonName);
 
 void playGame();
 void dropToken(int currentCol, int choiceCol, bool isHumanPlaying); // done
@@ -27,14 +32,10 @@ bool legalCheck(int choiceCol);
 void moveCalc();
 
 void reset();
-int gameState(int boardArray[][7]); //gameState() should return 0 if not won, 1 if red won, 2 if yellow won, 3 = draw
+int gameState(int boardArray[][BOARD_COLUMNS]); //gameState() should return 0 if not won, 1 if red won, 2 if yellow won, 3 = draw
 //gameState() must check if game is won or board is full
 
-const int CONVEYOR_ANGLE = 5 / (180/PI); // currently angle of slope of CONVEYOR
-const int DEFAULT_DISPLAY_LINE = 3;
-const int DISTANCE_BETWEEN_TWO_COL = 3.5;
-
-int boardArray[6][7] = 
+int boardArray[BOARD_ROWS][BOARD_COLUMNS] = 
     {
 	{0,0,0,0,0,0,0},
     {0,0,0,0,0,0,0},
@@ -51,8 +52,10 @@ task main()
 	sensorConfig();
 	configureMotors();
 	
-	displayString(DEFAULT_DISPLAY_LINE - 1, "First, place cartridges.");
-	displayAndWait("Then, press Enter to play!");
+	displayString(DEFAULT_DISPLAY_LINE, "First place cartridges on top");
+	displayString(DEFAULT_DISPLAY_LINE - 2, "Then press Enter to play!");
+	waitButton(buttonEnter);
+	eraseDisplay();
 
 	playGame();
 
@@ -179,16 +182,14 @@ assumption: the red = 1 = human, yellow = 2 = robot, also that the at the top vi
 
 	
 
-void displayAndWait(string message, int firstLine = DEFAULT_DISPLAY_LINE, TEV3Buttons buttonName = buttonEnter)
+void waitButton(TEV3Buttons buttonName)
 {
-	displayString(firstLine, message);
-
 	while(!getButtonPressed(buttonName))
 	{}
 	while(getButtonPressed(buttonName))
 	{}
 
-	eraseDisplay();
+	return;
 }
 
 void configureMotors()
@@ -211,7 +212,7 @@ void sensorConfig() {
 	wait1Msec(50);
 }
 
-int gameState(int boardArray[][7]) 
+int gameState(int boardArray[][BOARD_COLUMNS]) 
 // assumption: the red = 1 = human, yellow = 2 = robot
 {
 	if(boardArray[5][0] != 0 && boardArray[5][1] != 0 && boardArray[5][2] != 0 && boardArray[5][3] != 0
