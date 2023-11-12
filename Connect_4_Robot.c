@@ -34,7 +34,7 @@ const int CONVEYOR_ANGLE = 5 / (180/PI);
 const int DEFAULT_DISPLAY_LINE = 3;
 const int DISTANCE_BETWEEN_TWO_COL = 3.5;
 
-int boardArray[6][7] = {0}; 
+int boardArray[6][7] = {0};
 
 //Main function
 task main()
@@ -69,6 +69,8 @@ void humanMove(int currentCol){
 	} while(!legalCheck(choiceCol))
 	
 	dropToken(currentCol, choiceCol, true);
+
+	return;
 }
 
 void moveSelect(int currentCol);
