@@ -175,7 +175,7 @@ assumption: the red = 1 = human, yellow = 2 = robot, also that the at the top vi
 	{
 	
 		motor[motorC1] = -25;
-		while (nMotorEncoder[motorC1] < -45)
+		while (nMotorEncoder[motorC1] > -45)
 		{} 
 		motor[motorC1] = 0; 
 	}
