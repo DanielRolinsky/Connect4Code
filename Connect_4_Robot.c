@@ -214,6 +214,11 @@ void sensorConfig() {
 int gameState(int boardArray[][7]) 
 // assumption: the red = 1 = human, yellow = 2 = robot
 {
+	if(boardArray[5][0] != 0 && boardArray[5][1] != 0 && boardArray[5][2] != 0 && boardArray[5][3] != 0
+		&& boardArray[5][4] != 0 && boardArray[5][5] != 0 && boardArray[5][6] != 0)
+	{
+		return draw;
+	}
 	int redTokenCurrent = 1, yellowTokenCurrent = 2, humanWon = 1, robotWon = 2, draw = 3, notWon = 0;
 	for(int row = 0; row < 6; row++)
 	{
@@ -290,12 +295,7 @@ int gameState(int boardArray[][7])
 		}
 	}
 		
-	if(boardArray[5][0] != 0 && boardArray[5][1] != 0 && boardArray[5][2] != 0 && boardArray[5][3] != 0
-		&& boardArray[5][4] != 0 && boardArray[5][5] != 0 && boardArray[5][6] != 0)
-	{
-		return draw;
-	}
-	else
+	if
 	{
 		return notWon; // dont know if this one works!
 	}
