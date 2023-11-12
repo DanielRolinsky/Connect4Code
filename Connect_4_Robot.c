@@ -22,7 +22,7 @@ void humanMove();
 void robotMove();
 
 void moveSelect();
-void spinnerTop();
+void spinnerMotor();
 bool legalCheck();
 void moveCalc();
 
@@ -208,5 +208,5 @@ void dropToken(int currentCol, int choiceCol, bool humanPlaying)
 	{} 
 	motor[motorA]=motor[motorD] = 0; 
 	// Theorectically we have the hole in the track lined up to  the specified col
-	spinnerTop();
+	spinnerMotor();
 }
