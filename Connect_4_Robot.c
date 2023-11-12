@@ -15,14 +15,14 @@ void configureMotors();
 void displayAndWait();
 
 void playGame();
-void dropToken();
+void dropToken(); // done
 void sortToken();
 
 void humanMove();
 void robotMove();
 
 void moveSelect();
-void spinnerMotor();
+void spinnerMotor(); // done
 bool legalCheck();
 void moveCalc();
 
