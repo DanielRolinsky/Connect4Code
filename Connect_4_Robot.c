@@ -315,14 +315,17 @@ void dropToken(int currentCol, int choiceCol, bool isHumanPlaying)
 	if (countsConversion < 0)
 	{
 		motor[MotorA] = motor[MotorD] = -20;
+		while (nMotorEncoder[motorA] > countsConversion) 
+		{} 
+		motor[motorA]=motor[motorD] = 0;
 	}
 	else
 	{
 		motor[MotorA] = motor[MotorD] = 20;
-	}
-	while (nMotorEncoder[motorA] < countsConversion) // never leaves loop
-	{} 
-	motor[motorA]=motor[motorD] = 0; 
+		while (nMotorEncoder[motorA] < countsConversion) // never leaves loop
+		{} 
+		motor[motorA]=motor[motorD] = 0;
+	} 
 	// Theorectically we have the hole in the track lined up to  the specified col
 	spinnerMotor(isHumanPlaying);
 }
