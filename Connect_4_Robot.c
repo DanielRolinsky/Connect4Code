@@ -12,22 +12,22 @@ Motor D = Right pulley
 
 void sensorConfig();
 void configureMotors();
-void displayAndWait();
+void displayAndWait(string message, int firstLine = DEFAULT_DISPLAY_LINE, TEV3Buttons buttonName = buttonEnter);
 
 void playGame();
-void dropToken(); // done
+void dropToken(int currentCol, int choiceCol, bool isHumanPlaying); // done
 void sortToken();
 
-void humanMove();
+void humanMove(int currentCol);
 void robotMove();
 
-void moveSelect();
-void spinnerMotor(); // done
-bool legalCheck();
+void moveSelect(int currentCol);
+void spinnerMotor(bool isHumanPlaying); // done
+bool legalCheck(int choiceCol);
 void moveCalc();
 
 void reset();
-int gameState(); //gameState() should return 0 if not won, 1 if red won, 2 if yellow won, 3 = draw
+int gameState(int boardArray[][7]); //gameState() should return 0 if not won, 1 if red won, 2 if yellow won, 3 = draw
 //gameState() must check if game is won or board is full
 
 const int CONVEYOR_ANGLE = 5 / (180/PI); // currently angle of slope of CONVEYOR
@@ -76,7 +76,7 @@ void humanMove(int currentCol){
 		choiceCol = moveSelect(currentCol);
 	} while(!legalCheck(choiceCol))
 	
-	dropToken(currentCol, choiceCol, true);
+	dropToken(currentCol, choiceCol, true); // means human is playing
 
 	return;
 }
@@ -211,11 +211,97 @@ void sensorConfig() {
 	wait1Msec(50);
 }
 
-bool gameState()
+int gameState(int boardArray[][7]) 
+// assumption: the red = 1 = human, yellow = 2 = robot
 {
-//stuff that goes inside
+	int redTokenCurrent = 1, yellowTokenCurrent = 2, humanWon = 1, robotWon = 2, draw = 3, notWon = 0;
+	for(int row = 0; row < 6; row++)
+	{
+		for(int col = 0; col < 7; col++)
+		{
+			if(boardArray[row][col] == redTokenCurrent
+			&& boardArray[row + 1][col] == redTokenCurrent
+			&& boardArray[row + 2 ][col] == redTokenCurrent
+			&& boardArray[row + 3][col] == redTokenCurrent)
+			{
+				return humanWon;
+			} // checks vertical
+			
+			if(boardArray[row][col] == redTokenCurrent
+			&& boardArray[row][col + 1] == redTokenCurrent
+			&& boardArray[row][col + 2] == redTokenCurrent
+			&& boardArray[row][col + 3] == redTokenCurrent)
+			{
+				return humanWon;
+			} // checks horizontal
+
+			if(boardArray[row][col] == redTokenCurrent
+			&& boardArray[row + 1][col + 1] == redTokenCurrent
+			&& boardArray[row + 2 ][col + 2] == redTokenCurrent
+			&& boardArray[row + 3][col + 3] == redTokenCurrent)
+			{
+				return humanWon;
+			} // checks +ve slope
+
+			if(boardArray[row][col] == redTokenCurrent
+			&& boardArray[row - 1][col + 1] == redTokenCurrent
+			&& boardArray[row - 2 ][col + 2] == redTokenCurrent
+			&& boardArray[row - 3][col + 3] == redTokenCurrent)
+			{
+				return humanWon;
+			} //check -ve slope
+
+			// same exact thing but for robot now :)
+
+
+			if(boardArray[row][col] == yellowTokenCurrent
+			&& boardArray[row + 1][col] == yellowTokenCurrent
+			&& boardArray[row + 2 ][col] == yellowTokenCurrent
+			&& boardArray[row + 3][col] == yellowTokenCurrent)
+			{
+				return robotWon;
+			} // checks vertical
+			
+			if(boardArray[row][col] == yellowTokenCurrent
+			&& boardArray[row][col + 1] == yellowTokenCurrent
+			&& boardArray[row][col + 2] == yellowTokenCurrent
+			&& boardArray[row][col + 3] == yellowTokenCurrent)
+			{
+				return robotWon;
+			} // checks horizontal
+
+			if(boardArray[row][col] == yellowTokenCurrent
+			&& boardArray[row + 1][col + 1] == yellowTokenCurrent
+			&& boardArray[row + 2 ][col + 2] == yellowTokenCurrent
+			&& boardArray[row + 3][col + 3] == yellowTokenCurrent)
+			{
+				return robotWon;
+			} // checks +ve slope
+
+			if(boardArray[row][col] == yellowTokenCurrent
+			&& boardArray[row - 1][col + 1] == yellowTokenCurrent
+			&& boardArray[row - 2 ][col + 2] == yellowTokenCurrent
+			&& boardArray[row - 3][col + 3] == yellowTokenCurrent)
+			{
+				return robotWon;
+			} //check -ve slope
+
+
+		}
+	}
+		
+	if(boardArray[5][0] != 0 && boardArray[5][1] != 0 && boardArray[5][2] != 0 && boardArray[5][3] != 0
+		&& boardArray[5][4] != 0 && boardArray[5][5] != 0 && boardArray[5][6] != 0)
+	{
+		return draw;
+	}
+	else
+	{
+		return notWon; // dont know if this one works!
+	}
 
 }
+	
 
 void dropToken(int currentCol, int choiceCol, bool isHumanPlaying)
 {
