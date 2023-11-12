@@ -2,8 +2,6 @@
 #include <cstdlib>
 using namespace std;
 
-//hello test
-
 const int BOARD_ROWS = 6;
 const int BOARD_COLUMNS = 7;
 
