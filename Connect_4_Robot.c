@@ -180,7 +180,7 @@ assumption: the red = 1 = human, yellow = 2 = robot, also that the at the top vi
 		motor[motorC1] = 0; 
 	}
 
-	
+}
 
 void waitButton(TEV3Buttons buttonName)
 {

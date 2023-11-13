@@ -19,7 +19,6 @@ int humanMove(int boardArray[BOARD_ROWS][BOARD_COLUMNS], int currentCol);
 //Main
 int main()
 {
-  
   //In boardArray: 0 = empty, 1 = red, 2 = yellow;
   int boardArray[BOARD_ROWS][BOARD_COLUMNS] = {0};
   
@@ -29,10 +28,11 @@ int main()
   {
     currentCol = humanMove(boardArray, currentCol);
     displayBoard(boardArray);
+    currentCol = robotMove(boardArray, currentCol);
+    displayBoard(boardArray);
   }
   
   return EXIT_SUCCESS;
-  
 }
 
 int humanMove(int boardArray[BOARD_ROWS][BOARD_COLUMNS], int currentCol)
@@ -65,10 +65,17 @@ int gameWon(int boardArray[BOARD_ROWS][BOARD_COLUMNS])
   return false;
 }
 
+//Robot AI
+int robotMove(int boardArray[BOARD_ROWS][BOARD_COLUMNS], int currentCol)
+{
+  
+  
+  
+}
+
 //"Trivials"
 void displayBoard(int boardArray[BOARD_ROWS][BOARD_COLUMNS])
 {
-  
   for (int rowIndex = 0; rowIndex < BOARD_ROWS; rowIndex++)
   {
     cout << "{";
@@ -79,6 +86,7 @@ void displayBoard(int boardArray[BOARD_ROWS][BOARD_COLUMNS])
     cout << " }" << endl;
   }
   
+  return;
 }
 
 void dropToken(int boardArray[BOARD_ROWS][BOARD_COLUMNS], int choiceCol, int tokenColour)
