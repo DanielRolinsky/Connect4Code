@@ -5,6 +5,8 @@ using namespace std;
 const int BOARD_ROWS = 6;
 const int BOARD_COLUMNS = 7;
 
+void displayBoard(int boardArray[BOARD_ROWS][BOARD_COLUMNS]);
+
 int gameWon(int boardArray[BOARD_ROWS][BOARD_COLUMNS]);
 bool legalMove(int boardArray[BOARD_ROWS][BOARD_COLUMNS], int choiceCol);
 void dropToken(int boardArray[BOARD_ROWS][BOARD_COLUMNS], int choiceCol, int tokenColour);
@@ -22,6 +24,7 @@ int main()
   while(!gameWon(boardArray))
   {
     currentCol = humanMove(boardArray, currentCol);
+    displayBoard(boardArray);
   }
   
   return EXIT_SUCCESS;
@@ -74,4 +77,19 @@ void dropToken(int boardArray[BOARD_ROWS][BOARD_COLUMNS], int choiceCol, int tok
   }
   
   return;
+}
+
+void displayBoard(int boardArray[BOARD_ROWS][BOARD_COLUMNS])
+{
+  
+  for (int rowIndex = 0; rowIndex < BOARD_ROWS; rowIndex++)
+  {
+    cout << "{";
+    for (int colIndex = 0; colIndex < BOARD_COLUMNS; colIndex++)
+    {
+      cout << " " << boardArray[rowIndex][colIndex];
+    }
+    cout << " }" << endl;
+  }
+  
 }
