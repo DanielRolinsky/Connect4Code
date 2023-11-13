@@ -58,6 +58,7 @@ task main()
 	eraseDisplay();
 
 	playGame();
+	sortToken();
 
 }
 
@@ -149,10 +150,26 @@ void robotMove(){
 }
 
 void sortTokens(){
-	spinnter(true);
-	while(tokensLeft && finishSignal){
-	if(SensorValue[S1] = ){}
+	motor[motorA] = -10;
+	bool tokens = true;
+
+	while(tokens && SensorValue[S1] == false){
+  		if(SensorValue[S2] == 4) {
+  			motor[motorB] = -20;
+  			while(nMotorEncoder[motorB] > -65){}
+  			motor[motorB] = 0;
+		}
+		else if(SensorValue[S2] == 5) {
+	 		wait1Msec(500);
+	    	motor[motorB] = 20;
+  			while(nMotorEncoder[motorB] < 0){}
+  			motor[motorB] = 0;
+
+		}
 	}
+	motor[motorB] = 20;
+  	while(nMotorEncoder[motorB] < 0){}
+  	motor[motorB] = 0;
 }
 
 void spinnerMotor(bool isHumanPlaying) // at the top!!!!!!
@@ -180,7 +197,7 @@ assumption: the red = 1 = human, yellow = 2 = robot, also that the at the top vi
 		motor[motorC1] = 0; 
 	}
 
-	
+}
 
 void waitButton(TEV3Buttons buttonName)
 {
