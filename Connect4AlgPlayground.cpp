@@ -1,10 +1,13 @@
+//Libraries
 #include <iostream>
 #include <cstdlib>
 using namespace std;
 
+//Constants
 const int BOARD_ROWS = 6;
 const int BOARD_COLUMNS = 7;
 
+//Function Prototypes
 void displayBoard(int boardArray[BOARD_ROWS][BOARD_COLUMNS]);
 
 int gameWon(int boardArray[BOARD_ROWS][BOARD_COLUMNS]);
@@ -13,6 +16,7 @@ void dropToken(int boardArray[BOARD_ROWS][BOARD_COLUMNS], int choiceCol, int tok
 
 int humanMove(int boardArray[BOARD_ROWS][BOARD_COLUMNS], int currentCol);
 
+//Main
 int main()
 {
   
@@ -31,21 +35,6 @@ int main()
   
 }
 
-int gameWon(int boardArray[BOARD_ROWS][BOARD_COLUMNS])
-{
-  //placeholder
-  return false;
-}
-
-bool legalMove(int boardArray[BOARD_ROWS][BOARD_COLUMNS], int choiceCol)
-{
-  if(boardArray[0][choiceCol - 1] != 0)
-  {
-    return false;
-  }
-  return true;
-}
-
 int humanMove(int boardArray[BOARD_ROWS][BOARD_COLUMNS], int currentCol)
 {
   int choiceCol = currentCol;
@@ -58,6 +47,38 @@ int humanMove(int boardArray[BOARD_ROWS][BOARD_COLUMNS], int currentCol)
   dropToken(boardArray, choiceCol, 1);
   
   return choiceCol;
+}
+
+//Game State Functions
+bool legalMove(int boardArray[BOARD_ROWS][BOARD_COLUMNS], int choiceCol)
+{
+  if(boardArray[0][choiceCol - 1] != 0)
+  {
+    return false;
+  }
+  return true;
+}
+
+int gameWon(int boardArray[BOARD_ROWS][BOARD_COLUMNS])
+{
+  //placeholder
+  return false;
+}
+
+//"Trivials"
+void displayBoard(int boardArray[BOARD_ROWS][BOARD_COLUMNS])
+{
+  
+  for (int rowIndex = 0; rowIndex < BOARD_ROWS; rowIndex++)
+  {
+    cout << "{";
+    for (int colIndex = 0; colIndex < BOARD_COLUMNS; colIndex++)
+    {
+      cout << " " << boardArray[rowIndex][colIndex];
+    }
+    cout << " }" << endl;
+  }
+  
 }
 
 void dropToken(int boardArray[BOARD_ROWS][BOARD_COLUMNS], int choiceCol, int tokenColour)
@@ -77,19 +98,4 @@ void dropToken(int boardArray[BOARD_ROWS][BOARD_COLUMNS], int choiceCol, int tok
   }
   
   return;
-}
-
-void displayBoard(int boardArray[BOARD_ROWS][BOARD_COLUMNS])
-{
-  
-  for (int rowIndex = 0; rowIndex < BOARD_ROWS; rowIndex++)
-  {
-    cout << "{";
-    for (int colIndex = 0; colIndex < BOARD_COLUMNS; colIndex++)
-    {
-      cout << " " << boardArray[rowIndex][colIndex];
-    }
-    cout << " }" << endl;
-  }
-  
 }
