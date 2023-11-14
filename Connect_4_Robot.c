@@ -48,7 +48,7 @@ int boardArray[BOARD_ROWS][BOARD_COLUMNS] =
 //Main function
 task main()
 {
-	int currentCol = 0;
+	
 	sensorConfig();
 	configureMotors();
 	
