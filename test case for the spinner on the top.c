@@ -6,15 +6,15 @@ task main()
 {
 	configureMotors();
 	for(int i = 0; i <= 10; i ++){
-	spinnerMotor(true);
-	wait1Msec(1000);
-	spinnerMotor(false);
-}
+		spinnerMotor(true);
+		wait1Msec(1000);
+		spinnerMotor(false);
+	}
 }
 
 void spinnerMotor(bool isHumanPlaying){
 
-if(isHumanPlaying)
+	if(isHumanPlaying)
 	{
 
 		motor[motorC] = 25;
@@ -33,9 +33,9 @@ if(isHumanPlaying)
 }
 void configureMotors()
 {
- nMotorEncoder[motorC] =  0;
+	nMotorEncoder[motorC] =  0;
 
 
 	wait1Msec(500);
-	 motor[motorC]= 0 ;
+	motor[motorC]= 0 ;
 }
