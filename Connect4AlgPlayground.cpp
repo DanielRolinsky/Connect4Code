@@ -15,6 +15,9 @@ bool legalMove(int boardArray[BOARD_ROWS][BOARD_COLUMNS], int choiceCol);
 void dropToken(int boardArray[BOARD_ROWS][BOARD_COLUMNS], int choiceCol, int tokenColour);
 
 int humanMove(int boardArray[BOARD_ROWS][BOARD_COLUMNS], int currentCol);
+int robotMove(int boardArray[BOARD_ROWS][BOARD_COLUMNS], int currentCol);
+
+int minimaxAlg();
 
 //Main
 int main()
@@ -67,6 +70,13 @@ int gameWon(int boardArray[BOARD_ROWS][BOARD_COLUMNS])
 
 //Robot AI
 int robotMove(int boardArray[BOARD_ROWS][BOARD_COLUMNS], int currentCol)
+{
+  
+  minimaxAlg(boardArray, );
+  
+}
+
+int minimaxAlg(int boardArray[BOARD_ROWS][BOARD_COLUMNS], int depth, int alpha, int beta, int maxPlayer)
 {
   
   

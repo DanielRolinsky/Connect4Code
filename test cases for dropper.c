@@ -4,11 +4,16 @@ const int  DISTANCE_BETWEEN_TWO_COL = 3.5;
 void spinnerMotor(bool isHumanPlaying);
 task main()
 {
- dropToken(7, 5, true)
+
+motor[motorD] = 0;
+setMotorBrakeMode(motorD, motorCoast);
+motor[motorA] = -20
+while (true)
+{}
+ //dropToken(7, 5, true)
 // dropToken(3, 5, true);
 //	SensorType[S1] = sensorEV3_Touch;
 //	wait1Msec(50);
-
 }
 void dropToken(int currentCol, int choiceCol, bool isHumanPlaying)
 {
