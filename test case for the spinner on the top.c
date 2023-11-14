@@ -5,10 +5,11 @@ void configureMotors();
 task main()
 {
 	configureMotors();
-	for(int i = 0; i <= 10; i ++){
+	for(int i = 0; i <= 21; i ++){
 		spinnerMotor(true);
 		wait1Msec(1000);
 		spinnerMotor(false);
+		wait1Msec(1000);
 	}
 }
 
@@ -16,21 +17,22 @@ void spinnerMotor(bool isHumanPlaying){
 
 	if(isHumanPlaying)
 	{
-
-		motor[motorC] = 25;
-		while (nMotorEncoder[motorC] < 90)
+		motor[motorC] = 10;
+		while (nMotorEncoder[motorC] < 95)
 		{}
 		motor[motorC] = 0;
 	}
 	else
 	{
 
-		motor[motorC] = -25;
-		while (nMotorEncoder[motorC] > -90)
+		motor[motorC] = -10;
+		while (nMotorEncoder[motorC] > -5)
 		{}
 		motor[motorC] = 0;
 	}
+	return;
 }
+
 void configureMotors()
 {
 	nMotorEncoder[motorC] =  0;

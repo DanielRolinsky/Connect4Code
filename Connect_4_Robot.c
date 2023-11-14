@@ -180,22 +180,49 @@ assumption: the red = 1 = human, yellow = 2 = robot, also that the at the top vi
  FRAME OF REFERENCE: counter clock with is -ve while clockwise is +ve
 */ 
 
-	if(isHumanPlaying) 
-	{
-	
-		motor[motorC1] = 25;
-		while (nMotorEncoder[motorC1] < 45)
-		{} 
-		motor[motorC1] = 0; 
+	void spinnerMotor(bool isHumanPlaying);
+void configureMotors();
+
+
+task main()
+{
+	configureMotors();
+	for(int i = 0; i <= 21; i ++){
+		spinnerMotor(true);
+		wait1Msec(1000);
+		spinnerMotor(false);
+		wait1Msec(1000);
 	}
-	else 
+}
+
+void spinnerMotor(bool isHumanPlaying){
+
+	if(isHumanPlaying)
 	{
-	
-		motor[motorC1] = -25;
-		while (nMotorEncoder[motorC1] < -45)
-		{} 
-		motor[motorC1] = 0; 
+		motor[motorC1] = 10;
+		while (nMotorEncoder[motorC1] < 95)
+		{}
+		motor[motorC1] = 0;
 	}
+	else
+	{
+
+		motor[motorC1] = -10;
+		while (nMotorEncoder[motorC1] > -5)
+		{}
+		motor[motorC1] = 0;
+	}
+	return;
+}
+
+void configureMotors()
+{
+	nMotorEncoder[motorC] =  0;
+
+
+	wait1Msec(500);
+	motor[motorC]= 0 ;
+}
 
 }
 
