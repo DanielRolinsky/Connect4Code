@@ -4,12 +4,15 @@ void configureMotors();
 
 task main()
 {
-configureMotors();
-for(int i = 0; i <= 10; i ++){
-spinnerMotor(true);
-wait1Msec(1000);
-spinnerMotor(false);
+	configureMotors();
+	for(int i = 0; i <= 10; i ++){
+	spinnerMotor(true);
+	wait1Msec(1000);
+	spinnerMotor(false);
 }
+}
+
+void spinnerMotor(bool isHumanPlaying){
 
 if(isHumanPlaying)
 	{
@@ -23,12 +26,12 @@ if(isHumanPlaying)
 	{
 
 		motor[motorC] = -25;
-		while (nMotorEncoder[motorC1] > -45)
+		while (nMotorEncoder[motorC] > -45)
 		{}
 		motor[motorC] = 0;
 	}
-
-	void configureMotors()
+}
+void configureMotors()
 {
 	nMotorEncoder[motorA] = nMotorEncoder[motorB] = nMotorEncoder[motorC] = nMotorEncoder[motorD] = 0;
 	wait1Msec(500);
