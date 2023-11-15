@@ -48,17 +48,19 @@ int boardArray[BOARD_ROWS][BOARD_COLUMNS] =
 //Main function
 task main()
 {
-	
 	sensorConfig();
 	configureMotors();
 	
 	displayString(DEFAULT_DISPLAY_LINE, "First place cartridges on top");
-	displayString(DEFAULT_DISPLAY_LINE - 2, "Then press Enter to play!");
+	displayString(DEFAULT_DISPLAY_LINE + 1, "Then press Enter to play!");
 	waitButton(buttonEnter);
 	eraseDisplay();
 
 	playGame();
 	sortToken();
+	displayString(DEFAULT_DISPLAY_LINE, "Press the enter button to play again");
+	displayString(DEFAULT_DISPLAY_LINE + 1, "Enter any other button to exit");
+	
 
 }
 
@@ -78,14 +80,14 @@ void humanMove(int currentCol){
 	int choiceCol = 1;
 	do {
 		choiceCol = moveSelect(currentCol);
-	} while(!legalCheck(choiceCol))
+	} while(!legalCheck(choiceCol));
 	
 	dropToken(currentCol, choiceCol, true); // means human is playing
 
 	return;
 }
 
-void moveSelect(int currentCol);
+int moveSelect(int currentCol);
 {
 	int selectCol = currentCol;
 	eraseDisplay();
@@ -121,7 +123,7 @@ void moveSelect(int currentCol);
 			}
 			else
 			{
-				selectCol++;
+				selectCol--;
 			}
 
 			eraseDisplay();
@@ -180,7 +182,7 @@ assumption: the red = 1 = human, yellow = 2 = robot, also that the at the top vi
  FRAME OF REFERENCE: counter clock with is -ve while clockwise is +ve
 */ 
 
-	void spinnerMotor(bool isHumanPlaying);
+void spinnerMotor(bool isHumanPlaying);
 void configureMotors();
 
 
@@ -204,9 +206,9 @@ void spinnerMotor(bool isHumanPlaying){
 		{}
 		motor[motorC1] = 0;
 	}
+	
 	else
 	{
-
 		motor[motorC1] = -10;
 		while (nMotorEncoder[motorC1] > -5)
 		{}
@@ -217,11 +219,10 @@ void spinnerMotor(bool isHumanPlaying){
 
 void configureMotors()
 {
-	nMotorEncoder[motorC] =  0;
-
+	nMotorEncoder[motorA] = nMotorEncoder[motorB] = nMotorEncoder[motorC] = nMotorEncoder[motorD] = 0;
 
 	wait1Msec(500);
-	motor[motorC]= 0 ;
+	motor[motorA] = motor[motorB] = motor[motorC] = motor[motorD]= 0 ;
 }
 
 }
@@ -259,12 +260,14 @@ void sensorConfig() {
 int gameState(int boardArray[][BOARD_COLUMNS]) 
 // assumption: the red = 1 = human, yellow = 2 = robot
 {
-	if(boardArray[5][0] != 0 && boardArray[5][1] != 0 && boardArray[5][2] != 0 && boardArray[5][3] != 0
-		&& boardArray[5][4] != 0 && boardArray[5][5] != 0 && boardArray[5][6] != 0)
+	if(boardArray[0][0] != 0 && boardArray[0][1] != 0 && boardArray[0][2] != 0 && boardArray[0][3] != 0
+		&& boardArray[0][4] != 0 && boardArray[0][5] != 0 && boardArray[0][6] != 0)
 	{
 		return draw;
 	}
+
 	int redTokenCurrent = 1, yellowTokenCurrent = 2, humanWon = 1, robotWon = 2, draw = 3, notWon = 0;
+	
 	for(int row = 0; row < 6; row++)
 	{
 		for(int col = 0; col < 7; col++)
@@ -302,8 +305,6 @@ int gameState(int boardArray[][BOARD_COLUMNS])
 			} //check -ve slope
 
 			// same exact thing but for robot now :)
-
-
 			if(boardArray[row][col] == yellowTokenCurrent
 			&& boardArray[row + 1][col] == yellowTokenCurrent
 			&& boardArray[row + 2 ][col] == yellowTokenCurrent
@@ -340,11 +341,7 @@ int gameState(int boardArray[][BOARD_COLUMNS])
 		}
 	}
 		
-	if
-	{
-		return notWon; // dont know if this one works!
-	}
-
+	return notWon; //not won if neither the robot nor human has a connect 4
 }
 	
 
@@ -374,3 +371,5 @@ void dropToken(int currentCol, int choiceCol, bool isHumanPlaying)
 	// Theorectically we have the hole in the track lined up to  the specified col
 	spinnerMotor(isHumanPlaying);
 }
+
+void gameReset()
