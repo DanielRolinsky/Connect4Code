@@ -12,33 +12,36 @@ void displayBoard(int boardArray[BOARD_ROWS][BOARD_COLUMNS]);
 
 int gameWon(int boardArray[BOARD_ROWS][BOARD_COLUMNS]);
 bool legalMove(int boardArray[BOARD_ROWS][BOARD_COLUMNS], int choiceCol);
-void dropToken(int boardArray[BOARD_ROWS][BOARD_COLUMNS], int choiceCol, int tokenColour);
+void dropToken(int boardArray[BOARD_ROWS][BOARD_COLUMNS], int columnHeights[BOARD_COLUMNS], int choiceCol, int tokenType);
 
-int humanMove(int boardArray[BOARD_ROWS][BOARD_COLUMNS], int currentCol);
-int robotMove(int boardArray[BOARD_ROWS][BOARD_COLUMNS], int currentCol);
+int humanMove(int boardArray[BOARD_ROWS][BOARD_COLUMNS], int columnHeights[BOARD_COLUMNS], int currentCol);
+int robotMove(int boardArray[BOARD_ROWS][BOARD_COLUMNS], int columnHeights[BOARD_COLUMNS], int currentCol);
 
-int minimaxAlg();
+int minimaxAlg(int boardArray[BOARD_ROWS][BOARD_COLUMNS], int columnHeights[BOARD_COLUMNS], int depth, bool maxPlayer);
+int scoreBoard(int boardArray[BOARD_ROWS][BOARD_COLUMNS]);
 
 //Main
 int main()
 {
   //In boardArray: 0 = empty, 1 = red, 2 = yellow;
   int boardArray[BOARD_ROWS][BOARD_COLUMNS] = {0};
+  int columnHeights[BOARD_COLUMNS] = {0};
   
   int currentCol = 1;
   
   while(!gameWon(boardArray))
   {
-    currentCol = humanMove(boardArray, currentCol);
+    currentCol = humanMove(boardArray, columnHeights, currentCol);
     displayBoard(boardArray);
-    currentCol = robotMove(boardArray, currentCol);
+    
+    currentCol = robotMove(boardArray, columnHeights, currentCol);
     displayBoard(boardArray);
   }
   
   return EXIT_SUCCESS;
 }
 
-int humanMove(int boardArray[BOARD_ROWS][BOARD_COLUMNS], int currentCol)
+int humanMove(int boardArray[BOARD_ROWS][BOARD_COLUMNS], int columnHeights[BOARD_COLUMNS], int currentCol)
 {
   int choiceCol = currentCol;
   
@@ -47,7 +50,7 @@ int humanMove(int boardArray[BOARD_ROWS][BOARD_COLUMNS], int currentCol)
     cin >> choiceCol;
 	} while(!legalMove(boardArray, choiceCol));
   
-  dropToken(boardArray, choiceCol, 1);
+  dropToken(boardArray, columnHeights, choiceCol, 1);
   
   return choiceCol;
 }
@@ -68,18 +71,72 @@ int gameWon(int boardArray[BOARD_ROWS][BOARD_COLUMNS])
   return false;
 }
 
-//Robot AI
-int robotMove(int boardArray[BOARD_ROWS][BOARD_COLUMNS], int currentCol)
+int scoreBoard(int boardArray[BOARD_ROWS][BOARD_COLUMNS])
 {
   
-  minimaxAlg(boardArray, );
+  return -1;
   
 }
 
-int minimaxAlg(int boardArray[BOARD_ROWS][BOARD_COLUMNS], int depth, int alpha, int beta, int maxPlayer)
+//Robot AI
+int robotMove(int boardArray[BOARD_ROWS][BOARD_COLUMNS], int columnHeights[BOARD_COLUMNS], int currentCol)
 {
   
+  int choiceCol = minimaxAlg(boardArray, columnHeights, 1, true);
   
+}
+
+int minimaxAlg(int boardArray[BOARD_ROWS][BOARD_COLUMNS], int columnHeights[BOARD_COLUMNS], int depth, bool maxPlayer)
+{
+  
+  if(depth == 0)
+  {
+    return scoreBoard(boardArray);
+  }
+  
+  if(maxPlayer)
+  {
+   int maxScore = -9999;
+   
+   for(int colDropIndex = 0; colDropIndex < BOARD_COLUMNS; colDropIndex++) //Drops a token in each column to score that potential move
+   {
+      int emptyTokenRow = (BOARD_ROWS - 1) - columnHeights[colDropIndex];
+      boardArray[emptyTokenRow][colDropIndex] = 2;
+      columnHeights[colDropIndex] += 1;
+      
+      int possibleMoveScore = minimaxAlg(boardArray, columnHeights, depth - 1, !maxPlayer);
+      
+      maxScore = max(maxScore, possibleMoveScore);
+      
+      boardArray[emptyTokenRow][colDropIndex] = 0;
+      columnHeights[colDropIndex] -= 1;
+
+   }
+   
+   return maxScore;
+  
+  }
+  else
+  {
+    int minScore = 9999;
+    
+    for(int colDropIndex = 0; colDropIndex < BOARD_COLUMNS; colDropIndex++)
+    {
+      int emptyTokenRow = (BOARD_ROWS - 1) - columnHeights[colDropIndex];
+      boardArray[emptyTokenRow][colDropIndex] = 2;
+      columnHeights[colDropIndex] += 1;
+      
+      int possibleMoveScore = minimaxAlg(boardArray, columnHeights, depth - 1, !maxPlayer);
+      
+      minScore = min(minScore, possibleMoveScore);
+      
+      boardArray[emptyTokenRow][colDropIndex] = 0;
+      columnHeights[colDropIndex] -= 1;
+      
+    }
+    
+    return minScore;
+  }
   
 }
 
@@ -99,21 +156,14 @@ void displayBoard(int boardArray[BOARD_ROWS][BOARD_COLUMNS])
   return;
 }
 
-void dropToken(int boardArray[BOARD_ROWS][BOARD_COLUMNS], int choiceCol, int tokenColour)
+void dropToken(int boardArray[BOARD_ROWS][BOARD_COLUMNS], int columnHeights[BOARD_COLUMNS], int choiceCol, int tokenType)
 {
-  bool foundEmptySpot = false;
+  int emptyTokenRow = (BOARD_ROWS - 1) - columnHeights[choiceCol - 1];
   
-  for(int rowIndex = BOARD_ROWS - 1; rowIndex >= 0 && !foundEmptySpot; rowIndex--)
-  {
-    
-    if(boardArray[rowIndex][choiceCol - 1] == 0)
-    {
-      boardArray[rowIndex][choiceCol - 1] = tokenColour;
-      cout << "Token dropped to: (" << rowIndex + 1 << ", " << choiceCol << ")" << endl;
-      foundEmptySpot = true;
-    }
-    
-  }
+  boardArray[emptyTokenRow][choiceCol - 1] = tokenType;
+  columnHeights[choiceCol - 1] += 1;
+  
+  cout << "Token dropped to: (" << emptyTokenRow + 1 << ", " << choiceCol << ")" << endl;
   
   return;
 }
