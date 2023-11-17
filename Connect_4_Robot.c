@@ -31,7 +31,7 @@ void spinnerMotor(bool isHumanPlaying); // done
 bool legalCheck(int choiceCol);
 void moveCalc();
 
-void reset();
+void gameReset(int currentConverPos);
 int gameState(int boardArray[][BOARD_COLUMNS]); //gameState() should return 0 if not won, 1 if red won, 2 if yellow won, 3 = draw
 //gameState() must check if game is won or board is full
 
@@ -48,20 +48,35 @@ int boardArray[BOARD_ROWS][BOARD_COLUMNS] =
 //Main function
 task main()
 {
-	sensorConfig();
-	configureMotors();
+	bool stillPlaying
+	while(stillPlaying){
+		sensorConfig();
+		configureMotors();
+		
+		displayString(DEFAULT_DISPLAY_LINE, "First place cartridges on top");
+		displayString(DEFAULT_DISPLAY_LINE + 1, "Then press Enter to play!");
+		waitButton(buttonEnter);
+		eraseDisplay();
+
+		playGame();
+		sortToken();
+		displayString(DEFAULT_DISPLAY_LINE, "Please replace cartidges");
+		displayString(DEFAULT_DISPLAY_LINE + 1, "press enter once you're done");
+		waitButton(buttonEnter);
+		eraseDisplay();
+
+
+		displayString(DEFAULT_DISPLAY_LINE, "Press the enter button to play again");
+		displayString(DEFAULT_DISPLAY_LINE + 1, "Enter any other button to exit");
+	}
 	
-	displayString(DEFAULT_DISPLAY_LINE, "First place cartridges on top");
-	displayString(DEFAULT_DISPLAY_LINE + 1, "Then press Enter to play!");
-	waitButton(buttonEnter);
+	time1[T2] = 0;
+	displayString(DEFAULT_DISPLAY_LINE, "Thank you for playing!")
+	displayString(DEFAULT_DISPLAY_LINE, "Please leave a rating")
+	displayString(DEFAULT_DISPLAY_LINE, "by pressing the enter button 1-5 times")
+	displayString(DEFAULT_DISPLAY_LINE, "jk thats not a thing XD")
+	while(time1[T2] < 7000){}
 	eraseDisplay();
-
-	playGame();
-	sortToken();
-	displayString(DEFAULT_DISPLAY_LINE, "Press the enter button to play again");
-	displayString(DEFAULT_DISPLAY_LINE + 1, "Enter any other button to exit");
-	
-
 }
 
 int playGame(){
@@ -154,6 +169,9 @@ void robotMove(){
 void sortTokens(){
 	motor[motorC2] = -10;
 	bool tokens = true;
+	time1[T1] = 0;
+	time1[T2] = 0;
+	int previousMotor = 0;
 
 	while(tokens && SensorValue[S1] == false){
   		if(SensorValue[S2] == 4) {
@@ -166,7 +184,18 @@ void sortTokens(){
 	    	motor[motorB] = 20;
   			while(nMotorEncoder[motorB] < 0){}
   			motor[motorB] = 0;
+		}
+		if(nMotorEncoder[motorC2] == perviousMotor){
+			time1[T2] = 0;
+			while(time1[T2] <= 500){
+				motor[motorC2] = 10;
+			}
+			motor[motorC2] = -10;
+		}
 
+		if(time1[T1] == 250){
+			previousMotor = nMotorEncoder[motorC2];
+			time1[T1] = 0;
 		}
 	}
 	motor[motorB] = 20;
@@ -243,10 +272,12 @@ void configureMotors()
 	motor[motorA] = motor[motorB] = motor[motorC] = motor[motorD]= 0 ;
 }
 
-void reset()
+/*
+void resegameR()
 {
 	nMotorEncoder[motorA] = nMotorEncoder[motorB]= nMotorEncoder[motorC]= nMotorEncoder[motorD] = 0;
 }
+*/
 
 void sensorConfig() {
 	SensorType[S1] = sensorEV3_Touch;
@@ -372,4 +403,19 @@ void dropToken(int currentCol, int choiceCol, bool isHumanPlaying)
 	spinnerMotor(isHumanPlaying);
 }
 
-void gameReset()
+void gameReset(int currentConverPos, bool stillPlaying){
+	//dropToken(currentConverPos, 1, )
+    stringDisplay(DEFAULT_DISPLAY_LINE, "Press enter to continue playing");
+	stringDIsplay(DEFUALT_DISPLAY_LINE, "press any other to terminate program");
+	while(!getButtonPressed(buttonAny)){}
+	eraseDisplay();
+	if(getButtonPressed(buttonEnter)){
+		stillPlaying = 1;
+		return;
+	}
+		
+	else{
+		stillPlaying = 0;
+		return;
+	}
+}
