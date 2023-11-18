@@ -11,16 +11,15 @@ Motor D = Right pulley
 
 const int BOARD_ROWS = 6;
 const int BOARD_COLUMNS = 7;
-const int CONVEYOR_ANGLE = 5 / (180/PI); // currently angle of slope of CONVEYOR
 const int DEFAULT_DISPLAY_LINE = 3;
-const int DISTANCE_BETWEEN_TWO_COL = 3.5;
+
 
 void sensorConfig();
 void configureMotors();
 void waitButton(TEV3Buttons buttonName);
 
 void playGame();
-void dropToken(int currentCol, int choiceCol, bool isHumanPlaying); // done
+void dropToken (int choiceCol, bool isHumanPlaying); // done
 void sortToken();
 
 void humanMove(int currentCol);
@@ -376,30 +375,31 @@ int gameState(int boardArray[][BOARD_COLUMNS])
 }
 	
 
-void dropToken(int currentCol, int choiceCol, bool isHumanPlaying)
+void dropToken( int choiceCol, bool isHumanPlaying)
 {
-	float colDx= 0;
-	float colHyp = 0;
-	colDx = choiceCol-currentCol;
-	colDx *= DISTANCE_BETWEEN_TWO_COL;
-	colHyp = colDx / cos(CONVEYOR_ANGLE) // which is 5 deg angle is rad
-	float countsConversion = colHyp * 180 / (2.75*PI);
+	
 	nMotorEncoder[motorA] = 0;
-	if (countsConversion < 0)
+	const int colAngle[7]=
+	{0, -73, -155, -225, -320, -400, -528};
+
+	for(int col =0; col < 7; col++)
 	{
-		motor[MotorA] = motor[MotorD] = -20;
-		while (nMotorEncoder[motorA] > countsConversion) 
-		{} 
-		motor[motorA]=motor[motorD] = 0;
-	}
-	else
-	{
-		motor[MotorA] = motor[MotorD] = 20;
-		while (nMotorEncoder[motorA] < countsConversion) // never leaves loop
-		{} 
-		motor[motorA]=motor[motorD] = 0;
-	} 
-	// Theorectically we have the hole in the track lined up to  the specified col
+		if(choiceCol == col + 1)
+		{
+			motor[motorA] = -5;
+			motor[motorD] = 5;
+			while(nMotorEncoder[motorA] > colAngle[col])
+			{}
+			motor[motorA] = motor[motorD] = 2; // prototype of motor hold
+			while(!getButtonPress(buttonEnter))
+		{
+
+			}
+
+			motor[motorA] = motor[motorD] = 0;
+
+		}
+	}l
 	spinnerMotor(isHumanPlaying);
 }
 

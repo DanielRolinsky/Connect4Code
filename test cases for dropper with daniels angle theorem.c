@@ -20,7 +20,7 @@ dropToken(1,true);
 void dropToken(int choiceCol, bool isHumanPlaying)
 {
 	nMotorEncoder[motorA] = 0;
-	int colAngle[7]=
+	const int colAngle[7]=
 	{0, -73, -155, -225, -320, -400, -528};
 
 	for(int col =0; col < 7; col++)
