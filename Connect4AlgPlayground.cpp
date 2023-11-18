@@ -94,23 +94,51 @@ int scoreBoard(int boardArray[BOARD_ROWS][BOARD_COLUMNS], int columnOfMove)
       bool opponentTokenFound = false;
       int sum = 0;
       
-      for(int columnOffset = 0; columnOffset < 4 && !opponentTokenFound; columnOffset++)
+      if(column < 4)
       {
-        
-        if(boardArray[row][column + columnOffset] == HUMAN_TOKEN_TYPE)
+        for(int columnOffset = 0; columnOffset < 4 && !opponentTokenFound; columnOffset++)
         {
-          opponentTokenFound = true;
-        }
-        else if(boardArray[row][column + columnOffset] == ROBOT_TOKEN_TYPE)
-        {
-          sum++;
+          if(boardArray[row][column + columnOffset] == HUMAN_TOKEN_TYPE)
+          {
+            opponentTokenFound = true;
+          }
+          else if(boardArray[row][column + columnOffset] == ROBOT_TOKEN_TYPE)
+          {
+            sum++;
+          }
+          
         }
         
+        if(sum == 2)
+        {
+          score += 2;
+        }
+      
       }
       
-      if(sum == 2)
+      opponentTokenFound = false;
+      sum = 0;
+      
+      if(row >= 3)
       {
-        score += 2;
+        for(int rowOffset = 0; rowOffset < 4 && !opponentTokenFound; rowOffset++)
+        {
+          if(boardArray[row - rowOffset][column] == HUMAN_TOKEN_TYPE)
+          {
+            opponentTokenFound = true;
+          }
+          else if(boardArray[row - rowOffset][column] == ROBOT_TOKEN_TYPE)
+          {
+            sum++;
+          }
+          
+        }
+        
+        if(sum == 2)
+        {
+          score += 2;
+        }
+        
       }
       
     }
