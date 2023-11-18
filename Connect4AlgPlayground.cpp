@@ -64,9 +64,9 @@ bool legalMove(int boardArray[BOARD_ROWS][BOARD_COLUMNS], int choiceCol)
 {
   if(boardArray[0][choiceCol - 1] == 0 && choiceCol >= 1 && choiceCol <= 7)
   {
-    return false;
+    return true;
   }
-  return true;
+  return false;
 }
 
 //Game State Functions
