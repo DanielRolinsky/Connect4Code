@@ -230,18 +230,18 @@ void spinnerMotor(bool isHumanPlaying){
 
 	if(isHumanPlaying)
 	{
-		motor[motorC1] = 10;
-		while (nMotorEncoder[motorC1] < 95)
+		motor[motorC] = 10;
+		while (nMotorEncoder[motorC] < 95)
 		{}
-		motor[motorC1] = 0;
+		motor[motorC] = 0;
 	}
-	
 	else
 	{
-		motor[motorC1] = -10;
-		while (nMotorEncoder[motorC1] > -5)
+
+		motor[motorC] = -10;
+		while (nMotorEncoder[motorC] > -5)
 		{}
-		motor[motorC1] = 0;
+		motor[motorC] = 0;
 	}
 	return;
 }
