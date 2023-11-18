@@ -62,7 +62,7 @@ int humanMove(int boardArray[BOARD_ROWS][BOARD_COLUMNS], int columnHeights[BOARD
 
 bool legalMove(int boardArray[BOARD_ROWS][BOARD_COLUMNS], int choiceCol)
 {
-  if(boardArray[0][choiceCol - 1] != 0)
+  if(boardArray[0][choiceCol - 1] != 0 && choice >= 1 && choice <= 7)
   {
     return false;
   }
@@ -112,6 +112,10 @@ int scoreBoard(int boardArray[BOARD_ROWS][BOARD_COLUMNS], int columnOfMove)
         if(sum == 2)
         {
           score += 2;
+        }
+        else if(sum == 3)
+        {
+          score +=3;
         }
       
       }
