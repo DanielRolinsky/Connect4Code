@@ -287,84 +287,59 @@ void sensorConfig() {
 	wait1Msec(50);
 }
 
-int gameState(int boardArray[][BOARD_COLUMNS]) 
+int gameState(int boardArray[][BOARD_COLUMNS], int currentPlayer) 
 // assumption: the red = 1 = human, yellow = 2 = robot
 {
+	int currentplayer = 0, draw = 3, notWon = 0;
 	if(boardArray[0][0] != 0 && boardArray[0][1] != 0 && boardArray[0][2] != 0 && boardArray[0][3] != 0
 		&& boardArray[0][4] != 0 && boardArray[0][5] != 0 && boardArray[0][6] != 0)
 	{
 		return draw;
 	}
-
-	int redTokenCurrent = 1, yellowTokenCurrent = 2, humanWon = 1, robotWon = 2, draw = 3, notWon = 0;
-	
-	for(int row = 0; row < 6; row++)
+	if(currentPlayer == 1)
 	{
-		for(int col = 0; col < 7; col++)
+		win = 1; // human won
+	}
+	else
+	{
+		win = 2; // robot won
+	}
+
+	
+	for(int row = 0; row < 3 ; row++)
+	{
+		for(int col = 0; col < 4; col++)
 		{
-			if(boardArray[row][col] == redTokenCurrent
-			&& boardArray[row + 1][col] == redTokenCurrent
-			&& boardArray[row + 2 ][col] == redTokenCurrent
-			&& boardArray[row + 3][col] == redTokenCurrent)
+			if(boardArray[row][col] == currentPlayer
+			&& boardArray[row + 1][col] == currentPlayer
+			&& boardArray[row + 2 ][col] == currentPlayer
+			&& boardArray[row + 3][col] == currentPlayer)
 			{
-				return humanWon;
+				return win;
 			} // checks vertical
 			
-			if(boardArray[row][col] == redTokenCurrent
-			&& boardArray[row][col + 1] == redTokenCurrent
-			&& boardArray[row][col + 2] == redTokenCurrent
-			&& boardArray[row][col + 3] == redTokenCurrent)
+			if(boardArray[row][col] == currentPlayer
+			&& boardArray[row][col + 1] == currentPlayer
+			&& boardArray[row][col + 2] == currentPlayer
+			&& boardArray[row][col + 3] == currentPlayer)
 			{
-				return humanWon;
+				return win;
 			} // checks horizontal
 
-			if(boardArray[row][col] == redTokenCurrent
-			&& boardArray[row + 1][col + 1] == redTokenCurrent
-			&& boardArray[row + 2 ][col + 2] == redTokenCurrent
-			&& boardArray[row + 3][col + 3] == redTokenCurrent)
+			if(boardArray[row][col] == currentPlayer
+			&& boardArray[row + 1][col + 1] == currentPlayer
+			&& boardArray[row + 2 ][col + 2] == currentPlayer
+			&& boardArray[row + 3][col + 3] == currentPlayer)
 			{
-				return humanWon;
+				return win;
 			} // checks +ve slope
 
-			if(boardArray[row][col] == redTokenCurrent
-			&& boardArray[row - 1][col + 1] == redTokenCurrent
-			&& boardArray[row - 2 ][col + 2] == redTokenCurrent
-			&& boardArray[row - 3][col + 3] == redTokenCurrent)
+			if(boardArray[row][col] == currentPlayer
+			&& boardArray[row + 1][col - 1] == currentPlayer
+			&& boardArray[row + 2 ][col - 2] == currentPlayer
+			&& boardArray[row + 3][col - 3] == currentPlayer)
 			{
-				return humanWon;
-			} //check -ve slope
-
-			// same exact thing but for robot now :)
-			if(boardArray[row][col] == yellowTokenCurrent
-			&& boardArray[row + 1][col] == yellowTokenCurrent
-			&& boardArray[row + 2 ][col] == yellowTokenCurrent
-			&& boardArray[row + 3][col] == yellowTokenCurrent)
-			{
-				return robotWon;
-			} // checks vertical
-			
-			if(boardArray[row][col] == yellowTokenCurrent
-			&& boardArray[row][col + 1] == yellowTokenCurrent
-			&& boardArray[row][col + 2] == yellowTokenCurrent
-			&& boardArray[row][col + 3] == yellowTokenCurrent)
-			{
-				return robotWon;
-			} // checks horizontal
-
-			if(boardArray[row][col] == yellowTokenCurrent
-			&& boardArray[row + 1][col + 1] == yellowTokenCurrent
-			&& boardArray[row + 2 ][col + 2] == yellowTokenCurrent
-			&& boardArray[row + 3][col + 3] == yellowTokenCurrent)
-			{
-				return robotWon;
-			} // checks +ve slope
-
-			if(boardArray[row][col] == yellowTokenCurrent
-			&& boardArray[row - 1][col + 1] == yellowTokenCurrent
-			&& boardArray[row - 2 ][col + 2] == yellowTokenCurrent
-			&& boardArray[row - 3][col + 3] == yellowTokenCurrent)
-			{
-				return robotWon;
+				return win;
 			} //check -ve slope
 
 
