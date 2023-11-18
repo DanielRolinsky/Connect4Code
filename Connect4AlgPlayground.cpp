@@ -62,7 +62,7 @@ int humanMove(int boardArray[BOARD_ROWS][BOARD_COLUMNS], int columnHeights[BOARD
 
 bool legalMove(int boardArray[BOARD_ROWS][BOARD_COLUMNS], int choiceCol)
 {
-  if(boardArray[0][choiceCol - 1] != 0 && choiceCol >= 1 && choiceCol <= 7)
+  if(boardArray[0][choiceCol - 1] == 0 && choiceCol >= 1 && choiceCol <= 7)
   {
     return false;
   }
