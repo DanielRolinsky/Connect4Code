@@ -84,18 +84,7 @@ int scoreBoard(int boardArray[BOARD_ROWS][BOARD_COLUMNS], int columnOfMove)
     score += 4;
   }
   
-  //try and combine all these functions together into minimal loops
-  score += verticalCheck(boardArray, 3, ROBOT_TOKEN_TYPE) * 5;
-  score += horizontalCheck(boardArray, 3, ROBOT_TOKEN_TYPE) * 5;
   
-  score += verticalCheck(boardArray, 2, ROBOT_TOKEN_TYPE) * 2;
-  score += horizontalCheck(boardArray, 2, ROBOT_TOKEN_TYPE) * 5;
-  
-  score -= verticalCheck(boardArray, 2, HUMAN_TOKEN_TYPE) * 2;
-  score -= horizontalCheck(boardArray, 2, ROBOT_TOKEN_TYPE) * 2;
-  
-  displayBoard(boardArray); //for debugging
-  cout << endl << columnOfMove << " " << score << endl;
   
   return score;
   
