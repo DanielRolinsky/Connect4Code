@@ -18,10 +18,11 @@ bool legalMove(int boardArray[BOARD_ROWS][BOARD_COLUMNS], int choiceCol);
 void dropToken(int boardArray[BOARD_ROWS][BOARD_COLUMNS], int columnHeights[BOARD_COLUMNS], int choiceCol, int tokenType);
 
 int humanMove(int boardArray[BOARD_ROWS][BOARD_COLUMNS], int columnHeights[BOARD_COLUMNS], int currentCol);
-int robotMove(int boardArray[BOARD_ROWS][BOARD_COLUMNS], int columnHeights[BOARD_COLUMNS], int currentCol);
+int robotMove(int boardArray[BOARD_ROWS][BOARD_COLUMNS], int columnHeights[BOARD_COLUMNS]);
 
-int minimaxAlg(int boardArray[BOARD_ROWS][BOARD_COLUMNS], int columnHeights[BOARD_COLUMNS], int depth, bool maxPlayer, int &finalRobotMove, int colOfMove = 0);
+int minimaxAlg(int boardArray[BOARD_ROWS][BOARD_COLUMNS], int columnHeights[BOARD_COLUMNS], int &finalMove, int depth, bool maxPlayer, int columnOfMove = 0);
 int scoreBoard(int boardArray[BOARD_ROWS][BOARD_COLUMNS], int columnOfMove);
+void displayScore(int colOfMove, int score);
 
 //Main
 int main()
@@ -84,10 +85,51 @@ int scoreBoard(int boardArray[BOARD_ROWS][BOARD_COLUMNS], int columnOfMove)
     score += 4;
   }
   
+  for(int row = BOARD_ROWS - 1; row >= 0; row--)
+  {
+    
+    for(int column = 0; column < BOARD_COLUMNS; column++)
+    {
+      
+      bool opponentTokenFound = false;
+      int sum = 0;
+      
+      for(int columnOffset = 0; columnOffset < 4 && !opponentTokenFound; columnOffset++)
+      {
+        
+        if(boardArray[row][column + columnOffset] == HUMAN_TOKEN_TYPE)
+        {
+          opponentTokenFound = true;
+        }
+        else if(boardArray[row][column + columnOffset] == ROBOT_TOKEN_TYPE)
+        {
+          sum++;
+        }
+        
+      }
+      
+      if(sum == 2)
+      {
+        score += 2;
+      }
+      
+    }
+    
+  }
   
+  displayScore(boardArray, columnOfMove, score);
   
   return score;
   
+}
+
+void displayScore(int boardArray[BOARD_ROWS][BOARD_COLUMNS], int columnOfMove, int score)
+{
+  int boardArray[BOARD_ROWS][BOARD_COLUMNS]
+  displayBoard(boardArray);
+  cout << "Column: " << columnOfMove << ", Score: " << score << endl;
+  
+  return;
 }
 
 //Robot Player Functions
@@ -95,15 +137,15 @@ int robotMove(int boardArray[BOARD_ROWS][BOARD_COLUMNS], int columnHeights[BOARD
 {
   
   int finalMove = 1;
-  int minimaxPlaceholder = minimaxAlg(boardArray, columnHeights, 1, true, finalRobotMove); //Remember: minimax returns a value
+  int minimaxPlaceholder = minimaxAlg(boardArray, columnHeights, finalMove, 1, true); //Remember: minimax returns a value
   
   dropToken(boardArray, columnHeights, finalMove, ROBOT_TOKEN_TYPE);
   
-  return 1;
+  return finalMove;
   
 }
 
-int minimaxAlg(int boardArray[BOARD_ROWS][BOARD_COLUMNS], int columnHeights[BOARD_COLUMNS], int &finalMove, int depth, bool maxPlayer)
+int minimaxAlg(int boardArray[BOARD_ROWS][BOARD_COLUMNS], int columnHeights[BOARD_COLUMNS], int &finalMove, int depth, bool maxPlayer, int columnOfMove) //maybe change colOfMove to bool "center"?
 {
   
   if(depth == 0)
@@ -113,10 +155,10 @@ int minimaxAlg(int boardArray[BOARD_ROWS][BOARD_COLUMNS], int columnHeights[BOAR
   
   if(maxPlayer)
   {
-   int maxScore = -9999;
-   
-   for(int colDropIndex = 0; colDropIndex < BOARD_COLUMNS; colDropIndex++) //Drops a token in each column to score that potential move
-   {
+    int maxScore = -9999;
+    
+    for(int colDropIndex = 0; colDropIndex < BOARD_COLUMNS; colDropIndex++) //Drops a token in each column to score that potential move
+    {
       int emptyTokenRow = (BOARD_ROWS - 1) - columnHeights[colDropIndex]; //Checks if a column is not full
       
       if(emptyTokenRow > -1)
@@ -124,7 +166,7 @@ int minimaxAlg(int boardArray[BOARD_ROWS][BOARD_COLUMNS], int columnHeights[BOAR
         boardArray[emptyTokenRow][colDropIndex] = ROBOT_TOKEN_TYPE; //Adding token to row for scoring
         columnHeights[colDropIndex] += 1;
         
-        int possibleMoveScore = minimaxAlg(boardArray, columnHeights, depth - 1, false, finalRobotMove, colDropIndex);
+        int possibleMoveScore = minimaxAlg(boardArray, columnHeights, finalMove, depth - 1, false, colDropIndex);
         
         maxScore = max(maxScore, possibleMoveScore);
         if(maxScore == possibleMoveScore)
@@ -135,16 +177,41 @@ int minimaxAlg(int boardArray[BOARD_ROWS][BOARD_COLUMNS], int columnHeights[BOAR
         boardArray[emptyTokenRow][colDropIndex] = 0; //Removing added token that was for scoring
         columnHeights[colDropIndex] -= 1;
      }
-
-   }
-   
-   return maxScore;
+    
+    }
+    
+    return maxScore;
   
   }
   else
   {
     
+    int minScore = 9999;
     
+    for(int colDropIndex = 0; colDropIndex < BOARD_COLUMNS; colDropIndex++) //Drops a token in each column to score that potential move
+    {
+      int emptyTokenRow = (BOARD_ROWS - 1) - columnHeights[colDropIndex]; //Checks if a column is not full
+      
+      if(emptyTokenRow > -1)
+      {
+        boardArray[emptyTokenRow][colDropIndex] = ROBOT_TOKEN_TYPE; //Adding token to row for scoring
+        columnHeights[colDropIndex] += 1;
+        
+        int possibleMoveScore = minimaxAlg(boardArray, columnHeights, finalMove, depth - 1, false, colDropIndex);
+        
+        minScore = min(minScore, possibleMoveScore);
+        if(minScore == possibleMoveScore)
+        {
+          finalMove = colDropIndex + 1;
+        }
+        
+        boardArray[emptyTokenRow][colDropIndex] = 0; //Removing added token that was for scoring
+        columnHeights[colDropIndex] -= 1;
+     }
+    
+    }
+    
+    return minScore;
     
   }
   
