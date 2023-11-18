@@ -22,7 +22,7 @@ int robotMove(int boardArray[BOARD_ROWS][BOARD_COLUMNS], int columnHeights[BOARD
 
 int minimaxAlg(int boardArray[BOARD_ROWS][BOARD_COLUMNS], int columnHeights[BOARD_COLUMNS], int &finalMove, int depth, bool maxPlayer, int columnOfMove = 0);
 int scoreBoard(int boardArray[BOARD_ROWS][BOARD_COLUMNS], int columnOfMove);
-void displayScore(int colOfMove, int score);
+void displayScore(int boardArray[BOARD_ROWS][BOARD_COLUMNS], int columnOfMove, int score);
 
 //Main
 int main()
@@ -125,7 +125,7 @@ int scoreBoard(int boardArray[BOARD_ROWS][BOARD_COLUMNS], int columnOfMove)
 
 void displayScore(int boardArray[BOARD_ROWS][BOARD_COLUMNS], int columnOfMove, int score)
 {
-  int boardArray[BOARD_ROWS][BOARD_COLUMNS]
+  cout << endl;
   displayBoard(boardArray);
   cout << "Column: " << columnOfMove << ", Score: " << score << endl;
   
