@@ -105,15 +105,16 @@ int scoreBoard(int boardArray[BOARD_ROWS][BOARD_COLUMNS], int columnOfMove)
 int robotMove(int boardArray[BOARD_ROWS][BOARD_COLUMNS], int columnHeights[BOARD_COLUMNS])
 {
   
+  int finalMove = 1;
   int minimaxPlaceholder = minimaxAlg(boardArray, columnHeights, 1, true, finalRobotMove); //Remember: minimax returns a value
   
-  dropToken(boardArray, columnHeights, finalRobotMove + 1, ROBOT_TOKEN_TYPE);
+  dropToken(boardArray, columnHeights, finalMove, ROBOT_TOKEN_TYPE);
   
   return 1;
   
 }
 
-int minimaxAlg(int boardArray[BOARD_ROWS][BOARD_COLUMNS], int columnHeights[BOARD_COLUMNS], int depth, bool maxPlayer)
+int minimaxAlg(int boardArray[BOARD_ROWS][BOARD_COLUMNS], int columnHeights[BOARD_COLUMNS], int &finalMove, int depth, bool maxPlayer)
 {
   
   if(depth == 0)
@@ -127,11 +128,11 @@ int minimaxAlg(int boardArray[BOARD_ROWS][BOARD_COLUMNS], int columnHeights[BOAR
    
    for(int colDropIndex = 0; colDropIndex < BOARD_COLUMNS; colDropIndex++) //Drops a token in each column to score that potential move
    {
-      int emptyTokenRow = (BOARD_ROWS - 1) - columnHeights[colDropIndex];
+      int emptyTokenRow = (BOARD_ROWS - 1) - columnHeights[colDropIndex]; //Checks if a column is not full
       
       if(emptyTokenRow > -1)
       {
-        boardArray[emptyTokenRow][colDropIndex] = ROBOT_TOKEN_TYPE;
+        boardArray[emptyTokenRow][colDropIndex] = ROBOT_TOKEN_TYPE; //Adding token to row for scoring
         columnHeights[colDropIndex] += 1;
         
         int possibleMoveScore = minimaxAlg(boardArray, columnHeights, depth - 1, false, finalRobotMove, colDropIndex);
@@ -139,10 +140,10 @@ int minimaxAlg(int boardArray[BOARD_ROWS][BOARD_COLUMNS], int columnHeights[BOAR
         maxScore = max(maxScore, possibleMoveScore);
         if(maxScore == possibleMoveScore)
         {
-          finalRobotMove = colDropIndex;
+          finalMove = colDropIndex + 1;
         }
         
-        boardArray[emptyTokenRow][colDropIndex] = 0;
+        boardArray[emptyTokenRow][colDropIndex] = 0; //Removing added token that was for scoring
         columnHeights[colDropIndex] -= 1;
      }
 
