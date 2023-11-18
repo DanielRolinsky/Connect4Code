@@ -17,9 +17,6 @@ int gameWon(int boardArray[BOARD_ROWS][BOARD_COLUMNS]);
 bool legalMove(int boardArray[BOARD_ROWS][BOARD_COLUMNS], int choiceCol);
 void dropToken(int boardArray[BOARD_ROWS][BOARD_COLUMNS], int columnHeights[BOARD_COLUMNS], int choiceCol, int tokenType);
 
-int verticalCheck(int boardArray[BOARD_ROWS][BOARD_COLUMNS], int tokensPerLine, int tokenType);
-int horizontalCheck(int boardArray[BOARD_ROWS][BOARD_COLUMNS], int tokensPerLine, int tokenType);
-
 int humanMove(int boardArray[BOARD_ROWS][BOARD_COLUMNS], int columnHeights[BOARD_COLUMNS], int currentCol);
 int robotMove(int boardArray[BOARD_ROWS][BOARD_COLUMNS], int columnHeights[BOARD_COLUMNS], int currentCol);
 
@@ -40,13 +37,14 @@ int main()
     currentCol = humanMove(boardArray, columnHeights, currentCol);
     displayBoard(boardArray);
     
-    currentCol = robotMove(boardArray, columnHeights, currentCol);
+    currentCol = robotMove(boardArray, columnHeights);
     displayBoard(boardArray);
   }
   
   return EXIT_SUCCESS;
 }
 
+//Human Player Functions
 int humanMove(int boardArray[BOARD_ROWS][BOARD_COLUMNS], int columnHeights[BOARD_COLUMNS], int currentCol)
 {
   int choiceCol = currentCol;
@@ -61,7 +59,6 @@ int humanMove(int boardArray[BOARD_ROWS][BOARD_COLUMNS], int columnHeights[BOARD
   return choiceCol;
 }
 
-//Game State Functions
 bool legalMove(int boardArray[BOARD_ROWS][BOARD_COLUMNS], int choiceCol)
 {
   if(boardArray[0][choiceCol - 1] != 0)
@@ -71,6 +68,7 @@ bool legalMove(int boardArray[BOARD_ROWS][BOARD_COLUMNS], int choiceCol)
   return true;
 }
 
+//Game State Functions
 int gameWon(int boardArray[BOARD_ROWS][BOARD_COLUMNS])
 {
   //placeholder
@@ -103,105 +101,19 @@ int scoreBoard(int boardArray[BOARD_ROWS][BOARD_COLUMNS], int columnOfMove)
   
 }
 
-int verticalCheck(int boardArray[BOARD_ROWS][BOARD_COLUMNS], int tokensPerLine, int tokenType)
-{
-  int lines = 0;
-  int gaps = 1;
-  if(tokensPerLine == 4) //perhaps change (and for other functions)
-  {
-    gaps = 0;
-  }
-  
-  for(int columnIndex = 0; columnIndex < BOARD_COLUMNS; columnIndex++)
-  {
-    for(int rowIndex = BOARD_ROWS - 1; rowIndex > (tokensPerLine + gaps) - 2; rowIndex--) //condition from: (BOARD_ROWS - 1) - (BOARD_ROWS - (tokensPerLine + gaps) + 1)
-    {
-      if(boardArray[rowIndex][columnIndex] == tokenType)
-      {
-       int tokenSum = 0;
-       
-       for(int checkOffset = 0; checkOffset < tokensPerLine + gaps; checkOffset++)
-       {
-         if(boardArray[rowIndex - checkOffset][columnIndex] == tokenType)
-         {
-           tokenSum++;
-         }
-         
-       }
-       
-       cout << endl << "Sum: " << tokenSum << ", Row: " << rowIndex + 1 << endl;
-       if(tokenSum == tokensPerLine)
-       {
-         lines++;
-       }
-       
-      }
-      
-    }
-    
-  }
-  
-  cout << endl << lines << endl;
-  return lines;
-  
-}
-
-int horizontalCheck(int boardArray[BOARD_ROWS][BOARD_COLUMNS], int tokensPerLine, int tokenType)
-{
-  int lines = 0;
-  int gaps = 1;
-  if(tokensPerLine == 4)
-  {
-    gaps = 0;
-  }
-  
-  for(int rowIndex = 0; rowIndex < BOARD_ROWS; rowIndex++)
-  {
-    for(int columnIndex = 0; columnIndex < BOARD_COLUMNS - (tokensPerLine + gaps) + 1; columnIndex++)
-    {
-      if(boardArray[rowIndex][columnIndex] == tokenType)
-      {
-        int tokenSum = 0;
-        
-        for(int checkOffset = 0; checkOffset < tokensPerLine + gaps; checkOffset++)
-        {
-          if(boardArray[rowIndex][columnIndex + checkOffset] == tokenType)
-          {
-            tokenSum++;
-            
-          }
-          
-        }
-        
-        if(tokenSum == tokensPerLine)
-        {
-          lines++;
-        }
-        
-      }
-      
-    }
-    
-  }
-  
-  return lines;
-  
-}
-
-//Robot AI
-int robotMove(int boardArray[BOARD_ROWS][BOARD_COLUMNS], int columnHeights[BOARD_COLUMNS], int currentCol)
+//Robot Player Functions
+int robotMove(int boardArray[BOARD_ROWS][BOARD_COLUMNS], int columnHeights[BOARD_COLUMNS])
 {
   
-  int finalRobotMove = 0; 
-  minimaxAlg(boardArray, columnHeights, 1, true, finalRobotMove); //Remember: minimax returns a value
+  int minimaxPlaceholder = minimaxAlg(boardArray, columnHeights, 1, true, finalRobotMove); //Remember: minimax returns a value
   
   dropToken(boardArray, columnHeights, finalRobotMove + 1, ROBOT_TOKEN_TYPE);
   
-  return finalRobotMove;
+  return 1;
   
 }
 
-int minimaxAlg(int boardArray[BOARD_ROWS][BOARD_COLUMNS], int columnHeights[BOARD_COLUMNS], int depth, bool maxPlayer, int &finalRobotMove, int columnOfMove)
+int minimaxAlg(int boardArray[BOARD_ROWS][BOARD_COLUMNS], int columnHeights[BOARD_COLUMNS], int depth, bool maxPlayer)
 {
   
   if(depth == 0)
@@ -241,32 +153,9 @@ int minimaxAlg(int boardArray[BOARD_ROWS][BOARD_COLUMNS], int columnHeights[BOAR
   }
   else
   {
-    int minScore = 9999;
     
-    for(int colDropIndex = 0; colDropIndex < BOARD_COLUMNS; colDropIndex++)
-    {
-      int emptyTokenRow = (BOARD_ROWS - 1) - columnHeights[colDropIndex];
-      
-      if(emptyTokenRow > -1)
-      {
-        boardArray[emptyTokenRow][colDropIndex] = ROBOT_TOKEN_TYPE;
-        columnHeights[colDropIndex] += 1;
-        
-        int possibleMoveScore = minimaxAlg(boardArray, columnHeights, depth - 1, true, finalRobotMove, colDropIndex);
-        
-        minScore = min(minScore, possibleMoveScore);
-        if(minScore == possibleMoveScore)
-        {
-          finalRobotMove = colDropIndex;
-        }
-        
-        boardArray[emptyTokenRow][colDropIndex] = 0;
-        columnHeights[colDropIndex] -= 1;
-      }
-      
-    }
     
-    return minScore;
+    
   }
   
 }
