@@ -113,10 +113,10 @@ int scoreBoard(int boardArray[BOARD_ROWS][BOARD_COLUMNS], int columnOfMove)
         {
           score += 2;
         }
-        else if(sum == 3)
+        /*else if(sum == 3)
         {
           score +=3;
-        }
+        }*/
       
       }
       
@@ -141,6 +141,10 @@ int scoreBoard(int boardArray[BOARD_ROWS][BOARD_COLUMNS], int columnOfMove)
         if(sum == 2)
         {
           score += 2;
+        }
+        else if(sum == 3)
+        {
+          score += 3;
         }
         
       }
