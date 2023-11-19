@@ -202,8 +202,7 @@ void sortTokens(){
   	motor[motorB] = 0;
 }
 
-void spinnerMotor(bool isHumanPlaying) // at the top!!!!!!
-{ 
+
 /*
 assumption: the red = 1 = human, yellow = 2 = robot, also that the at the top view of the spinner,
  the cartriage at 180 deg will be the red token and the cartirage at 270 deg will be the yellow cartirage
