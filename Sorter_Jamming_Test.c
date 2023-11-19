@@ -1,5 +1,5 @@
 void sortTokens(){
-	motor[motorA] = -10;
+	motor[motorC] = -10;
 	wait1Msec(100);
 	bool tokens = true;
 	time1[T1] = 0;
@@ -25,13 +25,13 @@ void sortTokens(){
 
 		if(time1[T1] >= 1000){
 
-				if(previousMotor == nMotorEncoder[motorA]){
+				if(previousMotor == nMotorEncoder[motorC]){
 				  	displayString(4, "yes");
-						motor[motorA] = 10;
+						motor[motorC] = 10;
 						wait1Msec(1000);
-						motor[motorA] = -10;
+						motor[motorC] = -10;
 						}
-						previousMotor = nMotorEncoder[motorA];
+						previousMotor = nMotorEncoder[motorC];
 						displayString(5, "%f", previousMotor);
 						time1[T1] =0;
 					}
@@ -75,7 +75,7 @@ wait1Msec(50);
 SensorMode[S2] = modeEV3Color_Color;
 wait1Msec(50);
 
-nMotorEncoder[motorA] = 0;
+nMotorEncoder[motorC] = 0;
 nMotorEncoder[motorB] = 0;
 
 
