@@ -5,7 +5,7 @@ task main()
 sortTokens();
 
 }
-w
+
 void sortTokens(){
 	motor[motorC] = -10;
 	bool tokens = true;

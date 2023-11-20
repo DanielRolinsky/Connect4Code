@@ -12,7 +12,7 @@ const int colAngle[7]=
 task main()
 {
 	//motorHold(1);
-dropToken(1,true);
+dropToken(5,true);
 
 }
 
