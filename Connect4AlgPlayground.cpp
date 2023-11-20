@@ -100,6 +100,7 @@ int scoreBoard(int boardArray[BOARD_ROWS][BOARD_COLUMNS], int columnOfMove)
         {
           if(boardArray[row][column + columnOffset] == HUMAN_TOKEN_TYPE)
           {
+            sum = 0;
             opponentTokenFound = true;
           }
           else if(boardArray[row][column + columnOffset] == ROBOT_TOKEN_TYPE)
@@ -115,7 +116,7 @@ int scoreBoard(int boardArray[BOARD_ROWS][BOARD_COLUMNS], int columnOfMove)
         }
         /*else if(sum == 3)
         {
-          score +=3;
+          score += 5;
         }*/
       
       }
@@ -129,6 +130,7 @@ int scoreBoard(int boardArray[BOARD_ROWS][BOARD_COLUMNS], int columnOfMove)
         {
           if(boardArray[row - rowOffset][column] == HUMAN_TOKEN_TYPE)
           {
+            sum = 0;
             opponentTokenFound = true;
           }
           else if(boardArray[row - rowOffset][column] == ROBOT_TOKEN_TYPE)
@@ -144,7 +146,7 @@ int scoreBoard(int boardArray[BOARD_ROWS][BOARD_COLUMNS], int columnOfMove)
         }
         else if(sum == 3)
         {
-          score += 3;
+          score += 5;
         }
         
       }
