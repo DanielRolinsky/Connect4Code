@@ -19,7 +19,7 @@ void configureMotors();
 void waitButton(TEV3Buttons buttonName);
 
 void playGame();
-void dropToken (int choiceCol, bool isHumanPlaying); // done
+void dropToken(int choiceCol, bool isHumanPlaying);// done
 void sortToken();
 
 void humanMove(int currentCol);
@@ -209,20 +209,6 @@ assumption: the red = 1 = human, yellow = 2 = robot, also that the at the top vi
  FRAME OF REFERENCE: counter clock with is -ve while clockwise is +ve
 */ 
 
-void spinnerMotor(bool isHumanPlaying);
-void configureMotors();
-
-
-task main()
-{
-	configureMotors();
-	for(int i = 0; i <= 21; i ++){
-		spinnerMotor(true);
-		wait1Msec(1000);
-		spinnerMotor(false);
-		wait1Msec(1000);
-	}
-}
 
 void spinnerMotor(bool isHumanPlaying){
 
