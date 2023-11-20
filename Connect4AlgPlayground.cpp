@@ -16,8 +16,6 @@ void displayBoard(int boardArray[BOARD_ROWS][BOARD_COLUMNS]);
 int gameWon(int boardArray[BOARD_ROWS][BOARD_COLUMNS], int & currentPlayer);
 bool legalMove(int boardArray[BOARD_ROWS][BOARD_COLUMNS], int choiceCol);
 void dropToken(int boardArray[BOARD_ROWS][BOARD_COLUMNS], int columnHeights[BOARD_COLUMNS], int choiceCol, int tokenType);
-void addTokenToArray(int boardArray[BOARD_ROWS][BOARD_COLUMNS], int columnHeights[BOARD_COLUMNS], int row, int column, int tokenType);
-void removeTokenInArray(int boardArray[BOARD_ROWS][BOARD_COLUMNS], int columnHeights[BOARD_COLUMNS], int row, int column);
 
 int humanMove(int boardArray[BOARD_ROWS][BOARD_COLUMNS], int columnHeights[BOARD_COLUMNS], int currentCol);
 int robotMove(int boardArray[BOARD_ROWS][BOARD_COLUMNS], int columnHeights[BOARD_COLUMNS]);
@@ -104,7 +102,8 @@ int gameWon(int boardArray[BOARD_ROWS][BOARD_COLUMNS], int & currentPlayer)
 	{
 		for(int col = 0; col < 4; col++)
 		{
-			if(boardArray[row][col] == currentPlayer
+			if(col + 3 < 7 
+			&&	boardArray[row][col] == currentPlayer
 			&& boardArray[row + 1][col] == currentPlayer
 			&& boardArray[row + 2 ][col] == currentPlayer
 			&& boardArray[row + 3][col] == currentPlayer)
@@ -144,96 +143,84 @@ int gameWon(int boardArray[BOARD_ROWS][BOARD_COLUMNS], int & currentPlayer)
 
 }
 
-int horizontalCheck((int boardArray[BOARD_ROWS][BOARD_COLUMNS], int columnHeights[BOARD_COLUMNS], int columnOfMove)
-{
-  int score = 0;
-   
-  const int tokenRow = BOARD_ROWS - columnHeights[columnOfMove];
-  const int tokenColumn = columnOfMove;
-  
-  int startRow = tokenRow, startColumn = 0, endRow = 0, endColumn = 0;
-  
-  bool hitBorder = false; //If line of x tokens hits the end of the board or an enemy token
-  int sum = 0;
-  
-  for(int columnOffset = 0; columnOffset < 4 && !hitBorder; columnOffset++)
-  {
-    if(tokenColumn + columnOffset == BOARD_COLUMN - 1 || boardArray[tokenRow][tokenColumn + columnOffset] == HUMAN_TOKEN_TYPE)
-    {
-      startRow = tokenRow; //can remove this for horizontal check
-      startColumn = tokenColumn + columnOffset;
-      hitBorder = true;
-    }
-    else
-    {
-      if(boardArray[tokenRow][tokenColumn + columnOffset] == ROBOT_TOKEN_TYPE)
-      {
-        sum++;
-      }
-      
-      if(columnOffset == 3)
-      {
-        startRow = tokenRow; //can remove this for horizontal check
-        startColumn = tokenColumn + columnOffset;
-      }
-    }
-  }
-  
-  const int distanceDifference = startColumn - tokenColumn;
-  
-  if(distanceDifference < 3)
-  {
-    hitBorder = false;
-    
-    for(int columnOffset = 0; columnOffset > (3 - distanceDifference) * -1 && !hitBorder; column--)
-    {
-      if(tokenColumn + columnOffset == 0 || boardArray[tokenRow][tokenColumn + columnOffset] == HUMAN_TOKEN_TYPE)
-      {
-        endRow = tokenRow; //can remove this for horizontal check
-        endColumn = tokenColumn + columnOffset;
-        hitBorder = true;
-      }
-      else
-      {
-        if(boardArray[tokenRow][tokenColumn + columnOffset] == ROBOT_TOKEN_TYPE)
-        {
-          sum++;
-        }
-        
-        if(columnOffset == (3 - distanceDifference) * -1 + 1)
-        {
-          endRow = tokenRow; //can remove this for horizontal check
-          endColumn = tokenColumn + columnOffset;
-        }
-      }
-      
-    }
-    
-  }
-  
-  if(sum == 2)
-  {
-    score += 2;
-  }
-  else if(sum == 3)
-  {
-    score += 5;
-  }
-  
-  return score;
-  
-}
-
-int scoreBoard(int boardArray[BOARD_ROWS][BOARD_COLUMNS], int columnHeights[BOARD_COLUMNS], int columnOfMove)
+int scoreBoard(int boardArray[BOARD_ROWS][BOARD_COLUMNS], int columnOfMove)
 {
   int score = 0;
   
   if(columnOfMove == 3)
   {
-   score += 4; 
+    score += 4;
   }
   
-  score += horizontalCheck();
+  for(int row = BOARD_ROWS - 1; row >= 0; row--)
+  {
+    
+    for(int column = 0; column < BOARD_COLUMNS; column++)
+    {
+      
+      bool opponentTokenFound = false;
+      int sum = 0;
+      
+      if(column < 4)
+      {
+        for(int columnOffset = 0; columnOffset < 4 && !opponentTokenFound; columnOffset++)
+        {
+          if(boardArray[row][column + columnOffset] == HUMAN_TOKEN_TYPE)
+          {
+            sum = 0;
+            opponentTokenFound = true;
+          }
+          else if(boardArray[row][column + columnOffset] == ROBOT_TOKEN_TYPE)
+          {
+            sum++;
+          }
+          
+        }
+        
+        if(sum == 2)
+        {
+          score += 2;
+        }
+        /*else if(sum == 3)
+        {
+          score += 5;
+        }*/
+      
+      }
+      
+      opponentTokenFound = false;
+      sum = 0;
+      
+      if(row >= 3)
+      {
+        for(int rowOffset = 0; rowOffset < 4 && !opponentTokenFound; rowOffset++)
+        {
+          if(boardArray[row - rowOffset][column] == HUMAN_TOKEN_TYPE)
+          {
+            sum = 0;
+            opponentTokenFound = true;
+          }
+          else if(boardArray[row - rowOffset][column] == ROBOT_TOKEN_TYPE)
+          {
+            sum++;
+          }
+          
+        }
+        
+        if(sum == 2)
+        {
+          score += 2;
+        }
+        else if(sum == 3)
+        {
+          score += 5;
+        }
+        
+      }
+      
+    }
+    
+  }
   
   displayScore(boardArray, columnOfMove, score);
   
@@ -277,11 +264,12 @@ int minimaxAlg(int boardArray[BOARD_ROWS][BOARD_COLUMNS], int columnHeights[BOAR
     
     for(int colDropIndex = 0; colDropIndex < BOARD_COLUMNS; colDropIndex++) //Drops a token in each column to score that potential move
     {
-      const int emptyTokenRow = (BOARD_ROWS - 1) - columnHeights[colDropIndex]; //Checks if a column is not full
+      int emptyTokenRow = (BOARD_ROWS - 1) - columnHeights[colDropIndex]; //Checks if a column is not full
       
       if(emptyTokenRow > -1)
       {
-        addTokenToArray(boardArray, columnHeights, emptyTokenRow, colDropIndex, ROBOT_TOKEN_TYPE);        
+        boardArray[emptyTokenRow][colDropIndex] = ROBOT_TOKEN_TYPE; //Adding token to row for scoring
+        columnHeights[colDropIndex] += 1;
         
         int possibleMoveScore = minimaxAlg(boardArray, columnHeights, finalMove, depth - 1, false, colDropIndex);
         
@@ -291,7 +279,8 @@ int minimaxAlg(int boardArray[BOARD_ROWS][BOARD_COLUMNS], int columnHeights[BOAR
           finalMove = colDropIndex + 1;
         }
         
-        removeTokenInArray(boardArray, columnHeights, emptyTokenRow, colDropIndex);
+        boardArray[emptyTokenRow][colDropIndex] = 0; //Removing added token that was for scoring
+        columnHeights[colDropIndex] -= 1;
      }
     
     }
@@ -306,11 +295,12 @@ int minimaxAlg(int boardArray[BOARD_ROWS][BOARD_COLUMNS], int columnHeights[BOAR
     
     for(int colDropIndex = 0; colDropIndex < BOARD_COLUMNS; colDropIndex++) //Drops a token in each column to score that potential move
     {
-      const int emptyTokenRow = (BOARD_ROWS - 1) - columnHeights[colDropIndex]; //Checks if a column is not full
+      int emptyTokenRow = (BOARD_ROWS - 1) - columnHeights[colDropIndex]; //Checks if a column is not full
       
       if(emptyTokenRow > -1)
       {
-        addTokenToArray(boardArray, columnHeights, emptyTokenRow, colDropIndex, ROBOT_TOKEN_TYPE);  
+        boardArray[emptyTokenRow][colDropIndex] = ROBOT_TOKEN_TYPE; //Adding token to row for scoring
+        columnHeights[colDropIndex] += 1;
         
         int possibleMoveScore = minimaxAlg(boardArray, columnHeights, finalMove, depth - 1, false, colDropIndex);
         
@@ -320,7 +310,8 @@ int minimaxAlg(int boardArray[BOARD_ROWS][BOARD_COLUMNS], int columnHeights[BOAR
           finalMove = colDropIndex + 1;
         }
         
-        removeTokenInArray(boardArray, columnHeights, emptyTokenRow, colDropIndex);
+        boardArray[emptyTokenRow][colDropIndex] = 0; //Removing added token that was for scoring
+        columnHeights[colDropIndex] -= 1;
      }
     
     }
@@ -349,27 +340,12 @@ void displayBoard(int boardArray[BOARD_ROWS][BOARD_COLUMNS])
 
 void dropToken(int boardArray[BOARD_ROWS][BOARD_COLUMNS], int columnHeights[BOARD_COLUMNS], int choiceCol, int tokenType)
 {
-  const int emptyTokenRow = (BOARD_ROWS - 1) - columnHeights[choiceCol - 1];
+  int emptyTokenRow = (BOARD_ROWS - 1) - columnHeights[choiceCol - 1];
   
-  addTokenToArray(boardArray, columnHeights, emptyTokenRow, choiceCol - 1, tokenType);
+  boardArray[emptyTokenRow][choiceCol - 1] = tokenType;
+  columnHeights[choiceCol - 1] += 1;
   
   cout << "Token dropped to: (" << emptyTokenRow + 1 << ", " << choiceCol << ")" << endl;
-  
-  return;
-}
-
-void addTokenToArray(int boardArray[BOARD_ROWS][BOARD_COLUMNS], int columnHeights[BOARD_COLUMNS], int row, int column, int tokenType)
-{
-  boardArray[row][column] = tokenType;
-  columnHeights[column] += 1;
-  
-  return;
-}
-
-void removeTokenInArray(int boardArray[BOARD_ROWS][BOARD_COLUMNS], int columnHeights[BOARD_COLUMNS], int row, int column)
-{
-  boardArray[row][column] = 0;
-  columnHeights[column] -= 1;
   
   return;
 }
