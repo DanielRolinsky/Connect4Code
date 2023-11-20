@@ -5,16 +5,19 @@ const int BOARD_ROWS = 6;
 const int BOARD_COLUMNS = 7;
 const int DEFAULT_DISPLAY_LINE = 3;
 
+const int HUMAN_TOKEN_TYPE = 1;
+const int ROBOT_TOKEN_TYPE = 2;
+
 void sensorConfig();
 void configureMotors();
 void waitButton(TEV3Buttons buttonName);
-void motorHold(int choiceCol);
+void motorHold(int column);
 void playGame(int & currentPlayer);
-void dropToken(int choiceCol, bool isHumanPlaying); // done
+void dropToken(int *columnHeights, int choiceCol, bool isHumanPlaying); // done
 void sortTokens();
 int gameState(int & currentPlayer);
-void humanMove(int currentCol);
-void HumanMove2(int currentCol);
+void humanMove(int *columnHeights, int currentCol);
+void HumanMove2(int *columnHeights, int currentCol);
 
 //void gameReset(int currentCol);
 int moveSelect(int currentCol);
@@ -154,25 +157,26 @@ int gameState(int & currentPlayer)
 
 
 
-void playGame(int & currentPlayer){
+void playGame(int &currentPlayer){
 
+	int columnHeights[BOARD_COLUMNS] = {0,0,0,0,0,0,0};
 	int currentCol = 1;
 
 	while(gameState(currentPlayer) == 0)
 	{
-		humanMove(currentCol);
-		HumanMove2(currentCol);
+		humanMove(columnHeights, currentCol);
+		HumanMove2(columnHeights, currentCol);
 	}
 	return;
 }
 
-void humanMove(int currentCol){
+void humanMove(int *columnHeights, int currentCol){
 	int choiceCol = 1;
 	do {
 		choiceCol = moveSelect(currentCol);
 	} while(!legalCheck(choiceCol));
 
-	dropToken(choiceCol -1 , true); // means human is playing
+	dropToken(columnHeights, choiceCol, true); // means human is playing
 	return;
 }
 
@@ -231,21 +235,20 @@ int moveSelect(int currentCol)
 
 bool legalCheck(int choiceCol)
 {
-	if(boardArray[0][choiceCol - 1] != 0)
-	{
-		return false;
-	}
-
-	return true;
+	if(boardArray[0][choiceCol - 1] == 0 && choiceCol >= 1 && choiceCol <= 7)
+  {
+    return true;
+  }
+  return false;
 }
 
-void HumanMove2(int currentCol){
+void HumanMove2(int *columnHeights, int currentCol){
 	int choiceCol = 1;
 	do {
 		choiceCol = moveSelect(currentCol);
 	} while(!legalCheck(choiceCol));
 
-	dropToken(choiceCol -1 , false); // means human is playing
+	dropToken(columnHeights, choiceCol, false); // means human is playing
 
 }
 
@@ -288,9 +291,9 @@ void sensorConfig() {
 
 
 
-void dropToken(int choiceCol, bool isHumanPlaying)
+void dropToken(int *columnHeights, int choiceCol, bool isHumanPlaying)
 {
-	//nMotorEncoder[motorA] = 0;
+	choiceCol -= 1;
 
 	motor[motorA] = 15;
 	motor[motorD] = 15;
@@ -313,6 +316,16 @@ void dropToken(int choiceCol, bool isHumanPlaying)
 	motor[motorA] = motor[motorD] = 0;
 	wait1Msec(2000);
 
+	int tokenType = HUMAN_TOKEN_TYPE;
+	if(!isHumanPlaying)
+	{
+		tokenType = ROBOT_TOKEN_TYPE;
+	}
+	int emptyTokenRow = (BOARD_ROWS - 1) - columnHeights[choiceCol];
+
+  boardArray[emptyTokenRow][choiceCol] = tokenType;
+  columnHeights[choiceCol] += 1;
+
 	motor[motorA] = -15;
 	motor[motorD] = -15;
 	while(nMotorEncoder[motorA] < 0)
@@ -325,14 +338,14 @@ void dropToken(int choiceCol, bool isHumanPlaying)
 }
 
 
-void motorHold(int choiceCol)
+void motorHold(int column)
 {
-		while(nMotorEncoder[motorA] < colAngle[choiceCol])
+		while(nMotorEncoder[motorA] < colAngle[column])
 		{
 			motor[motorD] = -1;
 			motor[motorA] = -2;
 		}
-		while(nMotorEncoder[motorA] > colAngle[choiceCol])
+		while(nMotorEncoder[motorA] > colAngle[column])
 		{
 			motor[motorD] = 2;
 			motor[motorA] = 1;
