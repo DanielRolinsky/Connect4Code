@@ -13,22 +13,16 @@ const int ROBOT_TOKEN_TYPE = 2;
 //Function Prototypes
 void displayBoard(int boardArray[BOARD_ROWS][BOARD_COLUMNS]);
 
-int gameWon(int boardArray[BOARD_ROWS][BOARD_COLUMNS]);
+int gameWon(int boardArray[BOARD_ROWS][BOARD_COLUMNS], int & currentPlayer);
 bool legalMove(int boardArray[BOARD_ROWS][BOARD_COLUMNS], int choiceCol);
 void dropToken(int boardArray[BOARD_ROWS][BOARD_COLUMNS], int columnHeights[BOARD_COLUMNS], int choiceCol, int tokenType);
-void addTokenToArray(int boardArray[BOARD_ROWS][BOARD_COLUMNS], int columnHeights[BOARD_COLUMNS], int row, int column, int tokenType);
-void removeTokenInArray(int boardArray[BOARD_ROWS][BOARD_COLUMNS], int columnHeights[BOARD_COLUMNS], int row, int column);
 
 int humanMove(int boardArray[BOARD_ROWS][BOARD_COLUMNS], int columnHeights[BOARD_COLUMNS], int currentCol);
 int robotMove(int boardArray[BOARD_ROWS][BOARD_COLUMNS], int columnHeights[BOARD_COLUMNS]);
 
-int minimaxAlg(int boardArray[BOARD_ROWS][BOARD_COLUMNS], int columnHeights[BOARD_COLUMNS], int &finalMove, int depth, bool maxPlayer, int columnOfMove = 0);;
+int minimaxAlg(int boardArray[BOARD_ROWS][BOARD_COLUMNS], int columnHeights[BOARD_COLUMNS], int &finalMove, int depth, bool maxPlayer, int columnOfMove = 0);
+int scoreBoard(int boardArray[BOARD_ROWS][BOARD_COLUMNS], int columnOfMove);
 void displayScore(int boardArray[BOARD_ROWS][BOARD_COLUMNS], int columnOfMove, int score);
-
-int scoreBoard(int boardArray[BOARD_ROWS][BOARD_COLUMNS], int columnHeights[BOARD_COLUMNS], int columnOfMove, int playerToken, int oppoToken);
-int scorePoints(int playerToken, int sum);
-int horizontalCheck(int boardArray[BOARD_ROWS][BOARD_COLUMNS], int columnHeights[BOARD_COLUMNS], int columnOfMove, int playerToken, int oppoToken);
-int verticalCheck(int boardArray[BOARD_ROWS][BOARD_COLUMNS], int columnHeights[BOARD_COLUMNS], int columnOfMove, int playerToken, int oppoToken);
 
 //Main
 int main()
@@ -38,14 +32,21 @@ int main()
   int columnHeights[BOARD_COLUMNS] = {0};
   
   int currentCol = 1;
-  
-  while(!gameWon(boardArray))
+  int currentPlayer = 1;
+  while(!gameWon(boardArray, currentPlayer))
   {
+  	currentPlayer = 1;
     currentCol = humanMove(boardArray, columnHeights, currentCol);
     displayBoard(boardArray);
     
+
+    if(!gameWon(boardArray, currentPlayer))
+    {
+	currentPlayer = 2;
     currentCol = robotMove(boardArray, columnHeights);
     displayBoard(boardArray);
+	}
+    
   }
   
   return EXIT_SUCCESS;
@@ -76,317 +77,150 @@ bool legalMove(int boardArray[BOARD_ROWS][BOARD_COLUMNS], int choiceCol)
 }
 
 //Game State Functions
-int gameWon(int boardArray[BOARD_ROWS][BOARD_COLUMNS])
+int gameWon(int boardArray[BOARD_ROWS][BOARD_COLUMNS], int & currentPlayer)
 {
-  //placeholder
-  return false;
+
+// assumption: the red = 1 = human, yellow = 2 = robot
+
+	int draw = 3, notWon = 0, win = 0;
+	if(boardArray[0][0] != 0 && boardArray[0][1] != 0 && boardArray[0][2] != 0 && boardArray[0][3] != 0
+		&& boardArray[0][4] != 0 && boardArray[0][5] != 0 && boardArray[0][6] != 0)
+	{
+		return draw;
+	}
+	if(currentPlayer == 1)
+	{
+		win = 1; // human won
+	}
+	else if(currentPlayer == 2)
+	{
+		win = 2; // robot won
+	}
+
+
+	for(int row = 0; row < 6 ; row++)
+	{
+		for(int col = 0; col < 4; col++)
+		{
+			if(col + 3 < 7 
+			&&	boardArray[row][col] == currentPlayer
+			&& boardArray[row + 1][col] == currentPlayer
+			&& boardArray[row + 2 ][col] == currentPlayer
+			&& boardArray[row + 3][col] == currentPlayer)
+			{
+				return win;
+			} // checks vertical
+
+			if(boardArray[row][col] == currentPlayer
+			&& boardArray[row][col + 1] == currentPlayer
+			&& boardArray[row][col + 2] == currentPlayer
+			&& boardArray[row][col + 3] == currentPlayer)
+			{
+				return win;
+			} // checks horizontal
+
+			if(boardArray[row][col] == currentPlayer
+			&& boardArray[row + 1][col + 1] == currentPlayer
+			&& boardArray[row + 2 ][col + 2] == currentPlayer
+			&& boardArray[row + 3][col + 3] == currentPlayer)
+			{
+				return win;
+			} // checks +ve slope
+
+			if(boardArray[row][col] == currentPlayer
+			&& boardArray[row + 1][col - 1] == currentPlayer
+			&& boardArray[row + 2 ][col - 2] == currentPlayer
+			&& boardArray[row + 3][col - 3] == currentPlayer)
+			{
+				return win;
+			} //check -ve slope
+
+
+		}
+	}
+
+	return notWon; //not won if neither the robot nor human has a connect 4
+
 }
 
-int scorePoints(int playerToken, int sum)
-{
-  if(sum == 2)
-  {
-    return 2;
-  }
-  else if(sum == 3)
-  {
-    return 5;
-  }
-  else if(sum == 4)
-  {
-    return 999;
-  }
-  
-  return 0;
-}
-
-int horizontalCheck(int boardArray[BOARD_ROWS][BOARD_COLUMNS], int columnHeights[BOARD_COLUMNS], int columnOfMove, int playerToken, int oppoToken)
-{
-  int score = 0;
-   
-  const int TOKEN_ROW = BOARD_ROWS - columnHeights[columnOfMove];
-  const int TOKEN_COLUMN = columnOfMove;
-  
-  int startRow[2] = {-1, -2}; //can maybe intialize with token row for horizontal...
-  int startCol[2] = {-3, -4};
-  int endRow[2] = {-5, -6};
-  int endCol[2] = {-7, -8};
-  
-  bool hitBarrier = false;
-  int sum = 1;
-  int spacesLeft = 3;
-  
-  for(int colOffset = 1; colOffset <= spacesLeft && !hitBarrier; colOffset++)
-  {
-    int currentToken = boardArray[TOKEN_ROW][TOKEN_COLUMN + colOffset];
-    
-    if(currentToken == oppoToken || TOKEN_COLUMN + colOffset == BOARD_COLUMNS)
-    {
-      hitBarrier = true;
-      startRow[0] = TOKEN_ROW;
-      startCol[0] = TOKEN_COLUMN + colOffset - 1;
-      spacesLeft -= (colOffset - 1);
-    }
-    else if(currentToken == playerToken)
-    {
-      sum++;
-    }
-  }
-  
-  if(hitBarrier)
-  {
-    hitBarrier = false;
-    
-    for(int colOffset = 1; colOffset <= spacesLeft && !hitBarrier; colOffset++)
-    {
-      int currentToken = boardArray[TOKEN_ROW][TOKEN_COLUMN - colOffset];
-      
-      if(currentToken == oppoToken || TOKEN_COLUMN - colOffset == -1)
-      {
-        hitBarrier = true;
-        startRow[0] = -1;
-        startCol[0] = -3;
-      }
-      else if(currentToken == playerToken)
-      {
-        sum++;
-      }
-    }
-    
-    if(!hitBarrier)
-    {
-      endRow[0] = TOKEN_ROW;
-      endCol[0] = TOKEN_COLUMN - spacesLeft;
-    }
-  }
-  else
-  {
-    startRow[0] = TOKEN_ROW;
-    startCol[0] = TOKEN_COLUMN;
-    endRow[0] = TOKEN_ROW;
-    endCol[0] = TOKEN_COLUMN + spacesLeft;
-  }
-  //cout << endl << "Line 1: " << startCol[0] << ", " << endCol[0] << " Sum: " << sum << endl;
-  
-  if(!hitBarrier)
-  {
-    score += scorePoints(playerToken, sum);
-  }
-  
-  hitBarrier = false;
-  sum = 1;
-  spacesLeft = 3;
-  
-  for(int colOffset = 1; colOffset <= spacesLeft && !hitBarrier; colOffset++)
-  {
-    int currentToken = boardArray[TOKEN_ROW][TOKEN_COLUMN - colOffset];
-    
-    if(currentToken == oppoToken || TOKEN_COLUMN - colOffset == -1)
-    {
-      hitBarrier = true;
-      startRow[1] = TOKEN_ROW;
-      startCol[1] = TOKEN_COLUMN - colOffset + 1;
-      spacesLeft -= (colOffset - 1);
-    }
-    else if(currentToken == playerToken)
-    {
-      sum++;
-    }
-  }
-  
-  if(hitBarrier)
-  {
-    hitBarrier = false;
-    
-    for(int colOffset = 1; colOffset <= spacesLeft && !hitBarrier; colOffset++)
-    {
-      int currentToken = boardArray[TOKEN_ROW][TOKEN_COLUMN + colOffset];
-      
-      if(currentToken == oppoToken || TOKEN_COLUMN + colOffset == BOARD_COLUMNS)
-      {
-        hitBarrier = true;
-        startRow[1] = -2;
-        startCol[1] = -4;
-      }
-      else if(currentToken == playerToken)
-      {
-        sum++;
-      }
-    }
-    
-    if(!hitBarrier)
-    {
-      endRow[1] = TOKEN_ROW;
-      endCol[1] = TOKEN_COLUMN + spacesLeft;
-    }
-  }
-  else
-  {
-    startRow[1] = TOKEN_ROW;
-    startCol[1] = TOKEN_COLUMN;
-    endRow[1] = TOKEN_ROW;
-    endCol[1] = TOKEN_COLUMN - spacesLeft;
-  }
-  //cout << "Line 2: " << startCol[1] << ", " << endCol[1] << " Sum: " << sum;
-  
-  if(!hitBarrier && !(startCol[0] == endCol[1] && startCol[1] == endCol[0] || startCol[0] == startCol[1] && endCol[0] == endCol[1]))
-  {
-    score += scorePoints(playerToken, sum);
-  }
-  
-  return score;
-  
-}
-
-int verticalCheck(int boardArray[BOARD_ROWS][BOARD_COLUMNS], int columnHeights[BOARD_COLUMNS], int columnOfMove, int playerToken, int oppoToken)
-{
-  int score = 0;
-   
-  const int TOKEN_ROW = BOARD_ROWS - columnHeights[columnOfMove];
-  const int TOKEN_COLUMN = columnOfMove;
-  
-  int startRow[2] = {-1, -2};
-  int startCol[2] = {-3, -4}; //can maybe intialize with token column for vertical...
-  int endRow[2] = {-5, -6};
-  int endCol[2] = {-7, -8};
-  
-  bool hitBarrier = false;
-  int sum = 1;
-  int spacesLeft = 3;
-  
-  for(int rowOffset = 1; rowOffset <= spacesLeft && !hitBarrier; rowOffset++)
-  {
-    int currentToken = boardArray[TOKEN_ROW - rowOffset][TOKEN_COLUMN];
-    
-    if(currentToken == oppoToken || TOKEN_ROW - rowOffset == -1)
-    {
-      hitBarrier = true;
-      startRow[0] = TOKEN_ROW - rowOffset + 1;
-      startCol[0] = TOKEN_COLUMN;
-      spacesLeft -= (rowOffset - 1);
-    }
-    else if(currentToken == playerToken)
-    {
-      sum++;
-    }
-  }
-  
-  if(hitBarrier)
-  {
-    hitBarrier = false;
-    
-    for(int rowOffset = 1; rowOffset <= spacesLeft && !hitBarrier; rowOffset++)
-    {
-      int currentToken = boardArray[TOKEN_ROW + rowOffset][TOKEN_COLUMN];
-      
-      if(currentToken == oppoToken || TOKEN_ROW + rowOffset == BOARD_ROWS)
-      {
-        hitBarrier = true;
-        startRow[0] = -1;
-        startCol[0] = -3;
-      }
-      else if(currentToken == playerToken)
-      {
-        sum++;
-      }
-    }
-    
-    if(!hitBarrier)
-    {
-      endRow[0] = TOKEN_ROW + spacesLeft;
-      endCol[0] = TOKEN_COLUMN;
-    }
-  }
-  else
-  {
-    startRow[0] = TOKEN_ROW;
-    startCol[0] = TOKEN_COLUMN;
-    endRow[0] = TOKEN_ROW - spacesLeft;
-    endCol[0] = TOKEN_COLUMN;
-  }
-  cout << endl << "Line 1: " << startCol[0] << ", " << endCol[0] << " Sum: " << sum << endl;
-  
-  if(!hitBarrier)
-  {
-    score += scorePoints(playerToken, sum);
-  }
-  
-  hitBarrier = false;
-  sum = 1;
-  spacesLeft = 3;
-  
-  for(int rowOffset = 1; rowOffset <= spacesLeft && !hitBarrier; rowOffset++)
-  {
-    int currentToken = boardArray[TOKEN_ROW + rowOffset][TOKEN_COLUMN];
-    
-    if(currentToken == oppoToken || TOKEN_ROW + rowOffset == BOARD_ROWS)
-    {
-      hitBarrier = true;
-      startRow[1] = TOKEN_ROW + rowOffset - 1;
-      startCol[1] = TOKEN_COLUMN;
-      spacesLeft -= (rowOffset - 1);
-    }
-    else if(currentToken == playerToken)
-    {
-      sum++;
-    }
-  }
-  
-  if(hitBarrier)
-  {
-    hitBarrier = false;
-    
-    for(int rowOffset = 1; rowOffset <= spacesLeft && !hitBarrier; rowOffset++)
-    {
-      int currentToken = boardArray[TOKEN_ROW - rowOffset][TOKEN_COLUMN];
-      
-      if(currentToken == oppoToken || TOKEN_ROW - rowOffset == -1)
-      {
-        hitBarrier = true;
-        startRow[1] = -2;
-        startCol[1] = -4;
-      }
-      else if(currentToken == playerToken)
-      {
-        sum++;
-      }
-    }
-    
-    if(!hitBarrier)
-    {
-      endRow[1] = TOKEN_ROW - spacesLeft;
-      endCol[1] = TOKEN_COLUMN;
-    }
-  }
-  else
-  {
-    startRow[1] = TOKEN_ROW;
-    startCol[1] = TOKEN_COLUMN;
-    endRow[1] = TOKEN_ROW + spacesLeft;
-    endCol[1] = TOKEN_COLUMN;
-  }
-  cout << "Line 2: " << startCol[1] << ", " << endCol[1] << " Sum: " << sum;
-  
-  if(!hitBarrier && !(startRow[0] == endRow[1] && startRow[1] == endRow[0] || startRow[0] == startRow[1] && endRow[0] == endRow[1]))
-  {
-    score += scorePoints(playerToken, sum);
-  }
-  
-  return score;
-  
-}
-
-int scoreBoard(int boardArray[BOARD_ROWS][BOARD_COLUMNS], int columnHeights[BOARD_COLUMNS], int columnOfMove, int playerToken, int oppoToken)
+int scoreBoard(int boardArray[BOARD_ROWS][BOARD_COLUMNS], int columnOfMove)
 {
   int score = 0;
   
   if(columnOfMove == 3)
   {
-   score += 4; 
+    score += 4;
   }
   
-  score += horizontalCheck(boardArray, columnHeights, columnOfMove, playerToken, oppoToken);
-  score += verticalCheck(boardArray, columnHeights, columnOfMove, playerToken, oppoToken);
+  for(int row = BOARD_ROWS - 1; row >= 0; row--)
+  {
+    
+    for(int column = 0; column < BOARD_COLUMNS; column++)
+    {
+      
+      bool opponentTokenFound = false;
+      int sum = 0;
+      
+      if(column < 4)
+      {
+        for(int columnOffset = 0; columnOffset < 4 && !opponentTokenFound; columnOffset++)
+        {
+          if(boardArray[row][column + columnOffset] == HUMAN_TOKEN_TYPE)
+          {
+            sum = 0;
+            opponentTokenFound = true;
+          }
+          else if(boardArray[row][column + columnOffset] == ROBOT_TOKEN_TYPE)
+          {
+            sum++;
+          }
+          
+        }
+        
+        if(sum == 2)
+        {
+          score += 2;
+        }
+        /*else if(sum == 3)
+        {
+          score += 5;
+        }*/
+      
+      }
+      
+      opponentTokenFound = false;
+      sum = 0;
+      
+      if(row >= 3)
+      {
+        for(int rowOffset = 0; rowOffset < 4 && !opponentTokenFound; rowOffset++)
+        {
+          if(boardArray[row - rowOffset][column] == HUMAN_TOKEN_TYPE)
+          {
+            sum = 0;
+            opponentTokenFound = true;
+          }
+          else if(boardArray[row - rowOffset][column] == ROBOT_TOKEN_TYPE)
+          {
+            sum++;
+          }
+          
+        }
+        
+        if(sum == 2)
+        {
+          score += 2;
+        }
+        else if(sum == 3)
+        {
+          score += 5;
+        }
+        
+      }
+      
+    }
+    
+  }
   
   displayScore(boardArray, columnOfMove, score);
   
@@ -421,7 +255,7 @@ int minimaxAlg(int boardArray[BOARD_ROWS][BOARD_COLUMNS], int columnHeights[BOAR
   
   if(depth == 0)
   {
-    return scoreBoard(boardArray, columnHeights, columnOfMove, ROBOT_TOKEN_TYPE, HUMAN_TOKEN_TYPE);
+    return scoreBoard(boardArray, columnOfMove);
   }
   
   if(maxPlayer)
@@ -430,11 +264,12 @@ int minimaxAlg(int boardArray[BOARD_ROWS][BOARD_COLUMNS], int columnHeights[BOAR
     
     for(int colDropIndex = 0; colDropIndex < BOARD_COLUMNS; colDropIndex++) //Drops a token in each column to score that potential move
     {
-      const int emptyTokenRow = (BOARD_ROWS - 1) - columnHeights[colDropIndex]; //Checks if a column is not full
+      int emptyTokenRow = (BOARD_ROWS - 1) - columnHeights[colDropIndex]; //Checks if a column is not full
       
       if(emptyTokenRow > -1)
       {
-        addTokenToArray(boardArray, columnHeights, emptyTokenRow, colDropIndex, ROBOT_TOKEN_TYPE);        
+        boardArray[emptyTokenRow][colDropIndex] = ROBOT_TOKEN_TYPE; //Adding token to row for scoring
+        columnHeights[colDropIndex] += 1;
         
         int possibleMoveScore = minimaxAlg(boardArray, columnHeights, finalMove, depth - 1, false, colDropIndex);
         
@@ -444,7 +279,8 @@ int minimaxAlg(int boardArray[BOARD_ROWS][BOARD_COLUMNS], int columnHeights[BOAR
           finalMove = colDropIndex + 1;
         }
         
-        removeTokenInArray(boardArray, columnHeights, emptyTokenRow, colDropIndex);
+        boardArray[emptyTokenRow][colDropIndex] = 0; //Removing added token that was for scoring
+        columnHeights[colDropIndex] -= 1;
      }
     
     }
@@ -459,11 +295,12 @@ int minimaxAlg(int boardArray[BOARD_ROWS][BOARD_COLUMNS], int columnHeights[BOAR
     
     for(int colDropIndex = 0; colDropIndex < BOARD_COLUMNS; colDropIndex++) //Drops a token in each column to score that potential move
     {
-      const int emptyTokenRow = (BOARD_ROWS - 1) - columnHeights[colDropIndex]; //Checks if a column is not full
+      int emptyTokenRow = (BOARD_ROWS - 1) - columnHeights[colDropIndex]; //Checks if a column is not full
       
       if(emptyTokenRow > -1)
       {
-        addTokenToArray(boardArray, columnHeights, emptyTokenRow, colDropIndex, ROBOT_TOKEN_TYPE);  
+        boardArray[emptyTokenRow][colDropIndex] = ROBOT_TOKEN_TYPE; //Adding token to row for scoring
+        columnHeights[colDropIndex] += 1;
         
         int possibleMoveScore = minimaxAlg(boardArray, columnHeights, finalMove, depth - 1, false, colDropIndex);
         
@@ -473,7 +310,8 @@ int minimaxAlg(int boardArray[BOARD_ROWS][BOARD_COLUMNS], int columnHeights[BOAR
           finalMove = colDropIndex + 1;
         }
         
-        removeTokenInArray(boardArray, columnHeights, emptyTokenRow, colDropIndex);
+        boardArray[emptyTokenRow][colDropIndex] = 0; //Removing added token that was for scoring
+        columnHeights[colDropIndex] -= 1;
      }
     
     }
@@ -502,27 +340,12 @@ void displayBoard(int boardArray[BOARD_ROWS][BOARD_COLUMNS])
 
 void dropToken(int boardArray[BOARD_ROWS][BOARD_COLUMNS], int columnHeights[BOARD_COLUMNS], int choiceCol, int tokenType)
 {
-  const int emptyTokenRow = (BOARD_ROWS - 1) - columnHeights[choiceCol - 1];
+  int emptyTokenRow = (BOARD_ROWS - 1) - columnHeights[choiceCol - 1];
   
-  addTokenToArray(boardArray, columnHeights, emptyTokenRow, choiceCol - 1, tokenType);
+  boardArray[emptyTokenRow][choiceCol - 1] = tokenType;
+  columnHeights[choiceCol - 1] += 1;
   
   cout << "Token dropped to: (" << emptyTokenRow + 1 << ", " << choiceCol << ")" << endl;
-  
-  return;
-}
-
-void addTokenToArray(int boardArray[BOARD_ROWS][BOARD_COLUMNS], int columnHeights[BOARD_COLUMNS], int row, int column, int tokenType)
-{
-  boardArray[row][column] = tokenType;
-  columnHeights[column] += 1;
-  
-  return;
-}
-
-void removeTokenInArray(int boardArray[BOARD_ROWS][BOARD_COLUMNS], int columnHeights[BOARD_COLUMNS], int row, int column)
-{
-  boardArray[row][column] = 0;
-  columnHeights[column] -= 1;
   
   return;
 }

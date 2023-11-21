@@ -5,15 +5,16 @@ void sortTokens(){
 	wait1Msec(100);
 	bool tokens = true;
 	time1[T1] = 0;
-	time1[T2] = 0;
+	time1[T3] = 0;
 	int previousMotor = 100;
 	int nextEncoder = 0;
 
-	while(tokens && SensorValue[S1] == false){
+	while(time1[T3] < 7000){
   		if(SensorValue[S2] == 4) {
   			motor[motorB] = -35;
   			while(nMotorEncoder[motorB] > -55){}
   			motor[motorB] = 0;
+  			time1[T3] = 0;
 		}
 
 		else if(SensorValue[S2] == 5) {
@@ -21,24 +22,24 @@ void sortTokens(){
 	    	motor[motorB] = 35;
   			while(nMotorEncoder[motorB] < 0){}
   			motor[motorB] = 0;
+  			time1[T3] = 0;
 		}
-
-		int timeSample = time1[T1];
 
 		if(time1[T1] >= 1000){
 
 				if(previousMotor == MSMMotorEncoder(mmotor_S4_1)){
-				  	displayString(4, "yes");
 						MSMMotor(mmotor_S4_1, 1);
 						wait1Msec(1000);
 						MSMMotor(mmotor_S4_1, -1);
 						}
-						previousMotor = MSMMotorEncoder(mmotor_S4_1);
-						displayString(5, "%f", previousMotor);
-						time1[T1] =0;
-					}
-    }
 
+						previousMotor = MSMMotorEncoder(mmotor_S4_1);
+						time1[T1] = 0;
+
+					}
+
+
+}
 	motor[motorB] = 50;
   	while(nMotorEncoder[motorB] < -10)
   		{}
