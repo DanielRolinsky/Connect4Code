@@ -19,6 +19,7 @@ void sortTokens();
 int gameState(int & currentPlayer);
 void humanMove(int *columnHeights, int currentCol, int currentPlayer);
 void HumanMove2(int *columnHeights, int currentCol, int currentPlayer);
+void resetSpinner();
 
 //void gameReset(int currentCol);
 int moveSelect(int currentCol);
@@ -42,11 +43,15 @@ int boardArray[BOARD_ROWS][BOARD_COLUMNS] =
 #include "mindsensors-motormux.h"
 task main()
 {
+	bool playAgain = true;
+
+	while(playAgain == true)
+	{
 	MSMMUXinit();
 	SensorType[S4] = sensorI2CCustom;
 	//bool stillPlaying = false;
 	//while(stillPlaying)
-	{
+
 
 int	currentPlayer = 0;
 
@@ -60,20 +65,48 @@ int	currentPlayer = 0;
 
 		playGame(currentPlayer);
 
-		sortTokens();
-		MSMMotorEncoderReset(mmotor_S4_1);
-		nMotorEncoder[motorB] = 0;
+		eraseDisplay();
+		displayString(DEFAULT_DISPLAY_LINE, "Place cartridges at the bottom");
+		displayString(DEFAULT_DISPLAY_LINE +1 , "Please press the touch sensor") ;
+		displayString(DEFAULT_DISPLAY_LINE + 2,"When ready to sort the tokens");
+
+		while(SensorValue[S1] == 0)
+		{}
+			eraseDisplay();
+			resetSpinner();
+			sortTokens();
+
+
 		displayString(DEFAULT_DISPLAY_LINE, "Please replace cartidges");
 		displayString(DEFAULT_DISPLAY_LINE + 1, "press enter once you're done");
 		waitButton(buttonEnter);
 		eraseDisplay();
 
 
-		displayString(DEFAULT_DISPLAY_LINE, "Press the enter button to play again");
-		displayString(DEFAULT_DISPLAY_LINE + 1, "Enter any other button to exit");
-}
+		displayString(DEFAULT_DISPLAY_LINE, "Press enter to play again");
+		displayString(DEFAULT_DISPLAY_LINE + 1, "Or press up to exit");
 
-	time1[T2] = 0;
+		bool choiceSelected = false;
+		while(!choiceSelected){
+		if(getButtonPress(buttonEnter))
+			{
+				while(getButtonPress(buttonEnter)){}
+				playAgain = true;
+				choiceSelected = true;
+			}
+		else if(getButtonPress(buttonUp))
+		{
+			while(getButtonPress(buttonUp)){}
+			playAgain = false;
+			choiceSelected = true;
+		}
+
+	}
+			eraseDisplay();
+
+	}
+		eraseDisplay();
+	time1[T2] =0;
 	displayString(DEFAULT_DISPLAY_LINE, "Thank you for playing!");
 	while(time1[T2] < 7000){}
 	eraseDisplay();
@@ -182,7 +215,7 @@ void playGame(int &currentPlayer){
 		HumanMove2(columnHeights, currentCol, currentPlayer);
 	}
 }
-	nMotorEncoder[motorA] = 5;
+	nMotorEncoder[motorA] = 0;
 	return;
 
 }
@@ -284,12 +317,6 @@ void spinnerMotor(bool isHumanPlaying, int currentPlayer){
 		{}
 		motor[motorC] = 0;
 	}
-
-	if(gameState(currentPlayer) != 0){
-		motor[motorC] = 20;
-		while(nMotorEncoder[motorC] < 360){}
-  }
-
 	return;
 }
 
@@ -297,17 +324,21 @@ void configureMotors()
 {
 	nMotorEncoder[motorA] = nMotorEncoder[motorB] = nMotorEncoder[motorC] = nMotorEncoder[motorD] = 0;
 
-	wait1Msec(500);
+	wait1Msec(50);
 	motor[motorA] = motor[motorB] = motor[motorC] = motor[motorD]= 0 ;
+	wait1Msec(50);
+	MSMMotorEncoderReset(mmotor_S4_1);
+
 }
 
 void sensorConfig() {
 	SensorType[S1] = sensorEV3_Touch;
 	wait1Msec(50);
-	SensorType[S3] = sensorEV3_Color;
+	SensorType[S2] = sensorEV3_Color;
 	wait1Msec(50);
-	SensorMode[S3] = modeEV3Color_Color;
+	SensorMode[S2] = modeEV3Color_Color;
 	wait1Msec(50);
+
 }
 
 
@@ -332,10 +363,13 @@ void dropToken(int *columnHeights, int choiceCol, bool isHumanPlaying, int curre
 			spinnerMotor(isHumanPlaying, currentPlayer);
 			motorActivated = true;
 		}
-	}
 
-	motor[motorA] = motor[motorD] = 0;
-	wait1Msec(2000);
+	}
+		motor[motorA] = motor[motorD] = 0;
+		wait1Msec(500);
+
+
+
 
 	int tokenType = HUMAN_TOKEN_TYPE;
 	if(!isHumanPlaying)
@@ -402,12 +436,11 @@ void sortTokens(){
 	time1[T3] = 0;
 	MSMMotor(mmotor_S4_1, -1);
 	wait1Msec(100);
-	time1[T1] = 0;
-	time1[T2] = 0;
+	time1[T4] = 0;
 	int previousMotor = 100;
 	int nextEncoder = 0;
 
-	while(SensorValue[S1] == false && time1[T3] < 7500){
+	while(time1[T3] < 7000){
   		if(SensorValue[S2] == 4) {
   			motor[motorB] = -35;
   			while(nMotorEncoder[motorB] > -55){}
@@ -421,9 +454,10 @@ void sortTokens(){
   			while(nMotorEncoder[motorB] < 0){}
   			motor[motorB] = 0;
   			time1[T3] = 0;
+
 		}
 
-		if(time1[T1] >= 1000){
+		if(time1[T4] >= 1000){
 
 				if(previousMotor == MSMMotorEncoder(mmotor_S4_1)){
 						MSMMotor(mmotor_S4_1, 1);
@@ -432,8 +466,7 @@ void sortTokens(){
 						}
 
 						previousMotor = MSMMotorEncoder(mmotor_S4_1);
-						time1[T1] = 0;
-						time1[T3] = 0;
+						time1[T4] = 0;
 					}
     }
 
@@ -452,4 +485,13 @@ void waitButton(TEV3Buttons buttonName)
 	{}
 
 	return;
+}
+
+void resetSpinner()
+{
+	motor[motorC] = 20;
+	while(nMotorEncoder[motorC] < 360)
+{}
+	motor[motorC] = 0;
+
 }

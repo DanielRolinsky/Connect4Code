@@ -5,12 +5,17 @@ void configureMotors();
 task main()
 {
 	configureMotors();
-	for(int i = 0; i <= 21; i ++){
+	for(int i = 0; i <= 5; i ++){
 		spinnerMotor(true);
 		wait1Msec(1000);
 		spinnerMotor(false);
 		wait1Msec(1000);
 	}
+	spinnerMotor(true);
+	motor[motorC] = 10;
+	while(nMotorEncoder[motorC] < 360)
+{}
+	motor[motorC] = 0;
 }
 
 void spinnerMotor(bool isHumanPlaying){
