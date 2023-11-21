@@ -26,7 +26,8 @@ int minimaxAlg(int boardArray[BOARD_ROWS][BOARD_COLUMNS], int columnHeights[BOAR
 void displayScore(int boardArray[BOARD_ROWS][BOARD_COLUMNS], int columnOfMove, int score);
 
 int scoreBoard(int boardArray[BOARD_ROWS][BOARD_COLUMNS], int columnHeights[BOARD_COLUMNS], int columnOfMove, int playerToken, int oppoToken);
-int scorePoints(int playerToken, int sum);
+int scorePoints(int playerToken, int sum); //placeholder
+
 int horizontalCheck(int boardArray[BOARD_ROWS][BOARD_COLUMNS], int columnHeights[BOARD_COLUMNS], int columnOfMove, int playerToken, int oppoToken);
 int verticalCheck(int boardArray[BOARD_ROWS][BOARD_COLUMNS], int columnHeights[BOARD_COLUMNS], int columnOfMove, int playerToken, int oppoToken);
 int positiveSlopeCheck(int boardArray[BOARD_ROWS][BOARD_COLUMNS], int columnHeights[BOARD_COLUMNS], int columnOfMove, int playerToken, int oppoToken);
@@ -86,17 +87,32 @@ int gameWon(int boardArray[BOARD_ROWS][BOARD_COLUMNS])
 
 int scorePoints(int playerToken, int sum)
 {
-  if(sum == 2)
+  if(playerToken == ROBOT_TOKEN_TYPE)
   {
-    return 2;
+    if(sum == 2)
+    {
+      return 2;
+    }
+    else if(sum == 3)
+    {
+      return 5;
+    }
+    else if(sum == 4)
+    {
+      cout << endl << "GAME WON BY ROBOT" << endl;
+      return 999;
+    }
   }
-  else if(sum == 3)
+  else if(playerToken == HUMAN_TOKEN_TYPE)
   {
-    return 5;
-  }
-  else if(sum == 4)
-  {
-    return 999;
+    if(sum == 3)
+    {
+      return -2;
+    }
+    else if(sum == 4)
+    {
+      return -100;
+    }
   }
   
   return 0;
@@ -168,7 +184,6 @@ int horizontalCheck(int boardArray[BOARD_ROWS][BOARD_COLUMNS], int columnHeights
     endRow[0] = TOKEN_ROW;
     endCol[0] = TOKEN_COLUMN + spacesLeft;
   }
-  //cout << endl << "Line 1: " << startCol[0] << ", " << endCol[0] << " Sum: " << sum << endl;
   
   if(!hitBarrier)
   {
@@ -229,7 +244,6 @@ int horizontalCheck(int boardArray[BOARD_ROWS][BOARD_COLUMNS], int columnHeights
     endRow[1] = TOKEN_ROW;
     endCol[1] = TOKEN_COLUMN - spacesLeft;
   }
-  //cout << "Line 2: " << startCol[1] << ", " << endCol[1] << " Sum: " << sum;
   
   if(!hitBarrier && !(startCol[0] == endCol[1] && startCol[1] == endCol[0] || startCol[0] == startCol[1] && endCol[0] == endCol[1]))
   {
@@ -306,7 +320,6 @@ int verticalCheck(int boardArray[BOARD_ROWS][BOARD_COLUMNS], int columnHeights[B
     endRow[0] = TOKEN_ROW - spacesLeft;
     endCol[0] = TOKEN_COLUMN;
   }
-  cout << endl << "Line 1: " << startCol[0] << ", " << endCol[0] << " Sum: " << sum << endl;
   
   if(!hitBarrier)
   {
@@ -367,7 +380,6 @@ int verticalCheck(int boardArray[BOARD_ROWS][BOARD_COLUMNS], int columnHeights[B
     endRow[1] = TOKEN_ROW + spacesLeft;
     endCol[1] = TOKEN_COLUMN;
   }
-  cout << "Line 2: " << startCol[1] << ", " << endCol[1] << " Sum: " << sum;
   
   if(!hitBarrier && !(startRow[0] == endRow[1] && startRow[1] == endRow[0] || startRow[0] == startRow[1] && endRow[0] == endRow[1]))
   {
@@ -580,7 +592,6 @@ int negativeSlopeCheck(int boardArray[BOARD_ROWS][BOARD_COLUMNS], int columnHeig
     endRow[0] = TOKEN_ROW - spacesLeft;
     endCol[0] = TOKEN_COLUMN - spacesLeft;
   }
-  cout << endl << "Line 1: " << startRow[0] << ", " << startCol[0] << ", " << endRow[0] << ", " << endCol[0] << " Sum: " << sum << endl;
   
   if(!hitBarrier)
   {
@@ -641,7 +652,6 @@ int negativeSlopeCheck(int boardArray[BOARD_ROWS][BOARD_COLUMNS], int columnHeig
     endRow[1] = TOKEN_ROW + spacesLeft;
     endCol[1] = TOKEN_COLUMN + spacesLeft;
   }
-  cout << "Line 2: " << startRow[1] << ", " << startCol[1] << ", " << endRow[1] << ", " << endCol[1] << " Sum: " << sum << endl;
   
   if(!hitBarrier && !((startRow[0] == endRow[1] && startCol[0] == endCol[1] && endRow[0] == startRow[1] && endCol[0] == startCol[1]) || (startRow[0] == startRow[1] && startCol[0] == startCol[1] && endRow[0] == endRow[1] && endCol[0] == endCol[1])))
   {
@@ -655,6 +665,36 @@ int negativeSlopeCheck(int boardArray[BOARD_ROWS][BOARD_COLUMNS], int columnHeig
 int scoreBoard(int boardArray[BOARD_ROWS][BOARD_COLUMNS], int columnHeights[BOARD_COLUMNS], int columnOfMove, int playerToken, int oppoToken)
 {
   int score = 0;
+  
+  for(int colDropIndex = 0; colDropIndex < BOARD_COLUMNS; colDropIndex++)
+  {
+    const int emptyTokenRow = (BOARD_ROWS - 1) - columnHeights[colDropIndex];
+    if(emptyTokenRow > -1)
+    {
+      addTokenToArray(boardArray, columnHeights, emptyTokenRow, colDropIndex, oppoToken);
+      
+      /*cout << "(" << emptyTokenRow << ", " << colDropIndex << "): "
+           << horizontalCheck(boardArray, columnHeights, colDropIndex, oppoToken, playerToken) << ", "
+           << verticalCheck(boardArray, columnHeights, colDropIndex, oppoToken, playerToken) << ", "
+           << positiveSlopeCheck(boardArray, columnHeights, colDropIndex, oppoToken, playerToken) << ", "
+           << negativeSlopeCheck(boardArray, columnHeights, colDropIndex, oppoToken, playerToken) << endl;*/
+      
+      if(colDropIndex == columnOfMove)
+      {
+        score += horizontalCheck(boardArray, columnHeights, columnOfMove, oppoToken, playerToken);
+        score += positiveSlopeCheck(boardArray, columnHeights, columnOfMove, oppoToken, playerToken);
+        score += negativeSlopeCheck(boardArray, columnHeights, columnOfMove, oppoToken, playerToken);
+      }
+      else if(horizontalCheck(boardArray, columnHeights, colDropIndex, oppoToken, playerToken) <= -100 || verticalCheck(boardArray, columnHeights, colDropIndex, oppoToken, playerToken) <= -100 || positiveSlopeCheck(boardArray, columnHeights, colDropIndex, oppoToken, playerToken) <= -100 || negativeSlopeCheck(boardArray, columnHeights, colDropIndex, oppoToken, playerToken) <= -100)
+      {
+        displayScore(boardArray, colDropIndex, -100);
+        removeTokenInArray(boardArray, columnHeights, emptyTokenRow, colDropIndex);
+        return -100;
+      }
+      
+      removeTokenInArray(boardArray, columnHeights, emptyTokenRow, colDropIndex);
+    }
+  }
   
   if(columnOfMove == 3)
   {
