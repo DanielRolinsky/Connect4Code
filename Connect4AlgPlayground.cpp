@@ -98,15 +98,15 @@ int gameWon(int boardArray[BOARD_ROWS][BOARD_COLUMNS], int & currentPlayer)
 	}
 
 
-	for(int row = 0; row < 6 ; row++)
+	for(int row = 5; row >= 3 ; row--)
 	{
-		for(int col = 0; col < 4; col++)
+		for(int col = 0; col <= 3; col++)
 		{
-			if(col + 3 < 7 
-			&&	boardArray[row][col] == currentPlayer
-			&& boardArray[row + 1][col] == currentPlayer
-			&& boardArray[row + 2 ][col] == currentPlayer
-			&& boardArray[row + 3][col] == currentPlayer)
+			if(
+				boardArray[row][col] == currentPlayer
+			&& boardArray[row - 1][col] == currentPlayer
+			&& boardArray[row - 2][col] == currentPlayer
+			&& boardArray[row - 3][col] == currentPlayer)
 			{
 				return win;
 			} // checks vertical
@@ -134,6 +134,19 @@ int gameWon(int boardArray[BOARD_ROWS][BOARD_COLUMNS], int & currentPlayer)
 			{
 				return win;
 			} //check -ve slope
+/*
+{ 0 2 0 2 1 2 2 }
+{ 0 1 0 2 2 1 1 }
+{ 0 2 0 2 1 2 2 }
+{ 1 1 0 1 2 1 1 }
+{ 1 2 0 2 1 2 2 }
+{ 1 1 2 1 2 1 1 }
+*/
+
+
+
+
+
 
 
 		}
