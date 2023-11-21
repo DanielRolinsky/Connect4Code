@@ -43,17 +43,21 @@ int boardArray[BOARD_ROWS][BOARD_COLUMNS] =
 #include "mindsensors-motormux.h"
 task main()
 {
+
 	bool playAgain = true;
 
 	while(playAgain == true)
 	{
+
 	MSMMUXinit();
 	SensorType[S4] = sensorI2CCustom;
 	//bool stillPlaying = false;
 	//while(stillPlaying)
 
 
-int	currentPlayer = 0;
+
+
+	int	currentPlayer = 0;
 
 		sensorConfig();
 		configureMotors();
@@ -86,13 +90,20 @@ int	currentPlayer = 0;
 		displayString(DEFAULT_DISPLAY_LINE, "Press enter to play again");
 		displayString(DEFAULT_DISPLAY_LINE + 1, "Or press up to exit");
 
-		bool choiceSelected = false;
+			bool choiceSelected = false;
 		while(!choiceSelected){
 		if(getButtonPress(buttonEnter))
 			{
 				while(getButtonPress(buttonEnter)){}
-				playAgain = true;
+				 playAgain = true;
 				choiceSelected = true;
+				for(int row = 0; row < BOARD_ROWS; row ++)
+				{
+					for(int col = 0; col < BOARD_COLUMNS; col ++)
+					{
+					boardArray[row][col] = 0;
+					}
+				}
 			}
 		else if(getButtonPress(buttonUp))
 		{
@@ -102,6 +113,7 @@ int	currentPlayer = 0;
 		}
 
 	}
+
 			eraseDisplay();
 
 	}
@@ -486,6 +498,12 @@ void waitButton(TEV3Buttons buttonName)
 
 	return;
 }
+
+
+
+
+
+
 
 void resetSpinner()
 {
