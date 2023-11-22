@@ -117,6 +117,9 @@ task main()
 			eraseDisplay();
 
 	}
+
+
+
 		eraseDisplay();
 	time1[T2] =0;
 	displayString(DEFAULT_DISPLAY_LINE, "Thank you for playing!");
@@ -163,38 +166,42 @@ int gameState(int & currentPlayer)
 	}
 
 
-	for(int row = 5; row >= 0 ; row--)
+	for(int row = 5; row >= 0; row--)
 	{
 		for(int col = 0; col < 7; col++)
 		{
+				int row1 = row - 1;
+				int row2 = row - 2;
+				int row3 = row - 3;
 			if(row > 2)
 			{
-					if(boardArray[row][col] == currentPlayer
-					&& boardArray[row - 1][col] == currentPlayer
-					&& boardArray[row - 2][col] == currentPlayer
-					&& boardArray[row - 3][col] == currentPlayer)
-				{
-					return win;
-				} // checks vertical
-
-				if(col < 4)
-				{
-					if(boardArray[row][col] == currentPlayer
-						&& boardArray[row][col + 1] == currentPlayer
-						&& boardArray[row][col + 2] == currentPlayer
-						&& boardArray[row][col + 3] == currentPlayer)
-					{
-						return win;
-					} // checks horizontal
 
 					if(boardArray[row][col] == currentPlayer
-						&& boardArray[row - 1][col + 1] == currentPlayer
-						&& boardArray[row - 2 ][col + 2] == currentPlayer
-						&& boardArray[row - 3][col + 3] == currentPlayer)
+						&& boardArray[row1][col] == currentPlayer
+						&& boardArray[row2][col] == currentPlayer
+						&& boardArray[row3][col] == currentPlayer)
 					{
 						return win;
-					} // checks +ve slope
-				}
+					} // checks vertical
+
+					if(col < 4)
+					{
+						if(boardArray[row][col] == currentPlayer
+							&& boardArray[row][col + 1] == currentPlayer
+							&& boardArray[row][col + 2] == currentPlayer
+							&& boardArray[row][col + 3] == currentPlayer)
+						{
+							return win;
+						} // checks horizontal
+
+						if(boardArray[row][col] == currentPlayer
+							&& boardArray[row1][col + 1] == currentPlayer
+							&& boardArray[row2][col + 2] == currentPlayer
+							&& boardArray[row3][col + 3] == currentPlayer)
+						{
+							return win;
+						} // checks +ve slope
+					}
 
 			}
 			else if(col < 4)
@@ -209,7 +216,7 @@ int gameState(int & currentPlayer)
 
 				if(boardArray[row][col] == currentPlayer
 					&& boardArray[row + 1][col + 1] == currentPlayer
-					&& boardArray[row + 2 ][col + 2] == currentPlayer
+					&& boardArray[row + 2][col + 2] == currentPlayer
 					&& boardArray[row + 3][col + 3] == currentPlayer)
 				{
 					return win;
