@@ -163,46 +163,58 @@ int gameState(int & currentPlayer)
 	}
 
 
-	for(int row = 0; row < 6 ; row++)
+	for(int row = 5; row >= 0 ; row--)
 	{
-		for(int col = 0; col < 4; col++)
+		for(int col = 0; col < 7; col++)
 		{
-			if (row + 3 < 6
-                && boardArray[row][col] == currentPlayer
-                && boardArray[row + 1][col] == currentPlayer
-                && boardArray[row + 2][col] == currentPlayer
-                && boardArray[row + 3][col] == currentPlayer) {
-                return win;
-            }
-
-            // Check for horizontal win
-            if (col + 3 < 7
-                && boardArray[row][col] == currentPlayer
-                && boardArray[row][col + 1] == currentPlayer
-                && boardArray[row][col + 2] == currentPlayer
-                && boardArray[row][col + 3] == currentPlayer) {
-                return win;
-            }
-
-            // Check for positive slope win
-            if (row + 3 < 6 && col + 3 < 7
-                && boardArray[row][col] == currentPlayer
-                && boardArray[row + 1][col + 1] == currentPlayer
-                && boardArray[row + 2][col + 2] == currentPlayer
-                && boardArray[row + 3][col + 3] == currentPlayer) {
-                return win;
-            }
-
-            // Check for negative slope win
-            if (row + 3 < 6 && col - 3 >= 0
-                && boardArray[row][col] == currentPlayer
-                && boardArray[row + 1][col - 1] == currentPlayer
-                && boardArray[row + 2][col - 2] == currentPlayer
-                && boardArray[row + 3][col - 3] == currentPlayer)
+			if(row > 2)
 			{
-				return win;
-			} //check -ve slope
+					if(boardArray[row][col] == currentPlayer
+					&& boardArray[row - 1][col] == currentPlayer
+					&& boardArray[row - 2][col] == currentPlayer
+					&& boardArray[row - 3][col] == currentPlayer)
+				{
+					return win;
+				} // checks vertical
 
+				if(col < 4)
+				{
+					if(boardArray[row][col] == currentPlayer
+						&& boardArray[row][col + 1] == currentPlayer
+						&& boardArray[row][col + 2] == currentPlayer
+						&& boardArray[row][col + 3] == currentPlayer)
+					{
+						return win;
+					} // checks horizontal
+
+					if(boardArray[row][col] == currentPlayer
+						&& boardArray[row - 1][col + 1] == currentPlayer
+						&& boardArray[row - 2 ][col + 2] == currentPlayer
+						&& boardArray[row - 3][col + 3] == currentPlayer)
+					{
+						return win;
+					} // checks +ve slope
+				}
+
+			}
+			else if(col < 4)
+			{
+				if(boardArray[row][col] == currentPlayer
+					&& boardArray[row][col + 1] == currentPlayer
+					&& boardArray[row][col + 2] == currentPlayer
+					&& boardArray[row][col + 3] == currentPlayer)
+				{
+					return win;
+				} // checks horizontal
+
+				if(boardArray[row][col] == currentPlayer
+					&& boardArray[row + 1][col + 1] == currentPlayer
+					&& boardArray[row + 2 ][col + 2] == currentPlayer
+					&& boardArray[row + 3][col + 3] == currentPlayer)
+				{
+					return win;
+				} // checks -ve slope
+			}
 
 		}
 	}
