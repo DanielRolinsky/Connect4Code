@@ -177,7 +177,7 @@ int gameWon(int boardArray[BOARD_ROWS][BOARD_COLUMNS], int & currentPlayer)
 
 int scorePoints(int playerToken, int sum)
 {
-  if(playerToken == ROBOT_TOKEN_TYPE)
+  if(playerToken == ROBOT_TOKEN_TYPE) //2, 5, 777, -2, -10, -999
   {
     if(sum == 2)
     {
@@ -185,7 +185,7 @@ int scorePoints(int playerToken, int sum)
     }
     else if(sum == 3)
     {
-      return 5;
+      return 10;
     }
     else if(sum == 4)
     {
@@ -200,7 +200,7 @@ int scorePoints(int playerToken, int sum)
     }
     else if(sum == 3)
     {
-      return -10;
+      return -5;
     }
     else if(sum == 4)
     {
@@ -780,7 +780,7 @@ int scoreBoard(int boardArray[BOARD_ROWS][BOARD_COLUMNS], int columnHeights[BOAR
       }
       else if(horizontalCheck(boardArray, columnHeights, colDropIndex, oppoToken, playerToken) <= -100 || verticalCheck(boardArray, columnHeights, colDropIndex, oppoToken, playerToken) <= -100 || positiveSlopeCheck(boardArray, columnHeights, colDropIndex, oppoToken, playerToken) <= -100 || negativeSlopeCheck(boardArray, columnHeights, colDropIndex, oppoToken, playerToken) <= -100)
       {
-        displayScore(boardArray, colDropIndex, -100);
+        //displayScore(boardArray, colDropIndex, -100);
         removeTokenInArray(boardArray, columnHeights, emptyTokenRow, colDropIndex);
         return -100;
       }
