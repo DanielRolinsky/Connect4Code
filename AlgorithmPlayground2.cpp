@@ -13,7 +13,7 @@ const int ROBOT_TOKEN_TYPE = 2;
 //Function Prototypes
 void displayBoard(int boardArray[BOARD_ROWS][BOARD_COLUMNS]);
 
-int gameWon(int boardArray[BOARD_ROWS][BOARD_COLUMNS]);
+int gameWon(int boardArray[BOARD_ROWS][BOARD_COLUMNS], int & currentPlayer);
 bool legalMove(int boardArray[BOARD_ROWS][BOARD_COLUMNS], int choiceCol);
 void dropToken(int boardArray[BOARD_ROWS][BOARD_COLUMNS], int columnHeights[BOARD_COLUMNS], int choiceCol, int tokenType);
 void addTokenToArray(int boardArray[BOARD_ROWS][BOARD_COLUMNS], int columnHeights[BOARD_COLUMNS], int row, int column, int tokenType);
@@ -41,15 +41,22 @@ int main()
   int columnHeights[BOARD_COLUMNS] = {0};
   
   int currentCol = 1;
+  int currentPlayer = 1;
   
-  while(!gameWon(boardArray))
+  while(!gameWon(boardArray, currentPlayer))
   {
+  	currentPlayer = 1;
     currentCol = humanMove(boardArray, columnHeights, currentCol);
     displayBoard(boardArray);
     
-    currentCol = robotMove(boardArray, columnHeights);
-    displayBoard(boardArray);
-  }
+
+    if(!gameWon(boardArray, currentPlayer))
+    {
+      currentPlayer = 2;
+      currentCol = robotMove(boardArray, columnHeights);
+      displayBoard(boardArray);
+    }
+	}
   
   return EXIT_SUCCESS;
 }
@@ -79,10 +86,87 @@ bool legalMove(int boardArray[BOARD_ROWS][BOARD_COLUMNS], int choiceCol)
 }
 
 //Game State Functions
-int gameWon(int boardArray[BOARD_ROWS][BOARD_COLUMNS])
+int gameWon(int boardArray[BOARD_ROWS][BOARD_COLUMNS], int & currentPlayer)
 {
-  //placeholder
-  return false;
+
+// assumption: the red = 1 = human, yellow = 2 = robot
+
+	const int draw = 3, notWon = 0;
+  int win = 0;
+  
+	if(boardArray[0][0] != 0 && boardArray[0][1] != 0 && boardArray[0][2] != 0 && boardArray[0][3] != 0
+		&& boardArray[0][4] != 0 && boardArray[0][5] != 0 && boardArray[0][6] != 0)
+	{
+		return draw;
+	}
+  if(currentPlayer == 1)
+  {
+		win = 1; // human won
+	}
+	else if(currentPlayer == 2)
+	{
+		win = 2; // robot won
+	}
+	
+
+	for(int row = 5; row >= 0 ; row--)
+	{
+		for(int col = 0; col < 7; col++)
+		{
+			if(row > 2)
+			{
+				if(boardArray[row][col] == currentPlayer
+					&& boardArray[row - 1][col] == currentPlayer
+					&& boardArray[row - 2][col] == currentPlayer
+					&& boardArray[row - 3][col] == currentPlayer)
+				{
+					return win;
+				} // checks vertical
+				
+				if(col < 4)
+				{
+					if(boardArray[row][col] == currentPlayer
+						&& boardArray[row][col + 1] == currentPlayer
+						&& boardArray[row][col + 2] == currentPlayer
+						&& boardArray[row][col + 3] == currentPlayer)
+					{
+						return win;
+					} // checks horizontal
+					
+					if(boardArray[row][col] == currentPlayer
+						&& boardArray[row - 1][col + 1] == currentPlayer
+						&& boardArray[row - 2 ][col + 2] == currentPlayer
+						&& boardArray[row - 3][col + 3] == currentPlayer)
+					{
+						return win;
+					} // checks +ve slope
+				}
+			 
+			}
+			else if(col < 4)
+			{
+				if(boardArray[row][col] == currentPlayer
+					&& boardArray[row][col + 1] == currentPlayer
+					&& boardArray[row][col + 2] == currentPlayer
+					&& boardArray[row][col + 3] == currentPlayer)
+				{
+					return win;
+				} // checks horizontal
+				
+				if(boardArray[row][col] == currentPlayer
+					&& boardArray[row + 1][col + 1] == currentPlayer
+					&& boardArray[row + 2 ][col + 2] == currentPlayer
+					&& boardArray[row + 3][col + 3] == currentPlayer)
+				{
+					return win;
+				} // checks -ve slope
+			}
+
+		}
+	}
+
+	return notWon; //not won if neither the robot nor human has a connect 4
+
 }
 
 int scorePoints(int playerToken, int sum)
@@ -99,7 +183,6 @@ int scorePoints(int playerToken, int sum)
     }
     else if(sum == 4)
     {
-      cout << endl << "GAME WON BY ROBOT" << endl;
       return 999;
     }
   }
@@ -726,7 +809,7 @@ int robotMove(int boardArray[BOARD_ROWS][BOARD_COLUMNS], int columnHeights[BOARD
 {
   
   int finalMove = 1;
-  int minimaxPlaceholder = minimaxAlg(boardArray, columnHeights, finalMove, 1, true); //Remember: minimax returns a value
+  int minimaxPlaceholder = minimaxAlg(boardArray, columnHeights, finalMove, 3, true); //Remember: minimax returns a value
   
   dropToken(boardArray, columnHeights, finalMove, ROBOT_TOKEN_TYPE);
   
