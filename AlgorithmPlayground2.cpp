@@ -10,6 +10,12 @@ const int BOARD_COLUMNS = 7;
 const int HUMAN_TOKEN_TYPE = 1;
 const int ROBOT_TOKEN_TYPE = 2;
 
+//Type Structs
+typedef struct
+{
+  int score, columnOfMove;
+} minimaxReturns;
+
 //Function Prototypes
 void displayBoard(int boardArray[BOARD_ROWS][BOARD_COLUMNS]);
 
@@ -22,7 +28,7 @@ void removeTokenInArray(int boardArray[BOARD_ROWS][BOARD_COLUMNS], int columnHei
 int humanMove(int boardArray[BOARD_ROWS][BOARD_COLUMNS], int columnHeights[BOARD_COLUMNS], int currentCol);
 int robotMove(int boardArray[BOARD_ROWS][BOARD_COLUMNS], int columnHeights[BOARD_COLUMNS]);
 
-int minimaxAlg(int boardArray[BOARD_ROWS][BOARD_COLUMNS], int columnHeights[BOARD_COLUMNS], int &finalMove, int depth, bool maxPlayer, int columnOfMove = 0);;
+minimaxReturns minimaxAlg(int boardArray[BOARD_ROWS][BOARD_COLUMNS], int columnHeights[BOARD_COLUMNS], int depth, bool maxPlayer, int columnOfMove = 0);
 void displayScore(int boardArray[BOARD_ROWS][BOARD_COLUMNS], int columnOfMove, int score);
 
 int scoreBoard(int boardArray[BOARD_ROWS][BOARD_COLUMNS], int columnHeights[BOARD_COLUMNS], int columnOfMove, int playerToken, int oppoToken);
@@ -183,18 +189,22 @@ int scorePoints(int playerToken, int sum)
     }
     else if(sum == 4)
     {
-      return 999;
+      return 777;
     }
   }
   else if(playerToken == HUMAN_TOKEN_TYPE)
   {
-    if(sum == 3)
+    if(sum == 2)
     {
       return -2;
     }
+    else if(sum == 3)
+    {
+      return -10;
+    }
     else if(sum == 4)
     {
-      return -100;
+      return -999;
     }
   }
   
@@ -752,7 +762,7 @@ int scoreBoard(int boardArray[BOARD_ROWS][BOARD_COLUMNS], int columnHeights[BOAR
   for(int colDropIndex = 0; colDropIndex < BOARD_COLUMNS; colDropIndex++)
   {
     const int emptyTokenRow = (BOARD_ROWS - 1) - columnHeights[colDropIndex];
-    if(emptyTokenRow > -1)
+    if(emptyTokenRow > -1 && boardArray[emptyTokenRow][colDropIndex] == 0)
     {
       addTokenToArray(boardArray, columnHeights, emptyTokenRow, colDropIndex, oppoToken);
       
@@ -781,7 +791,14 @@ int scoreBoard(int boardArray[BOARD_ROWS][BOARD_COLUMNS], int columnHeights[BOAR
   
   if(columnOfMove == 3)
   {
-   score += 4; 
+    if(playerToken == ROBOT_TOKEN_TYPE)
+    {
+      score += 4;
+    }
+    else
+    {
+      score -= 2;
+    }
   }
   
   score += horizontalCheck(boardArray, columnHeights, columnOfMove, playerToken, oppoToken);
@@ -789,7 +806,7 @@ int scoreBoard(int boardArray[BOARD_ROWS][BOARD_COLUMNS], int columnHeights[BOAR
   score += positiveSlopeCheck(boardArray, columnHeights, columnOfMove, playerToken, oppoToken);
   score += negativeSlopeCheck(boardArray, columnHeights, columnOfMove, playerToken, oppoToken);
   
-  displayScore(boardArray, columnOfMove, score);
+  //displayScore(boardArray, columnOfMove, score);
   
   return score;
   
@@ -808,26 +825,38 @@ void displayScore(int boardArray[BOARD_ROWS][BOARD_COLUMNS], int columnOfMove, i
 int robotMove(int boardArray[BOARD_ROWS][BOARD_COLUMNS], int columnHeights[BOARD_COLUMNS])
 {
   
-  int finalMove = 1;
-  int minimaxPlaceholder = minimaxAlg(boardArray, columnHeights, finalMove, 3, true); //Remember: minimax returns a value
+  minimaxReturns values;
+  values = minimaxAlg(boardArray, columnHeights, 4, true);
   
-  dropToken(boardArray, columnHeights, finalMove, ROBOT_TOKEN_TYPE);
+  dropToken(boardArray, columnHeights, values.columnOfMove, ROBOT_TOKEN_TYPE);
   
-  return finalMove;
+  return values.columnOfMove;
   
 }
 
-int minimaxAlg(int boardArray[BOARD_ROWS][BOARD_COLUMNS], int columnHeights[BOARD_COLUMNS], int &finalMove, int depth, bool maxPlayer, int columnOfMove) //maybe change colOfMove to bool "center"?
+minimaxReturns minimaxAlg(int boardArray[BOARD_ROWS][BOARD_COLUMNS], int columnHeights[BOARD_COLUMNS], int depth, bool maxPlayer, int columnOfMove)
 {
   
   if(depth == 0) //add gamestate
   {
-    return scoreBoard(boardArray, columnHeights, columnOfMove, ROBOT_TOKEN_TYPE, HUMAN_TOKEN_TYPE);
+    minimaxReturns scoreValue;
+    if(maxPlayer)
+    {
+      scoreValue.score = scoreBoard(boardArray, columnHeights, columnOfMove, HUMAN_TOKEN_TYPE, ROBOT_TOKEN_TYPE);
+    }
+    else
+    {
+      scoreValue.score = scoreBoard(boardArray, columnHeights, columnOfMove, ROBOT_TOKEN_TYPE, HUMAN_TOKEN_TYPE);
+    }
+    
+    return scoreValue;
   }
   
   if(maxPlayer)
   {
-    int maxScore = -9999;
+    minimaxReturns maxValues;
+    maxValues.score = -9999;
+    maxValues.columnOfMove = 1;
     
     for(int colDropIndex = 0; colDropIndex < BOARD_COLUMNS; colDropIndex++) //Drops a token in each column to score that potential move
     {
@@ -837,12 +866,12 @@ int minimaxAlg(int boardArray[BOARD_ROWS][BOARD_COLUMNS], int columnHeights[BOAR
       {
         addTokenToArray(boardArray, columnHeights, emptyTokenRow, colDropIndex, ROBOT_TOKEN_TYPE);        
         
-        int possibleMoveScore = minimaxAlg(boardArray, columnHeights, finalMove, depth - 1, false, colDropIndex);
+        minimaxReturns possibleMoveScore = minimaxAlg(boardArray, columnHeights, depth - 1, false, colDropIndex);
         
-        maxScore = max(maxScore, possibleMoveScore);
-        if(maxScore == possibleMoveScore)
+        if(max(maxValues.score, possibleMoveScore.score) == possibleMoveScore.score /*&& possibleMoveScore.score != maxValues.score*/)
         {
-          finalMove = colDropIndex + 1;
+          maxValues.score = possibleMoveScore.score;
+          maxValues.columnOfMove = colDropIndex + 1;
         }
         
         removeTokenInArray(boardArray, columnHeights, emptyTokenRow, colDropIndex);
@@ -850,13 +879,16 @@ int minimaxAlg(int boardArray[BOARD_ROWS][BOARD_COLUMNS], int columnHeights[BOAR
     
     }
     
-    return maxScore;
+    cout << depth << ": "<< maxValues.score << endl;
+    cout << "FinalMove: " << maxValues.columnOfMove - 1 << endl;
+    return maxValues;
   
   }
   else
   {
-    
-    int minScore = 9999;
+    minimaxReturns minValues;
+    minValues.score = 9999;
+    minValues.columnOfMove = 1;
     
     for(int colDropIndex = 0; colDropIndex < BOARD_COLUMNS; colDropIndex++) //Drops a token in each column to score that potential move
     {
@@ -866,12 +898,12 @@ int minimaxAlg(int boardArray[BOARD_ROWS][BOARD_COLUMNS], int columnHeights[BOAR
       {
         addTokenToArray(boardArray, columnHeights, emptyTokenRow, colDropIndex, HUMAN_TOKEN_TYPE); //dont forget to do this in terms of min for human !!
         
-        int possibleMoveScore = minimaxAlg(boardArray, columnHeights, finalMove, depth - 1, false, colDropIndex);
+        minimaxReturns possibleMoveScore = minimaxAlg(boardArray, columnHeights, depth - 1, true, colDropIndex);
         
-        minScore = min(minScore, possibleMoveScore);
-        if(minScore == possibleMoveScore)
+        if(min(minValues.score, possibleMoveScore.score) == possibleMoveScore.score /*&& possibleMoveScore.score != minValues.score*/)
         {
-          finalMove = colDropIndex + 1;
+          minValues.score = possibleMoveScore.score;
+          minValues.columnOfMove = colDropIndex + 1;
         }
         
         removeTokenInArray(boardArray, columnHeights, emptyTokenRow, colDropIndex);
@@ -879,7 +911,9 @@ int minimaxAlg(int boardArray[BOARD_ROWS][BOARD_COLUMNS], int columnHeights[BOAR
     
     }
     
-    return minScore;
+    cout << depth << ": "<< minValues.score << endl;
+    cout << "FinalMove: " << minValues.columnOfMove - 1 << endl;
+    return minValues;
     
   }
   
