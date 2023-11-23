@@ -189,7 +189,7 @@ int scorePoints(int playerToken, int sum)
     }
     else if(sum == 4)
     {
-      return 777; //777
+      return 100; //777
     }
   }
   else if(playerToken == HUMAN_TOKEN_TYPE)
@@ -200,11 +200,11 @@ int scorePoints(int playerToken, int sum)
     }
     else if(sum == 3)
     {
-      return -5;
+      return -10;
     }
     else if(sum == 4)
     {
-      return -999; //-999
+      return -100; //-999
     }
   }
   
@@ -826,7 +826,7 @@ int robotMove(int boardArray[BOARD_ROWS][BOARD_COLUMNS], int columnHeights[BOARD
 {
   
   minimaxReturns values;
-  minimaxAlg(boardArray, columnHeights, 4, true, values);
+  minimaxAlg(boardArray, columnHeights, 3, true, values);
   
   dropToken(boardArray, columnHeights, values.columnOfMove, ROBOT_TOKEN_TYPE);
   
@@ -837,10 +837,20 @@ int robotMove(int boardArray[BOARD_ROWS][BOARD_COLUMNS], int columnHeights[BOARD
 void minimaxAlg(int boardArray[BOARD_ROWS][BOARD_COLUMNS], int columnHeights[BOARD_COLUMNS], int depth, bool maxPlayer, minimaxReturns &values, int columnOfMove)
 {
   
-  if(depth == 0) //|| gameWon(boardArray, ROBOT_TOKEN_TYPE) || gameWon(boardArray, HUMAN_TOKEN_TYPE)
+  int wonNum = gameWon(boardArray, ROBOT_TOKEN_TYPE);
+  if(depth == 0 || wonNum != 0)
   {
     minimaxReturns scoreValue;
-    if(maxPlayer)
+    
+    if(wonNum == HUMAN_TOKEN_TYPE)
+    {
+    	scoreValue.score = -10000;
+	}
+	else if(wonNum == ROBOT_TOKEN_TYPE)
+	{
+		scoreValue.score = 10000;
+	}
+    else if(maxPlayer)
     {
       scoreValue.score = scoreBoard(boardArray, columnHeights, columnOfMove, HUMAN_TOKEN_TYPE, ROBOT_TOKEN_TYPE);
     }
