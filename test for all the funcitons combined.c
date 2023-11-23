@@ -86,17 +86,26 @@ task main()
 		sensorConfig();
 		configureMotors();
 
-		displayString(DEFAULT_DISPLAY_LINE, "First place cartridges on top");
-		displayString(DEFAULT_DISPLAY_LINE + 1, "Then press Enter to play!");
+		displayBigTextLine(DEFAULT_DISPLAY_LINE, "Put Cartridges");
+		displayBigTextLine(DEFAULT_DISPLAY_LINE + 3, "On Top!");
+		displayBigTextLine(DEFAULT_DISPLAY_LINE + 6, "Then Press");
+		displayBigTextLine(DEFAULT_DISPLAY_LINE + 9, "Enter To Play!");
+
+	//	displayBigTextLine(DEFAULT_DISPLAY_LINE + 1, "Then press Enter to play!");
 		waitButton(buttonEnter);
 		eraseDisplay();
 
 		playGame(currentPlayer);
 
 		eraseDisplay();
-		displayString(DEFAULT_DISPLAY_LINE, "Place cartridges at the bottom");
-		displayString(DEFAULT_DISPLAY_LINE +1 , "Please press the touch sensor") ;
-		displayString(DEFAULT_DISPLAY_LINE + 2,"When ready to sort the tokens");
+		displayBigTextLine(DEFAULT_DISPLAY_LINE, "Put Cartridges");
+		displayBigTextLine(DEFAULT_DISPLAY_LINE + 3, "At The Bottom");
+		wait1Msec(5000);
+		eraseDisplay();
+		displayBigTextLine(DEFAULT_DISPLAY_LINE , "Please Press The");
+		displayBigTextLine(DEFAULT_DISPLAY_LINE + 3 ,"Touch Sensor");
+		displayBigTextLine(DEFAULT_DISPLAY_LINE + 6,"When Ready To");
+		displayBigTextLine(DEFAULT_DISPLAY_LINE + 9,"Sort The Tokens");
 
 		while(SensorValue[S1] == 0)
 		{}
@@ -105,14 +114,19 @@ task main()
 			sortTokens();
 
 
-		displayString(DEFAULT_DISPLAY_LINE, "Please replace cartidges");
-		displayString(DEFAULT_DISPLAY_LINE + 1, "press enter once you're done");
+		displayBigTextLine(DEFAULT_DISPLAY_LINE, "Put Cartridges ");
+		displayBigTextLine(DEFAULT_DISPLAY_LINE + 3, "At The Top!");
+		displayBigTextLine(DEFAULT_DISPLAY_LINE + 6, "Press Enter");
+		displayBigTextLine(DEFAULT_DISPLAY_LINE + 9, "Once Finished");
+
 		waitButton(buttonEnter);
 		eraseDisplay();
 
 
-		displayString(DEFAULT_DISPLAY_LINE, "Press enter to play again");
-		displayString(DEFAULT_DISPLAY_LINE + 1, "Or press up to exit");
+		displayBigTextLine(DEFAULT_DISPLAY_LINE, "Press Enter To");
+		displayBigTextLine(DEFAULT_DISPLAY_LINE +3 , "Play Again");
+		displayBigTextLine(DEFAULT_DISPLAY_LINE + 6, "Or Press");
+		displayBigTextLine(DEFAULT_DISPLAY_LINE + 9, "Up To Exit");
 
 			bool choiceSelected = false;
 		while(!choiceSelected){
@@ -145,9 +159,12 @@ task main()
 
 
 
+
 		eraseDisplay();
 	time1[T2] =0;
-	displayString(DEFAULT_DISPLAY_LINE, "Thank you for playing!");
+	displayString(DEFAULT_DISPLAY_LINE, "Thank You");
+	displayString(DEFAULT_DISPLAY_LINE +3 , "For Playing!");
+
 	while(time1[T2] < 7000){}
 	eraseDisplay();
 
@@ -316,7 +333,9 @@ int moveSelect(int currentCol)
 {
 	int selectCol = currentCol;
 	eraseDisplay();
-	displayString(DEFAULT_DISPLAY_LINE, "Current Column: %d", selectCol);
+	displayBigTextLine(DEFAULT_DISPLAY_LINE, "Current Column:");
+	displayBigTextLine(DEFAULT_DISPLAY_LINE +3 , "%d", selectCol);
+
 
 	while(!getButtonPress(buttonEnter))
 	{
@@ -335,7 +354,9 @@ int moveSelect(int currentCol)
 			}
 
 			eraseDisplay();
-			displayString(DEFAULT_DISPLAY_LINE, "Current Column: %d", selectCol);
+			displayBigTextLine(DEFAULT_DISPLAY_LINE, "Current Column:");
+			displayBigTextLine(DEFAULT_DISPLAY_LINE +3 , "%d", selectCol);
+
 
 			wait1Msec(500);
 		}
@@ -514,7 +535,7 @@ void sortTokens(){
 	int previousMotor = 100;
 	int nextEncoder = 0;
 
-	while(time1[T3] < 7000){
+	while(time1[T3] < 30000 || SensorValue[S1] == 0 ){
   		if(SensorValue[S2] == 4) {
   			motor[motorB] = -35;
   			while(nMotorEncoder[motorB] > -55){}
@@ -544,8 +565,8 @@ void sortTokens(){
 					}
     }
 
-	motor[motorB] = 50;
-  	while(nMotorEncoder[motorB] < -10)
+	motor[motorB] = 30;
+  	while(nMotorEncoder[motorB] < 0)
   		{}
   	MSMotorStop(mmotor_S4_1);
   	motor[motorB] = 0;
@@ -582,32 +603,32 @@ int scorePoints(int playerToken, int sum)
 {
   if(playerToken == ROBOT_TOKEN_TYPE) //2, 5, 777, -2, -10, -999
   {
-    if(sum == 2)
+     if(sum == 2)
     {
-      return 2;
+      return 10; // Two in a row
     }
     else if(sum == 3)
     {
-      return 10;
+      return 10;  // Three in a row
     }
     else if(sum == 4)
     {
-      return 777;
+      return 1000;  // Four in a row, robot wins
     }
   }
-  else if(playerToken == HUMAN_TOKEN_TYPE)
+  else if(playerToken == HUMAN_TOKEN_TYPE) // Human's perspective
   {
     if(sum == 2)
     {
-      return -2;
+      return -1;  // Blocking two in a row
     }
     else if(sum == 3)
     {
-      return -5;
+      return -100;  // Blocking three in a row
     }
     else if(sum == 4)
     {
-      return -999;
+      return -10000;  // Blocking four in a row, preventing robot from winning
     }
   }
 
