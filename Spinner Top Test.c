@@ -102,6 +102,14 @@ task main()
 		displayBigTextLine(DEFAULT_DISPLAY_LINE + 3, "At The Bottom");
 		wait1Msec(5000);
 		eraseDisplay();
+
+		displayBigTextLine(DEFAULT_DISPLAY_LINE , "Please Swap The");
+		displayBigTextLine(DEFAULT_DISPLAY_LINE + 3 ,"Motor on Top For");
+		displayBigTextLine(DEFAULT_DISPLAY_LINE + 6,"The Motor On The");
+		displayBigTextLine(DEFAULT_DISPLAY_LINE + 9,"Bottom");
+		wait1Msec(5000);
+		eraseDisplay();
+
 		displayBigTextLine(DEFAULT_DISPLAY_LINE , "Please Press The");
 		displayBigTextLine(DEFAULT_DISPLAY_LINE + 3 ,"Touch Sensor");
 		displayBigTextLine(DEFAULT_DISPLAY_LINE + 6,"When Ready To");
