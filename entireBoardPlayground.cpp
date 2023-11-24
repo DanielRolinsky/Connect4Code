@@ -13,8 +13,8 @@ const int ROBOT_TOKEN_TYPE = 2;
 const int MIDDLE_COLUMN = 4;
 const int TWO_LINE = 2;
 const int THREE_LINE = 5;
+const int OPPO_THREE_LINE = 4;
 const int FOUR_LINE = 900;
-const int NEXT_FOUR_LINE = 100;
 
 //Type Structs
 typedef struct
@@ -28,6 +28,7 @@ void displayBoard(int boardArray[BOARD_ROWS][BOARD_COLUMNS]);
 int gameWon(int boardArray[BOARD_ROWS][BOARD_COLUMNS], int currentPlayer);
 bool legalMove(int boardArray[BOARD_ROWS][BOARD_COLUMNS], int choiceCol);
 void dropToken(int boardArray[BOARD_ROWS][BOARD_COLUMNS], int columnHeights[BOARD_COLUMNS], int choiceCol, int tokenType);
+
 void addTokenToArray(int boardArray[BOARD_ROWS][BOARD_COLUMNS], int columnHeights[BOARD_COLUMNS], int row, int column, int tokenType);
 void removeTokenInArray(int boardArray[BOARD_ROWS][BOARD_COLUMNS], int columnHeights[BOARD_COLUMNS], int row, int column);
 
@@ -183,22 +184,22 @@ int gameWon(int boardArray[BOARD_ROWS][BOARD_COLUMNS], int currentPlayer)
 
 int scorePoints(int sum, bool oppoCheck)
 {
-  if(!oppoCheck) //2, 5, 777, -2, -10, -999
+  if(!oppoCheck)
   {
     if(sum == 2)
     {
-      return 2;
+      return TWO_LINE;
     }
     else if(sum == 3)
     {
-      return 5;
+      return THREE_LINE;
     }
   }
   else
   {
     if(sum == 3)
     {
-      return -4;
+      return -1 * OPPO_THREE_LINE;
     }
   }
   
@@ -332,7 +333,7 @@ int scoreBoard(int boardArray[BOARD_ROWS][BOARD_COLUMNS], int columnOfMove, int 
   
   if(columnOfMove == 3)
   {
-    score += 4;
+    score += MIDDLE_COLUMN;
   }
   
   for(int row = 5; row >= 0 ; row--)
@@ -340,11 +341,6 @@ int scoreBoard(int boardArray[BOARD_ROWS][BOARD_COLUMNS], int columnOfMove, int 
 		for(int col = 0; col < 7; col++)
 		{
       int currentToken = boardArray[row][col];
-      
-      /*if(currentToken == playerToken && col == 3)
-      {
-        score += 1;
-      }*/
       
 			if(currentToken != 0 && row > 2)
 			{
@@ -425,8 +421,8 @@ int robotMove(int boardArray[BOARD_ROWS][BOARD_COLUMNS], int columnHeights[BOARD
 void minimaxAlg(int boardArray[BOARD_ROWS][BOARD_COLUMNS], int columnHeights[BOARD_COLUMNS], int depth, bool maxPlayer, minimaxReturns &values, int columnOfMove)
 {
   
-  int wonRobot = gameWon(boardArray, ROBOT_TOKEN_TYPE);
-  int wonHuman = gameWon(boardArray, HUMAN_TOKEN_TYPE);
+  const int wonRobot = gameWon(boardArray, ROBOT_TOKEN_TYPE);
+  const int wonHuman = gameWon(boardArray, HUMAN_TOKEN_TYPE);
   if(depth == 0 || wonRobot || wonHuman)
   {
     minimaxReturns scoreValue;
@@ -501,8 +497,8 @@ void minimaxAlg(int boardArray[BOARD_ROWS][BOARD_COLUMNS], int columnHeights[BOA
     
     }
     
-    cout << depth << ": "<< maxValues.score << endl;
-    cout << "FinalMove: " << maxValues.columnOfMove - 1 << endl;
+    //cout << depth << ": "<< maxValues.score << endl;
+    //cout << "FinalMove: " << maxValues.columnOfMove - 1 << endl;
     values.score = maxValues.score;
     values.columnOfMove = maxValues.columnOfMove;
     return;
@@ -520,7 +516,7 @@ void minimaxAlg(int boardArray[BOARD_ROWS][BOARD_COLUMNS], int columnHeights[BOA
       
       if(emptyTokenRow > -1)
       {
-        addTokenToArray(boardArray, columnHeights, emptyTokenRow, colDropIndex, HUMAN_TOKEN_TYPE); //dont forget to do this in terms of min for human !!
+        addTokenToArray(boardArray, columnHeights, emptyTokenRow, colDropIndex, HUMAN_TOKEN_TYPE);
         
         minimaxReturns possibleMoveScore;
         minimaxAlg(boardArray, columnHeights, depth - 1, true, possibleMoveScore, colDropIndex);
@@ -538,8 +534,8 @@ void minimaxAlg(int boardArray[BOARD_ROWS][BOARD_COLUMNS], int columnHeights[BOA
     
     }
     
-    cout << depth << ": "<< minValues.score << endl;
-    cout << "FinalMove: " << minValues.columnOfMove - 1 << endl;
+    //cout << depth << ": "<< minValues.score << endl;
+    //cout << "FinalMove: " << minValues.columnOfMove - 1 << endl;
     values.score = minValues.score;
     values.columnOfMove = minValues.columnOfMove;
     return;
@@ -556,7 +552,19 @@ void displayBoard(int boardArray[BOARD_ROWS][BOARD_COLUMNS])
     cout << "{";
     for (int colIndex = 0; colIndex < BOARD_COLUMNS; colIndex++)
     {
-      cout << " " << boardArray[rowIndex][colIndex];
+      char character = boardArray[rowIndex][colIndex];
+      if(character == HUMAN_TOKEN_TYPE)
+      {
+        cout << " X";
+      }
+      else if(character == ROBOT_TOKEN_TYPE)
+      {
+        cout << " O";
+      }
+      else
+      {
+        cout << " -";
+      }
     }
     cout << " }" << endl;
   }
