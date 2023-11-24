@@ -1004,37 +1004,6 @@ void minimaxAlg(int *columnHeights, int depth, bool maxPlayer, minimaxReturns &v
     return;
 
 	}
-	else
-	{
-		minimaxReturns minValues;
-		minValues.score = 9999;
-		minValues.columnOfMove = 1;
-
-		for(int colDropIndex = 0; colDropIndex < BOARD_COLUMNS; colDropIndex++) //Drops a token in each column to score that potential move
-		{
-			const int emptyTokenRow = (BOARD_ROWS - 1) - columnHeights[colDropIndex]; //Checks if a column is not full
-
-			if(emptyTokenRow > -1)
-			{
-				addTokenToArray( columnHeights, emptyTokenRow, colDropIndex, HUMAN_TOKEN_TYPE); //dont forget to do this in terms of min for human !!
-
-				minimaxReturns* possibleMoveScore = minimaxAlg( columnHeights, depth - 1, true, colDropIndex);
-
-				if (possibleMoveScore->score < minValues.score /* && possibleMoveScore->score != minValues->score */)
-				{
-					minValues.score = possibleMoveScore->score;
-					minValues.columnOfMove = colDropIndex + 1;
-				}
-
-				removeTokenInArray(columnHeights, emptyTokenRow, colDropIndex);
-			}
-
-		}
-
-
-		return minValues;
-
-	}
 
 }
 
