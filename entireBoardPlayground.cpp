@@ -304,9 +304,9 @@ int negativeSlopeCheck(int boardArray[BOARD_ROWS][BOARD_COLUMNS], int row, int c
   
   for(int slopeOffset = 1; slopeOffset < 4; slopeOffset++)
   {
-    int currentToken = boardArray[START_ROW - slopeOffset][START_COLUMN - slopeOffset];
+    int currentToken = boardArray[START_ROW + slopeOffset][START_COLUMN + slopeOffset];
     
-    if(currentToken == oppoToken || START_ROW - slopeOffset == -1 || START_COLUMN - slopeOffset == -1)
+    if(currentToken == oppoToken || START_ROW + slopeOffset == BOARD_ROWS || START_COLUMN + slopeOffset == BOARD_COLUMNS)
     {
       return 0;
     }
