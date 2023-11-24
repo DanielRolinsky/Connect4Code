@@ -10,6 +10,12 @@ const int BOARD_COLUMNS = 7;
 const int HUMAN_TOKEN_TYPE = 1;
 const int ROBOT_TOKEN_TYPE = 2;
 
+const int MIDDLE_COLUMN = 4;
+const int TWO_LINE = 2;
+const int THREE_LINE = 5;
+const int FOUR_LINE = 900;
+const int NEXT_FOUR_LINE = 100;
+
 //Type Structs
 typedef struct
 {
@@ -32,12 +38,12 @@ void minimaxAlg(int boardArray[BOARD_ROWS][BOARD_COLUMNS], int columnHeights[BOA
 void displayScore(int boardArray[BOARD_ROWS][BOARD_COLUMNS], int columnOfMove, int score);
 
 int scoreBoard(int boardArray[BOARD_ROWS][BOARD_COLUMNS], int columnHeights[BOARD_COLUMNS], int columnOfMove, int playerToken, int oppoToken);
-int scorePoints(int playerToken, int sum); //placeholder
+int scorePoints(int sum, bool oppoCheck); //placeholder
 
-int horizontalCheck(int boardArray[BOARD_ROWS][BOARD_COLUMNS], int columnHeights[BOARD_COLUMNS], int columnOfMove, int playerToken, int oppoToken);
-int verticalCheck(int boardArray[BOARD_ROWS][BOARD_COLUMNS], int columnHeights[BOARD_COLUMNS], int columnOfMove, int playerToken, int oppoToken);
-int positiveSlopeCheck(int boardArray[BOARD_ROWS][BOARD_COLUMNS], int columnHeights[BOARD_COLUMNS], int columnOfMove, int playerToken, int oppoToken);
-int negativeSlopeCheck(int boardArray[BOARD_ROWS][BOARD_COLUMNS], int columnHeights[BOARD_COLUMNS], int columnOfMove, int playerToken, int oppoToken);
+int horizontalCheck(int boardArray[BOARD_ROWS][BOARD_COLUMNS], int columnHeights[BOARD_COLUMNS], int columnOfMove, int playerToken, int oppoToken, bool oppoCheck = false);
+int verticalCheck(int boardArray[BOARD_ROWS][BOARD_COLUMNS], int columnHeights[BOARD_COLUMNS], int columnOfMove, int playerToken, int oppoToken, bool oppoCheck = false);
+int positiveSlopeCheck(int boardArray[BOARD_ROWS][BOARD_COLUMNS], int columnHeights[BOARD_COLUMNS], int columnOfMove, int playerToken, int oppoToken, bool oppoCheck = false);
+int negativeSlopeCheck(int boardArray[BOARD_ROWS][BOARD_COLUMNS], int columnHeights[BOARD_COLUMNS], int columnOfMove, int playerToken, int oppoToken, bool oppoCheck = false);
 
 //Main
 int main()
@@ -175,43 +181,39 @@ int gameWon(int boardArray[BOARD_ROWS][BOARD_COLUMNS], int currentPlayer)
 
 }
 
-int scorePoints(int playerToken, int sum)
+int scorePoints(int sum, bool oppoCheck)
 {
-  if(playerToken == ROBOT_TOKEN_TYPE) // Robot's perspective
+  if(!oppoCheck) //2, 5, 777, -2, -10, -999
   {
     if(sum == 2)
     {
-      return 30;  // Two in a row
+      return TWO_LINE;
     }
     else if(sum == 3)
     {
-      return 200;  // Three in a row
+      return THREE_LINE;
     }
     else if(sum == 4)
     {
-      return 1000;  // Four in a row, robot wins
+      return FOUR_LINE; //777
     }
   }
-  else if(playerToken == HUMAN_TOKEN_TYPE) // Human's perspective
+  else
   {
-    if(sum == 2)
+    if(sum == 3)
     {
-      return -1;  // Blocking two in a row
-    }
-    else if(sum == 3)
-    {
-      return -100;  // Blocking three in a row
+      return -1 * TWO_LINE;
     }
     else if(sum == 4)
     {
-      return -10000;  // Blocking four in a row, preventing robot from winning
+      return -1 * NEXT_FOUR_LINE; //-999
     }
   }
   
   return 0;  // Default case
 }
 
-int horizontalCheck(int boardArray[BOARD_ROWS][BOARD_COLUMNS], int columnHeights[BOARD_COLUMNS], int columnOfMove, int playerToken, int oppoToken)
+int horizontalCheck(int boardArray[BOARD_ROWS][BOARD_COLUMNS], int columnHeights[BOARD_COLUMNS], int columnOfMove, int playerToken, int oppoToken, bool oppoCheck)
 {
   int score = 0;
    
@@ -280,7 +282,7 @@ int horizontalCheck(int boardArray[BOARD_ROWS][BOARD_COLUMNS], int columnHeights
   
   if(!hitBarrier)
   {
-    score += scorePoints(playerToken, sum);
+    score += scorePoints(sum, oppoCheck);
   }
   
   hitBarrier = false;
@@ -340,14 +342,14 @@ int horizontalCheck(int boardArray[BOARD_ROWS][BOARD_COLUMNS], int columnHeights
   
   if(!hitBarrier && !(startCol[0] == endCol[1] && startCol[1] == endCol[0] || startCol[0] == startCol[1] && endCol[0] == endCol[1]))
   {
-    score += scorePoints(playerToken, sum);
+    score += scorePoints(sum, oppoCheck);
   }
   
   return score;
   
 }
 
-int verticalCheck(int boardArray[BOARD_ROWS][BOARD_COLUMNS], int columnHeights[BOARD_COLUMNS], int columnOfMove, int playerToken, int oppoToken)
+int verticalCheck(int boardArray[BOARD_ROWS][BOARD_COLUMNS], int columnHeights[BOARD_COLUMNS], int columnOfMove, int playerToken, int oppoToken, bool oppoCheck)
 {
   int score = 0;
    
@@ -416,7 +418,7 @@ int verticalCheck(int boardArray[BOARD_ROWS][BOARD_COLUMNS], int columnHeights[B
   
   if(!hitBarrier)
   {
-    score += scorePoints(playerToken, sum);
+    score += scorePoints(sum, oppoCheck);
   }
   
   hitBarrier = false;
@@ -476,14 +478,14 @@ int verticalCheck(int boardArray[BOARD_ROWS][BOARD_COLUMNS], int columnHeights[B
   
   if(!hitBarrier && !(startRow[0] == endRow[1] && startRow[1] == endRow[0] || startRow[0] == startRow[1] && endRow[0] == endRow[1]))
   {
-    score += scorePoints(playerToken, sum);
+    score += scorePoints(sum, oppoCheck);
   }
   
   return score;
   
 }
 
-int positiveSlopeCheck(int boardArray[BOARD_ROWS][BOARD_COLUMNS], int columnHeights[BOARD_COLUMNS], int columnOfMove, int playerToken, int oppoToken)
+int positiveSlopeCheck(int boardArray[BOARD_ROWS][BOARD_COLUMNS], int columnHeights[BOARD_COLUMNS], int columnOfMove, int playerToken, int oppoToken, bool oppoCheck)
 {
   int score = 0;
    
@@ -552,7 +554,7 @@ int positiveSlopeCheck(int boardArray[BOARD_ROWS][BOARD_COLUMNS], int columnHeig
   
   if(!hitBarrier)
   {
-    score += scorePoints(playerToken, sum);
+    score += scorePoints(sum, oppoCheck);
   }
   
   hitBarrier = false;
@@ -612,14 +614,14 @@ int positiveSlopeCheck(int boardArray[BOARD_ROWS][BOARD_COLUMNS], int columnHeig
   
   if(!hitBarrier && !((startRow[0] == endRow[1] && startCol[0] == endCol[1] && endRow[0] == startRow[1] && endCol[0] == startCol[1]) || (startRow[0] == startRow[1] && startCol[0] == startCol[1] && endRow[0] == endRow[1] && endCol[0] == endCol[1])))
   {
-    score += scorePoints(playerToken, sum);
+    score += scorePoints(sum, oppoCheck);
   }
   
   return score;
   
 }
 
-int negativeSlopeCheck(int boardArray[BOARD_ROWS][BOARD_COLUMNS], int columnHeights[BOARD_COLUMNS], int columnOfMove, int playerToken, int oppoToken)
+int negativeSlopeCheck(int boardArray[BOARD_ROWS][BOARD_COLUMNS], int columnHeights[BOARD_COLUMNS], int columnOfMove, int playerToken, int oppoToken, bool oppoCheck)
 {
   int score = 0;
    
@@ -688,7 +690,7 @@ int negativeSlopeCheck(int boardArray[BOARD_ROWS][BOARD_COLUMNS], int columnHeig
   
   if(!hitBarrier)
   {
-    score += scorePoints(playerToken, sum);
+    score += scorePoints(sum, oppoCheck);
   }
   
   hitBarrier = false;
@@ -748,7 +750,7 @@ int negativeSlopeCheck(int boardArray[BOARD_ROWS][BOARD_COLUMNS], int columnHeig
   
   if(!hitBarrier && !((startRow[0] == endRow[1] && startCol[0] == endCol[1] && endRow[0] == startRow[1] && endCol[0] == startCol[1]) || (startRow[0] == startRow[1] && startCol[0] == startCol[1] && endRow[0] == endRow[1] && endCol[0] == endCol[1])))
   {
-    score += scorePoints(playerToken, sum);
+    score += scorePoints(sum, oppoCheck);
   }
   
   return score;
@@ -758,31 +760,29 @@ int negativeSlopeCheck(int boardArray[BOARD_ROWS][BOARD_COLUMNS], int columnHeig
 int scoreBoard(int boardArray[BOARD_ROWS][BOARD_COLUMNS], int columnHeights[BOARD_COLUMNS], int columnOfMove, int playerToken, int oppoToken)
 {
   int score = 0;
+  int scoreCoefficient = 1;
+  if(playerToken == HUMAN_TOKEN_TYPE)
+  {
+    scoreCoefficient = -1;
+  }
   
   for(int colDropIndex = 0; colDropIndex < BOARD_COLUMNS; colDropIndex++)
   {
     const int emptyTokenRow = (BOARD_ROWS - 1) - columnHeights[colDropIndex];
-    if(emptyTokenRow > -1 && boardArray[emptyTokenRow][colDropIndex] == 0) //idk why i added the second condition...
+    if(emptyTokenRow > -1)
     {
       addTokenToArray(boardArray, columnHeights, emptyTokenRow, colDropIndex, oppoToken);
-      
-      /*cout << "(" << emptyTokenRow << ", " << colDropIndex << "): "
-           << horizontalCheck(boardArray, columnHeights, colDropIndex, oppoToken, playerToken) << ", "
-           << verticalCheck(boardArray, columnHeights, colDropIndex, oppoToken, playerToken) << ", "
-           << positiveSlopeCheck(boardArray, columnHeights, colDropIndex, oppoToken, playerToken) << ", "
-           << negativeSlopeCheck(boardArray, columnHeights, colDropIndex, oppoToken, playerToken) << endl;*/
-      
-      if(colDropIndex == columnOfMove)
+                  
+      if(colDropIndex != columnOfMove && (horizontalCheck(boardArray, columnHeights, colDropIndex, oppoToken, playerToken, true) <= -100 || verticalCheck(boardArray, columnHeights, colDropIndex, oppoToken, playerToken, true) <= -100 || positiveSlopeCheck(boardArray, columnHeights, colDropIndex, oppoToken, playerToken, true) <= -100 || negativeSlopeCheck(boardArray, columnHeights, colDropIndex, oppoToken, playerToken, true) <= -100))
       {
-        score += horizontalCheck(boardArray, columnHeights, columnOfMove, oppoToken, playerToken);
-        score += positiveSlopeCheck(boardArray, columnHeights, columnOfMove, oppoToken, playerToken);
-        score += negativeSlopeCheck(boardArray, columnHeights, columnOfMove, oppoToken, playerToken);
-      }
-      else if(horizontalCheck(boardArray, columnHeights, colDropIndex, oppoToken, playerToken) <= -100 || verticalCheck(boardArray, columnHeights, colDropIndex, oppoToken, playerToken) <= -100 || positiveSlopeCheck(boardArray, columnHeights, colDropIndex, oppoToken, playerToken) <= -100 || negativeSlopeCheck(boardArray, columnHeights, colDropIndex, oppoToken, playerToken) <= -100)
-      {
-        //displayScore(boardArray, colDropIndex, -100);
         removeTokenInArray(boardArray, columnHeights, emptyTokenRow, colDropIndex);
-        return -100;
+        return -1 * NEXT_FOUR_LINE * scoreCoefficient;
+      }
+      else if(colDropIndex == columnOfMove)
+      {
+        score += horizontalCheck(boardArray, columnHeights, columnOfMove, oppoToken, playerToken, true);
+        score += positiveSlopeCheck(boardArray, columnHeights, columnOfMove, oppoToken, playerToken, true);
+        score += negativeSlopeCheck(boardArray, columnHeights, columnOfMove, oppoToken, playerToken, true);
       }
       
       removeTokenInArray(boardArray, columnHeights, emptyTokenRow, colDropIndex);
@@ -791,14 +791,7 @@ int scoreBoard(int boardArray[BOARD_ROWS][BOARD_COLUMNS], int columnHeights[BOAR
   
   if(columnOfMove == 3)
   {
-    if(playerToken == ROBOT_TOKEN_TYPE)
-    {
-      score += 4;
-    }
-    else
-    {
-      score -= 2;
-    }
+    score += MIDDLE_COLUMN;
   }
   
   score += horizontalCheck(boardArray, columnHeights, columnOfMove, playerToken, oppoToken);
@@ -806,7 +799,7 @@ int scoreBoard(int boardArray[BOARD_ROWS][BOARD_COLUMNS], int columnHeights[BOAR
   score += positiveSlopeCheck(boardArray, columnHeights, columnOfMove, playerToken, oppoToken);
   score += negativeSlopeCheck(boardArray, columnHeights, columnOfMove, playerToken, oppoToken);
   
-  //displayScore(boardArray, columnOfMove, score);
+  score *= scoreCoefficient;
   
   return score;
   
@@ -837,25 +830,44 @@ int robotMove(int boardArray[BOARD_ROWS][BOARD_COLUMNS], int columnHeights[BOARD
 void minimaxAlg(int boardArray[BOARD_ROWS][BOARD_COLUMNS], int columnHeights[BOARD_COLUMNS], int depth, bool maxPlayer, minimaxReturns &values, int columnOfMove)
 {
   
-
-  if((depth == 0) || (gameWon(boardArray, ROBOT_TOKEN_TYPE)) || (gameWon(boardArray, HUMAN_TOKEN_TYPE)))
+  int wonRobot = gameWon(boardArray, ROBOT_TOKEN_TYPE);
+  int wonHuman = gameWon(boardArray, HUMAN_TOKEN_TYPE);
+  if(depth == 0 || wonRobot || wonHuman)
   {
     minimaxReturns scoreValue;
     
-//    if(wonNum == HUMAN_TOKEN_TYPE)
-//    {
-//    	scoreValue.score = -10000;
-//	}
-//	else if(wonNum == ROBOT_TOKEN_TYPE)
-//	{
-//		scoreValue.score = 10000;
-//	}
-     if(maxPlayer)
+    if(maxPlayer)
     {
+      if(wonRobot == ROBOT_TOKEN_TYPE)
+      {
+        values.score = FOUR_LINE;
+        values.columnOfMove = scoreValue.columnOfMove;
+        return;
+      }
+      else if(wonHuman == HUMAN_TOKEN_TYPE)
+      {
+        values.score = -1 * FOUR_LINE;
+        values.columnOfMove = scoreValue.columnOfMove;
+        return;
+      }
+      
       scoreValue.score = scoreBoard(boardArray, columnHeights, columnOfMove, HUMAN_TOKEN_TYPE, ROBOT_TOKEN_TYPE);
     }
     else
     {
+      if(wonRobot == ROBOT_TOKEN_TYPE)
+      {
+        values.score = FOUR_LINE;
+        values.columnOfMove = scoreValue.columnOfMove;
+        return;
+      }
+      else if(wonHuman == HUMAN_TOKEN_TYPE)
+      {
+        values.score = -1 * FOUR_LINE;
+        values.columnOfMove = scoreValue.columnOfMove;
+        return;
+      }
+      
       scoreValue.score = scoreBoard(boardArray, columnHeights, columnOfMove, ROBOT_TOKEN_TYPE, HUMAN_TOKEN_TYPE);
     }
     
@@ -881,7 +893,9 @@ void minimaxAlg(int boardArray[BOARD_ROWS][BOARD_COLUMNS], int columnHeights[BOA
         minimaxReturns possibleMoveScore;
         minimaxAlg(boardArray, columnHeights, depth - 1, false, possibleMoveScore, colDropIndex);
         
-        if(max(maxValues.score, possibleMoveScore.score) == possibleMoveScore.score /*&& possibleMoveScore.score != maxValues.score*/)
+        displayScore(boardArray, colDropIndex, possibleMoveScore.score);
+        
+        if(max(maxValues.score, possibleMoveScore.score) == possibleMoveScore.score) /*&& possibleMoveScore.score != maxValues.score*/
         {
           maxValues.score = possibleMoveScore.score;
           maxValues.columnOfMove = colDropIndex + 1;
@@ -916,7 +930,9 @@ void minimaxAlg(int boardArray[BOARD_ROWS][BOARD_COLUMNS], int columnHeights[BOA
         minimaxReturns possibleMoveScore;
         minimaxAlg(boardArray, columnHeights, depth - 1, true, possibleMoveScore, colDropIndex);
         
-        if(min(minValues.score, possibleMoveScore.score) == possibleMoveScore.score /*&& possibleMoveScore.score != minValues.score*/)
+        displayScore(boardArray, colDropIndex, possibleMoveScore.score);
+        
+        if(min(minValues.score, possibleMoveScore.score) == possibleMoveScore.score) /*&& possibleMoveScore.score != minValues.score*/
         {
           minValues.score = possibleMoveScore.score;
           minValues.columnOfMove = colDropIndex + 1;
