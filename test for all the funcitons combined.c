@@ -475,14 +475,14 @@ task main()
 
 		if(isHumanPlaying){
 			MSMMotor(mmotor_S4_2,2);
-			while (MSMMotorEncoder(mmotor_S4_2) > -90){}
+			while (MSMMotorEncoder(mmotor_S4_2) < 95){}
 			MSMotorStop(mmotor_S4_2);
 		}
 
 		else
 			{
 			MSMMotor(mmotor_S4_2, -2);
-			while (MSMMotorEncoder(mmotor_S4_2) < 0){}
+			while (MSMMotorEncoder(mmotor_S4_2) > -5){}
 			MSMotorStop(mmotor_S4_2);
 		}
 		return;
