@@ -1,9 +1,10 @@
 void spinnerMotor(bool isHumanPlaying);
 void configureMotors();
-
+#include "mindsensors-motormux.h"
 
 task main()
 {
+	MSMMUXinit();
 	configureMotors();
 	for(int i = 0; i <= 5; i ++){
 		spinnerMotor(true);
@@ -12,37 +13,37 @@ task main()
 		wait1Msec(1000);
 	}
 	spinnerMotor(true);
-	motor[motorC] = 10;
+	MSMMotor(mmotor_S4_1, 1);
 	while(nMotorEncoder[motorC] < 360)
 {}
-	motor[motorC] = 0;
+	MSMotorStop(mmotor_S4_1);
 }
 
 void spinnerMotor(bool isHumanPlaying){
 
 	if(isHumanPlaying)
 	{
-		motor[motorC] = 10;
-		while (nMotorEncoder[motorC] < 95)
+		MSMMotor(mmotor_S4_1, 1);
+		while (MSMMotorEncoder(mmotor_S4_1) < 95)
 		{}
-		motor[motorC] = 0;
+		MSMotorStop(mmotor_S4_1);
 	}
 	else
 	{
 
-		motor[motorC] = -10;
-		while (nMotorEncoder[motorC] > -5)
+		MSMMotor(mmotor_S4_1, -1);
+		while (MSMMotorEncoder(mmotor_S4_1) > -5)
 		{}
-		motor[motorC] = 0;
+		MSMotorStop(mmotor_S4_1);
 	}
 	return;
 }
 
 void configureMotors()
 {
-	nMotorEncoder[motorC] =  0;
+	MSMMotorEncoderReset(mmotor_S4_1);
 
 
 	wait1Msec(500);
-	motor[motorC]= 0 ;
+	MSMotorStop(mmotor_S4_1);
 }
