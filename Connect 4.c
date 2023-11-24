@@ -465,6 +465,7 @@ int moveSelect(int currentCol, int currentPlayer, bool &exitProgram)
 	while(getButtonPress(buttonEnter))
 	{}
 
+<<<<<<< Updated upstream
 	return selectCol;
 }
 
@@ -597,9 +598,16 @@ void sortTokens(){
 	motor[motorC] = -10;
 	time1[T3] = 0;
 
+=======
+	void sortTokens(){
+		motor[motorC] = -7;
+	  time1[T3] = 0;
+	  time1[T4] = 0;
+>>>>>>> Stashed changes
 
 	int previousMotor = 100;
 
+<<<<<<< Updated upstream
 	while(SensorValue[S1] == 0){
 		if(SensorValue[S2] == 4) {
 			motor[motorB] = -35;
@@ -624,6 +632,40 @@ void sortTokens(){
 			previousMotor = nMotorEncoder[motorC];
 			time1[T3] = 0;
 		}
+=======
+		while(SensorValue[S1] == 0){
+			if(SensorValue[S2] == 4) {
+				motor[motorB] = -60;
+				while(nMotorEncoder[motorB] > -55){}
+				motor[motorB] = 0;
+
+			}
+
+			else if(SensorValue[S2] == 5) {
+				time1[T4] = 0;
+				while(time1[T4] < 500){}
+				time1[T4] = 0;
+				motor[motorB] = 60;
+				while(nMotorEncoder[motorB] < 0){}
+				motor[motorB] = 0;
+			}
+
+			if(time1[T3] >= 500){
+				if(previousMotor == nMotorEncoder[motorC]){
+					motor[motorC] = 7;
+					wait1Msec(1000);
+					motor[motorC] = -7;
+				}
+				previousMotor = nMotorEncoder[motorC];
+				time1[T3] = 0;
+			}
+		}
+
+		motor[motorC] = 0;
+		motor[motorB] = 30;
+		while(nMotorEncoder[motorB] < 0){}
+		motor[motorB] = 0;
+>>>>>>> Stashed changes
 	}
 
 	motor[motorC] = 0;
@@ -688,6 +730,7 @@ int horizontalCheck(int row, int column, int playerToken, int oppoToken, bool op
 
 	for(int colOffset = 1; colOffset < 4; colOffset++)
 	{
+<<<<<<< Updated upstream
 		int currentToken = boardArray[START_ROW][START_COLUMN + colOffset];
 
 		if(currentToken == oppoToken || START_COLUMN + colOffset == BOARD_COLUMNS)
@@ -698,6 +741,12 @@ int horizontalCheck(int row, int column, int playerToken, int oppoToken, bool op
 		{
 			sum++;
 		}
+=======
+		motor[motorC] = 10;
+		while(nMotorEncoder[motorC] < 360)
+		{}
+		motor[motorC] = 0;
+>>>>>>> Stashed changes
 	}
 
 	score += scorePoints(sum, oppoCheck);

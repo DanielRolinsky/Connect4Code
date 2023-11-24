@@ -8,7 +8,7 @@ void sortTokens(){
 
 	while(SensorValue[T1] == 0){
   		if(SensorValue[S2] == 4) {
-  			motor[motorB] = -35;
+  			motor[motorB] = -60;
   			while(nMotorEncoder[motorB] > -60){}
   			motor[motorB] = 0;
 
@@ -16,7 +16,7 @@ void sortTokens(){
 
 			else if(SensorValue[S2] == 5) {
 		 		  wait1Msec(500);
-		    	motor[motorB] = 35;
+		    	motor[motorB] = 60;
 	  			while(nMotorEncoder[motorB] < 0){}
 	  			motor[motorB] = 0;
 			 }
@@ -33,7 +33,7 @@ void sortTokens(){
   }
 
 	motor[motorC] = 0;
-	motor[motorB] = 35;
+	motor[motorB] = 30;
   while(nMotorEncoder[motorB] < 0){}
   motor[motorB] = 0;
   wait1Msec(5000);
