@@ -9,9 +9,9 @@ const int DEFAULT_DISPLAY_LINE = 3;
 const int HUMAN_TOKEN_TYPE = 1;
 const int ROBOT_TOKEN_TYPE = 2;
 
- typedef struct
+typedef struct
 {
-  int score, columnOfMove;
+	int score, columnOfMove;
 } minimaxReturns ;
 int horizontalCheck(int *columnHeights,int columnOfMove, int playerToken, int oppoToken);
 int verticalCheck(int *columnHeights, int columnOfMove, int playerToken, int oppoToken);
@@ -35,32 +35,32 @@ void sensorConfig();
 void configureMotors();
 void waitButton(TEV3Buttons buttonName);
 void motorHold(int column);
-void playGame(int & currentPlayer);
+void playGame(int & currentPlayer, bool playerTwo, bool & exitProgram);
 void dropToken(int *columnHeights, int choiceCol, bool isHumanPlaying); // done
 void sortTokens();
 int gameWon(int & currentPlayer);
-void humanMove(int *columnHeights, int currentCol);
-// void HumanMove2(int *columnHeights, int currentCol);
+void humanMove(int *columnHeights, int currentCol, int currentPlayer, bool & exitProgram);
+void HumanMove2(int *columnHeights, int currentCol, int currentPlayer, bool & exitProgram);
 void resetSpinner();
 
 //void gameReset(int currentCol);
-int moveSelect(int currentCol);
+int moveSelect(int currentCol, int currentPlayer, bool & exitProgram);
 void spinnerMotor(bool isHumanPlaying); // done
 bool legalCheck(int choiceCol);
 
 const int colAngle[7]=
-	{0, -70, -145, -215, -300, -400, -528};
+{0, -70, -145, -215, -300, -400, -528};
 
 
 int boardArray[BOARD_ROWS][BOARD_COLUMNS] =
-    {
-		{0,0,0,0,0,0,0},
-    {0,0,0,0,0,0,0},
-    {0,0,0,0,0,0,0},
-    {0,0,0,0,0,0,0},
-    {0,0,0,0,0,0,0},
-    {0,0,0,0,0,0,0}
-    };
+{
+	{0,0,0,0,0,0,0},
+	{0,0,0,0,0,0,0},
+	{0,0,0,0,0,0,0},
+	{0,0,0,0,0,0,0},
+	{0,0,0,0,0,0,0},
+	{0,0,0,0,0,0,0}
+};
 
 #include "mindsensors-motormux.h"
 task main()
@@ -69,19 +69,20 @@ task main()
 
 
 	bool playAgain = true;
+	bool exitProgram = false;
 
-	while(playAgain == true)
+	while(playAgain == true && exitProgram == false)
 	{
 
-	MSMMUXinit();
-	SensorType[S4] = sensorI2CCustom;
-	//bool stillPlaying = false;
-	//while(stillPlaying)
+		MSMMUXinit();
+		SensorType[S4] = sensorI2CCustom;
+		//bool stillPlaying = false;
+		//while(stillPlaying)
 
 
 
 
-	int	currentPlayer = 0;
+		int	currentPlayer = 0;
 
 		sensorConfig();
 		configureMotors();
@@ -90,13 +91,44 @@ task main()
 		displayBigTextLine(DEFAULT_DISPLAY_LINE + 3, "On Top!");
 		displayBigTextLine(DEFAULT_DISPLAY_LINE + 6, "Then Press");
 		displayBigTextLine(DEFAULT_DISPLAY_LINE + 9, "Enter To Play!");
-
-	//	displayBigTextLine(DEFAULT_DISPLAY_LINE + 1, "Then press Enter to play!");
 		waitButton(buttonEnter);
 		eraseDisplay();
 
-		playGame(currentPlayer);
+		displayBigTextLine(DEFAULT_DISPLAY_LINE, "Select Mode:");
+		displayBigTextLine(DEFAULT_DISPLAY_LINE + 3, "Up Button: PvP");
+		displayBigTextLine(DEFAULT_DISPLAY_LINE + 6, "Enter Button:");
+		displayBigTextLine(DEFAULT_DISPLAY_LINE + 9, "Player V CPU");
 
+		bool playerTwo = false;
+		bool modeSelected = false;
+		while(!modeSelected){
+			if(getButtonPress(buttonEnter))
+			{
+				while(getButtonPress(buttonEnter)){}
+				playerTwo = true;
+				modeSelected = true;
+			}
+			else if(getButtonPress(buttonUp))
+			{
+				while(getButtonPress(buttonUp)){}
+				playerTwo = false;
+				modeSelected = true;
+			}
+
+		}
+
+
+
+
+
+		playGame(currentPlayer, playerTwo, exitProgram);
+//			if(exitProgramCondition(exitProgram) == true)
+			//	{
+
+			//	exitProgram = true;
+
+			//	}
+    if(!exitProgram){
 		eraseDisplay();
 		displayBigTextLine(DEFAULT_DISPLAY_LINE, "Put Cartridges");
 		displayBigTextLine(DEFAULT_DISPLAY_LINE + 3, "At The Bottom");
@@ -109,9 +141,9 @@ task main()
 
 		while(SensorValue[S1] == 0)
 		{}
-			eraseDisplay();
-			resetSpinner();
-			sortTokens();
+		eraseDisplay();
+		resetSpinner();
+		sortTokens();
 
 
 		displayBigTextLine(DEFAULT_DISPLAY_LINE, "Put Cartridges ");
@@ -128,64 +160,68 @@ task main()
 		displayBigTextLine(DEFAULT_DISPLAY_LINE + 6, "Or Press");
 		displayBigTextLine(DEFAULT_DISPLAY_LINE + 9, "Up To Exit");
 
-			bool choiceSelected = false;
+		bool choiceSelected = false;
 		while(!choiceSelected){
-		if(getButtonPress(buttonEnter))
+			if(getButtonPress(buttonEnter))
 			{
 				while(getButtonPress(buttonEnter)){}
-				 playAgain = true;
+				playAgain = true;
 				choiceSelected = true;
 				for(int row = 0; row < BOARD_ROWS; row ++)
 				{
 					for(int col = 0; col < BOARD_COLUMNS; col ++)
 					{
-					boardArray[row][col] = 0;
-					columnHeights[col] = 0;
+						boardArray[row][col] = 0;
+						columnHeights[col] = 0;
 					}
 				}
 			}
-		else if(getButtonPress(buttonUp))
-		{
-			while(getButtonPress(buttonUp)){}
-			playAgain = false;
-			choiceSelected = true;
+			else if(getButtonPress(buttonUp))
+			{
+				while(getButtonPress(buttonUp)){}
+				playAgain = false;
+				choiceSelected = true;
+			}
+
 		}
 
-	}
-
-			eraseDisplay();
-
-	}
-
-
-
-
 		eraseDisplay();
-	time1[T2] =0;
-	displayString(DEFAULT_DISPLAY_LINE, "Thank You");
-	displayString(DEFAULT_DISPLAY_LINE +3 , "For Playing!");
 
-	while(time1[T2] < 7000){}
-	eraseDisplay();
+	}
+
+
+
+	if(exitProgram == false)
+	{
+		eraseDisplay();
+		time1[T2] =0;
+		displayString(DEFAULT_DISPLAY_LINE, "Thank You");
+		displayString(DEFAULT_DISPLAY_LINE +3 , "For Playing!");
+
+		while(time1[T2] < 7000){}
+		eraseDisplay();
+	}
+}
+
 
 }
 
 /*
 void gameReset(int currentCol){
-	//dropToken(currentConverPos, 1, )
-    displayString(DEFAULT_DISPLAY_LINE, "Press enter to continue playing");
-	displayString(DEFAULT_DISPLAY_LINE, "press any other to terminate program");
-	while(!getButtonPress(buttonAny)){}
-	eraseDisplay();
-	if(getButtonPress(buttonEnter)){
-		//stillPlaying = 1;
-		return;
-	}
+//dropToken(currentConverPos, 1, )
+displayString(DEFAULT_DISPLAY_LINE, "Press enter to continue playing");
+displayString(DEFAULT_DISPLAY_LINE, "press any other to terminate program");
+while(!getButtonPress(buttonAny)){}
+eraseDisplay();
+if(getButtonPress(buttonEnter)){
+//stillPlaying = 1;
+return;
+}
 
-	else{
-	//	stillPlaying = 0;
-		return;
-	}
+else{
+//	stillPlaying = 0;
+return;
+}
 }
 */
 
@@ -212,54 +248,54 @@ int gameWon(int & currentPlayer)
 	{
 		for(int col = 0; col < 7; col++)
 		{
-				int row1 = row - 1;
-				int row2 = row - 2;
-				int row3 = row - 3;
+			int row1 = row - 1;
+			int row2 = row - 2;
+			int row3 = row - 3;
 			if(row > 2)
 			{
 
+				if(boardArray[row][col] == currentPlayer
+					&& boardArray[row1][col] == currentPlayer
+				&& boardArray[row2][col] == currentPlayer
+				&& boardArray[row3][col] == currentPlayer)
+				{
+					return win;
+				} // checks vertical
+
+				if(col < 4)
+				{
 					if(boardArray[row][col] == currentPlayer
-						&& boardArray[row1][col] == currentPlayer
-						&& boardArray[row2][col] == currentPlayer
-						&& boardArray[row3][col] == currentPlayer)
+						&& boardArray[row][col + 1] == currentPlayer
+					&& boardArray[row][col + 2] == currentPlayer
+					&& boardArray[row][col + 3] == currentPlayer)
 					{
 						return win;
-					} // checks vertical
+					} // checks horizontal
 
-					if(col < 4)
+					if(boardArray[row][col] == currentPlayer
+						&& boardArray[row1][col + 1] == currentPlayer
+					&& boardArray[row2][col + 2] == currentPlayer
+					&& boardArray[row3][col + 3] == currentPlayer)
 					{
-						if(boardArray[row][col] == currentPlayer
-							&& boardArray[row][col + 1] == currentPlayer
-							&& boardArray[row][col + 2] == currentPlayer
-							&& boardArray[row][col + 3] == currentPlayer)
-						{
-							return win;
-						} // checks horizontal
-
-						if(boardArray[row][col] == currentPlayer
-							&& boardArray[row1][col + 1] == currentPlayer
-							&& boardArray[row2][col + 2] == currentPlayer
-							&& boardArray[row3][col + 3] == currentPlayer)
-						{
-							return win;
-						} // checks +ve slope
-					}
+						return win;
+					} // checks +ve slope
+				}
 
 			}
 			else if(col < 4)
 			{
 				if(boardArray[row][col] == currentPlayer
 					&& boardArray[row][col + 1] == currentPlayer
-					&& boardArray[row][col + 2] == currentPlayer
-					&& boardArray[row][col + 3] == currentPlayer)
+				&& boardArray[row][col + 2] == currentPlayer
+				&& boardArray[row][col + 3] == currentPlayer)
 				{
 					return win;
 				} // checks horizontal
 
 				if(boardArray[row][col] == currentPlayer
 					&& boardArray[row + 1][col + 1] == currentPlayer
-					&& boardArray[row + 2][col + 2] == currentPlayer
-					&& boardArray[row + 3][col + 3] == currentPlayer)
+				&& boardArray[row + 2][col + 2] == currentPlayer
+				&& boardArray[row + 3][col + 3] == currentPlayer)
 				{
 					return win;
 				} // checks -ve slope
@@ -273,31 +309,58 @@ int gameWon(int & currentPlayer)
 
 
 
-void playGame(int &currentPlayer){
+void playGame(int &currentPlayer, bool playerTwo, bool &exitProgram){
+
 	currentPlayer = 1;
 	int columnHeights[BOARD_COLUMNS] = {0,0,0,0,0,0,0};
 	int currentCol = 1;
 
-	while(gameWon(currentPlayer) == 0)
+	while(gameWon(currentPlayer) == 0 && exitProgram == false)
 	{
+
+		//exitProgramCondition(exitProgram);
+		//if(exitProgramCondition(exitProgram) == true)
+			//	{
+				//  writeDebugStreamLine("Exiting playGame due to exitProgram.");
+			//		return;
+			//	}
 		currentPlayer = 1;
-		humanMove(columnHeights, currentCol);
-		if(gameWon(currentPlayer) == 0)
+		humanMove(columnHeights, currentCol, currentPlayer, exitProgram);
+
+			//exitProgramCondition(exitProgram);
+
+		if(gameWon(currentPlayer) == 0 && exitProgram == false)
 		{
-			currentPlayer = 2;
-		robotMove(columnHeights);
+
+			if(playerTwo == true)
+			{
+
+				currentPlayer = 2;
+				robotMove(columnHeights);
+
+
+			}
+			else
+		{
+				currentPlayer = 2;
+				HumanMove2(columnHeights, currentCol, currentPlayer, exitProgram);
+
+			}
+		}
+//		nMotorEncoder[motorA] = 0;
 	}
-}
-	nMotorEncoder[motorA] = 0;
+
 	return;
-
 }
 
-void humanMove(int *columnHeights, int currentCol){
+void humanMove(int *columnHeights, int currentCol, int currentPlayer, bool &exitProgram){
+
 	int choiceCol = 1;
 	do {
-		choiceCol = moveSelect(choiceCol);
-	} while(!legalCheck(choiceCol));
+		choiceCol = moveSelect(choiceCol, currentPlayer, exitProgram);
+	} while(!legalCheck(choiceCol) && exitProgram == false);
+	if(exitProgram == true)
+		return;
 
 	dropToken(columnHeights, choiceCol, true); // means human is playing
 	return;
@@ -306,39 +369,57 @@ void humanMove(int *columnHeights, int currentCol){
 
 int robotMove(int *columnHeights)
 {
-    // Use the minimax algorithm to find the best move
-    minimaxReturns* values = minimaxAlg(columnHeights, 2, true);
+	// Use the minimax algorithm to find the best move
+	minimaxReturns* values = minimaxAlg(columnHeights, 2, true);
+	displayBigTextLine(DEFAULT_DISPLAY_LINE, "Robot Move");
+	displayBigTextLine(DEFAULT_DISPLAY_LINE +3 , "Current Column:");
+	displayBigTextLine(DEFAULT_DISPLAY_LINE +6 , "%d", values->columnOfMove);
 
-    // Drop the token into the chosen column
-    dropToken(columnHeights, values->columnOfMove, false);
+	// Drop the token into the chosen column
+	dropToken(columnHeights, values->columnOfMove, false);
 
 
-    // Return the chosen column
-    return values->columnOfMove;
+	// Return the chosen column
+	return values->columnOfMove;
 }
 
 
-/*
-void HumanMove2(int *columnHeights, int currentCol){
+
+void HumanMove2(int *columnHeights, int currentCol, int currentPlayer, bool &exitProgram){
+
 	int choiceCol = 1;
 	do {
-		choiceCol = moveSelect(currentCol);
-	} while(!legalCheck(choiceCol));
+		choiceCol = moveSelect(currentCol, currentPlayer, exitProgram);
+	} while(!legalCheck(choiceCol) && exitProgram == false);
 
+	if(exitProgram == true)
+		return;
 	dropToken(columnHeights, choiceCol, false); // means human is playing
 
+	return;
 }
-*/
-int moveSelect(int currentCol)
+
+int moveSelect(int currentCol, int currentPlayer, bool &exitProgram)
 {
+
 	int selectCol = currentCol;
+  time1[T1] = 0;
+
 	eraseDisplay();
-	displayBigTextLine(DEFAULT_DISPLAY_LINE, "Current Column:");
-	displayBigTextLine(DEFAULT_DISPLAY_LINE +3 , "%d", selectCol);
+	displayBigTextLine(DEFAULT_DISPLAY_LINE, "Player: %d", currentPlayer);
+	displayBigTextLine(DEFAULT_DISPLAY_LINE +3, "Current Column:");
+	displayBigTextLine(DEFAULT_DISPLAY_LINE +6 , "%d", selectCol);
 
 
-	while(!getButtonPress(buttonEnter))
+	while(!getButtonPress(buttonEnter) && !exitProgram)
 	{
+		if(SensorValue[S1] == 1 && time1[T1] > 1500){
+		  exitProgram = true;
+	  }
+   	else if(SensorValue[S1] == 0){
+	  	time1[T1] = 0;
+	  }
+
 		if(getButtonPress(buttonUp))
 		{
 			while(getButtonPress(buttonUp))
@@ -354,8 +435,9 @@ int moveSelect(int currentCol)
 			}
 
 			eraseDisplay();
-			displayBigTextLine(DEFAULT_DISPLAY_LINE, "Current Column:");
-			displayBigTextLine(DEFAULT_DISPLAY_LINE +3 , "%d", selectCol);
+			displayBigTextLine(DEFAULT_DISPLAY_LINE, "Player: %d", currentPlayer);
+			displayBigTextLine(DEFAULT_DISPLAY_LINE +3 , "Current Column:");
+			displayBigTextLine(DEFAULT_DISPLAY_LINE +6 , "%d", selectCol);
 
 
 			wait1Msec(500);
@@ -375,10 +457,13 @@ int moveSelect(int currentCol)
 			}
 
 			eraseDisplay();
-			displayString(DEFAULT_DISPLAY_LINE, "Current Column: %d", selectCol);
+			displayBigTextLine(DEFAULT_DISPLAY_LINE, "Player: %d", currentPlayer);
+			displayBigTextLine(DEFAULT_DISPLAY_LINE +3 , "Current Column:");
+			displayBigTextLine(DEFAULT_DISPLAY_LINE +6 , "%d", selectCol);
 
 			wait1Msec(500);
 		}
+
 	}
 	while(getButtonPress(buttonEnter))
 	{}
@@ -389,10 +474,10 @@ int moveSelect(int currentCol)
 bool legalCheck(int choiceCol)
 {
 	if(boardArray[0][choiceCol - 1] == 0 && choiceCol >= 1 && choiceCol <= 7)
-  {
-    return true;
-  }
-  return false;
+	{
+		return true;
+	}
+	return false;
 }
 
 
@@ -460,8 +545,8 @@ void dropToken(int *columnHeights, int choiceCol, bool isHumanPlaying)
 		}
 
 	}
-		motor[motorA] = motor[motorD] = 0;
-		wait1Msec(500);
+	motor[motorA] = motor[motorD] = 0;
+	wait1Msec(500);
 
 
 
@@ -473,8 +558,8 @@ void dropToken(int *columnHeights, int choiceCol, bool isHumanPlaying)
 	}
 	int emptyTokenRow = (BOARD_ROWS - 1) - columnHeights[choiceCol];
 
-  boardArray[emptyTokenRow][choiceCol] = tokenType;
-  columnHeights[choiceCol] += 1;
+	boardArray[emptyTokenRow][choiceCol] = tokenType;
+	columnHeights[choiceCol] += 1;
 
 	motor[motorA] = -15;
 	motor[motorD] = -15;
@@ -490,40 +575,20 @@ void dropToken(int *columnHeights, int choiceCol, bool isHumanPlaying)
 
 void motorHold(int column)
 {
-		while(nMotorEncoder[motorA] < colAngle[column])
-		{
-			motor[motorD] = -1;
-			motor[motorA] = -2;
-		}
-		while(nMotorEncoder[motorA] > colAngle[column])
-		{
-			motor[motorD] = 2;
-			motor[motorA] = 1;
-		}
-		motor[motorD] = 1;
-		motor[motorA] = -1;
+	while(nMotorEncoder[motorA] < colAngle[column])
+	{
+		motor[motorD] = -1;
+		motor[motorA] = -2;
+	}
+	while(nMotorEncoder[motorA] > colAngle[column])
+	{
+		motor[motorD] = 2;
+		motor[motorA] = 1;
+	}
+	motor[motorD] = 1;
+	motor[motorA] = -1;
 
 }
-
-/*
-void gameReset(int currentCol){
-	//dropToken(currentConverPos, 1, )
-    displayString(DEFAULT_DISPLAY_LINE, "Press enter to continue playing");
-	displayString(DEFAULT_DISPLAY_LINE, "press any other to terminate program");
-	while(!getButtonPress(buttonAny)){}
-	eraseDisplay();
-	if(getButtonPress(buttonEnter)){
-		stillPlaying = 1;
-		return;
-	}
-
-	else{
-		stillPlaying = 0;
-		return;
-	}
-}
-*/
-
 
 
 void sortTokens(){
@@ -533,43 +598,43 @@ void sortTokens(){
 	wait1Msec(100);
 	time1[T4] = 0;
 	int previousMotor = 100;
-	int nextEncoder = 0;
+
 
 	while(time1[T3] < 30000 || SensorValue[S1] == 0 ){
-  		if(SensorValue[S2] == 4) {
-  			motor[motorB] = -35;
-  			while(nMotorEncoder[motorB] > -55){}
-  			motor[motorB] = 0;
-  			time1[T3] = 0;
+		if(SensorValue[S2] == 4) {
+			motor[motorB] = -35;
+			while(nMotorEncoder[motorB] > -55){}
+			motor[motorB] = 0;
+			time1[T3] = 0;
 		}
 
 		else if(SensorValue[S2] == 5) {
-	 		wait1Msec(500);
-	    	motor[motorB] = 35;
-  			while(nMotorEncoder[motorB] < 0){}
-  			motor[motorB] = 0;
-  			time1[T3] = 0;
+			wait1Msec(500);
+			motor[motorB] = 35;
+			while(nMotorEncoder[motorB] < 0){}
+			motor[motorB] = 0;
+			time1[T3] = 0;
 
 		}
 
 		if(time1[T4] >= 1000){
 
-				if(previousMotor == MSMMotorEncoder(mmotor_S4_1)){
-						MSMMotor(mmotor_S4_1, 1);
-						wait1Msec(1000);
-						MSMMotor(mmotor_S4_1, -1);
-						}
+			if(previousMotor == MSMMotorEncoder(mmotor_S4_1)){
+				MSMMotor(mmotor_S4_1, 1);
+				wait1Msec(1000);
+				MSMMotor(mmotor_S4_1, -1);
+			}
 
-						previousMotor = MSMMotorEncoder(mmotor_S4_1);
-						time1[T4] = 0;
-					}
-    }
+			previousMotor = MSMMotorEncoder(mmotor_S4_1);
+			time1[T4] = 0;
+		}
+	}
 
 	motor[motorB] = 30;
-  	while(nMotorEncoder[motorB] < 0)
-  		{}
-  	MSMotorStop(mmotor_S4_1);
-  	motor[motorB] = 0;
+	while(nMotorEncoder[motorB] < 0)
+	{}
+	MSMotorStop(mmotor_S4_1);
+	motor[motorB] = 0;
 }
 
 void waitButton(TEV3Buttons buttonName)
@@ -583,16 +648,11 @@ void waitButton(TEV3Buttons buttonName)
 }
 
 
-
-
-
-
-
 void resetSpinner()
 {
 	motor[motorC] = 20;
 	while(nMotorEncoder[motorC] < 360)
-{}
+	{}
 	motor[motorC] = 0;
 
 }
@@ -601,638 +661,638 @@ void resetSpinner()
 
 int scorePoints(int playerToken, int sum)
 {
-  if(playerToken == ROBOT_TOKEN_TYPE) //2, 5, 777, -2, -10, -999
-  {
-     if(sum == 2)
-    {
-      return 10; // Two in a row
-    }
-    else if(sum == 3)
-    {
-      return 10;  // Three in a row
-    }
-    else if(sum == 4)
-    {
-      return 1000;  // Four in a row, robot wins
-    }
-  }
-  else if(playerToken == HUMAN_TOKEN_TYPE) // Human's perspective
-  {
-    if(sum == 2)
-    {
-      return -1;  // Blocking two in a row
-    }
-    else if(sum == 3)
-    {
-      return -100;  // Blocking three in a row
-    }
-    else if(sum == 4)
-    {
-      return -10000;  // Blocking four in a row, preventing robot from winning
-    }
-  }
+	if(playerToken == ROBOT_TOKEN_TYPE) //2, 5, 777, -2, -10, -999
+	{
+		if(sum == 2)
+		{
+			return 10; // Two in a row
+		}
+		else if(sum == 3)
+		{
+			return 10;  // Three in a row
+		}
+		else if(sum == 4)
+		{
+			return 1000;  // Four in a row, robot wins
+		}
+	}
+	else if(playerToken == HUMAN_TOKEN_TYPE) // Human's perspective
+	{
+		if(sum == 2)
+		{
+			return -1;  // Blocking two in a row
+		}
+		else if(sum == 3)
+		{
+			return -100;  // Blocking three in a row
+		}
+		else if(sum == 4)
+		{
+			return -10000;  // Blocking four in a row, preventing robot from winning
+		}
+	}
 
-  return 0;
+	return 0;
 }
 
 int horizontalCheck( int *columnHeights, int columnOfMove, int playerToken, int oppoToken)
 {
-  int score = 0;
+	int score = 0;
 
-  const int TOKEN_ROW = BOARD_ROWS - columnHeights[columnOfMove];
-  const int TOKEN_COLUMN = columnOfMove;
+	const int TOKEN_ROW = BOARD_ROWS - columnHeights[columnOfMove];
+	const int TOKEN_COLUMN = columnOfMove;
 
-  int startRow[2] = {-1, -2}; //can maybe intialize with token row for horizontal...
-  int startCol[2] = {-3, -4};
-  int endRow[2] = {-5, -6};
-  int endCol[2] = {-7, -8};
+	int startRow[2] = {-1, -2}; //can maybe intialize with token row for horizontal...
+	int startCol[2] = {-3, -4};
+	int endRow[2] = {-5, -6};
+	int endCol[2] = {-7, -8};
 
-  bool hitBarrier = false;
-  int sum = 1;
-  int spacesLeft = 3;
+	bool hitBarrier = false;
+	int sum = 1;
+	int spacesLeft = 3;
 
-  for(int colOffset = 1; colOffset <= spacesLeft && !hitBarrier; colOffset++)
-  {
-    int currentToken = boardArray[TOKEN_ROW][TOKEN_COLUMN + colOffset];
+	for(int colOffset = 1; colOffset <= spacesLeft && !hitBarrier; colOffset++)
+	{
+		int currentToken = boardArray[TOKEN_ROW][TOKEN_COLUMN + colOffset];
 
-    if(currentToken == oppoToken || TOKEN_COLUMN + colOffset == BOARD_COLUMNS)
-    {
-      hitBarrier = true;
-      startRow[0] = TOKEN_ROW;
-      startCol[0] = TOKEN_COLUMN + colOffset - 1;
-      spacesLeft -= (colOffset - 1);
-    }
-    else if(currentToken == playerToken)
-    {
-      sum++;
-    }
-  }
+		if(currentToken == oppoToken || TOKEN_COLUMN + colOffset == BOARD_COLUMNS)
+		{
+			hitBarrier = true;
+			startRow[0] = TOKEN_ROW;
+			startCol[0] = TOKEN_COLUMN + colOffset - 1;
+			spacesLeft -= (colOffset - 1);
+		}
+		else if(currentToken == playerToken)
+		{
+			sum++;
+		}
+	}
 
-  if(hitBarrier)
-  {
-    hitBarrier = false;
+	if(hitBarrier)
+	{
+		hitBarrier = false;
 
-    for(int colOffset = 1; colOffset <= spacesLeft && !hitBarrier; colOffset++)
-    {
-      int currentToken = boardArray[TOKEN_ROW][TOKEN_COLUMN - colOffset];
+		for(int colOffset = 1; colOffset <= spacesLeft && !hitBarrier; colOffset++)
+		{
+			int currentToken = boardArray[TOKEN_ROW][TOKEN_COLUMN - colOffset];
 
-      if(currentToken == oppoToken || TOKEN_COLUMN - colOffset == -1)
-      {
-        hitBarrier = true;
-        startRow[0] = -1;
-        startCol[0] = -3;
-      }
-      else if(currentToken == playerToken)
-      {
-        sum++;
-      }
-    }
+			if(currentToken == oppoToken || TOKEN_COLUMN - colOffset == -1)
+			{
+				hitBarrier = true;
+				startRow[0] = -1;
+				startCol[0] = -3;
+			}
+			else if(currentToken == playerToken)
+			{
+				sum++;
+			}
+		}
 
-    if(!hitBarrier)
-    {
-      endRow[0] = TOKEN_ROW;
-      endCol[0] = TOKEN_COLUMN - spacesLeft;
-    }
-  }
-  else
-  {
-    startRow[0] = TOKEN_ROW;
-    startCol[0] = TOKEN_COLUMN;
-    endRow[0] = TOKEN_ROW;
-    endCol[0] = TOKEN_COLUMN + spacesLeft;
-  }
+		if(!hitBarrier)
+		{
+			endRow[0] = TOKEN_ROW;
+			endCol[0] = TOKEN_COLUMN - spacesLeft;
+		}
+	}
+	else
+	{
+		startRow[0] = TOKEN_ROW;
+		startCol[0] = TOKEN_COLUMN;
+		endRow[0] = TOKEN_ROW;
+		endCol[0] = TOKEN_COLUMN + spacesLeft;
+	}
 
-  if(!hitBarrier)
-  {
-    score += scorePoints(playerToken, sum);
-  }
+	if(!hitBarrier)
+	{
+		score += scorePoints(playerToken, sum);
+	}
 
-  hitBarrier = false;
-  sum = 1;
-  spacesLeft = 3;
+	hitBarrier = false;
+	sum = 1;
+	spacesLeft = 3;
 
-  for(int colOffset = 1; colOffset <= spacesLeft && !hitBarrier; colOffset++)
-  {
-    int currentToken = boardArray[TOKEN_ROW][TOKEN_COLUMN - colOffset];
+	for(int colOffset = 1; colOffset <= spacesLeft && !hitBarrier; colOffset++)
+	{
+		int currentToken = boardArray[TOKEN_ROW][TOKEN_COLUMN - colOffset];
 
-    if(currentToken == oppoToken || TOKEN_COLUMN - colOffset == -1)
-    {
-      hitBarrier = true;
-      startRow[1] = TOKEN_ROW;
-      startCol[1] = TOKEN_COLUMN - colOffset + 1;
-      spacesLeft -= (colOffset - 1);
-    }
-    else if(currentToken == playerToken)
-    {
-      sum++;
-    }
-  }
+		if(currentToken == oppoToken || TOKEN_COLUMN - colOffset == -1)
+		{
+			hitBarrier = true;
+			startRow[1] = TOKEN_ROW;
+			startCol[1] = TOKEN_COLUMN - colOffset + 1;
+			spacesLeft -= (colOffset - 1);
+		}
+		else if(currentToken == playerToken)
+		{
+			sum++;
+		}
+	}
 
-  if(hitBarrier)
-  {
-    hitBarrier = false;
+	if(hitBarrier)
+	{
+		hitBarrier = false;
 
-    for(int colOffset = 1; colOffset <= spacesLeft && !hitBarrier; colOffset++)
-    {
-      int currentToken = boardArray[TOKEN_ROW][TOKEN_COLUMN + colOffset];
+		for(int colOffset = 1; colOffset <= spacesLeft && !hitBarrier; colOffset++)
+		{
+			int currentToken = boardArray[TOKEN_ROW][TOKEN_COLUMN + colOffset];
 
-      if(currentToken == oppoToken || TOKEN_COLUMN + colOffset == BOARD_COLUMNS)
-      {
-        hitBarrier = true;
-        startRow[1] = -2;
-        startCol[1] = -4;
-      }
-      else if(currentToken == playerToken)
-      {
-        sum++;
-      }
-    }
+			if(currentToken == oppoToken || TOKEN_COLUMN + colOffset == BOARD_COLUMNS)
+			{
+				hitBarrier = true;
+				startRow[1] = -2;
+				startCol[1] = -4;
+			}
+			else if(currentToken == playerToken)
+			{
+				sum++;
+			}
+		}
 
-    if(!hitBarrier)
-    {
-      endRow[1] = TOKEN_ROW;
-      endCol[1] = TOKEN_COLUMN + spacesLeft;
-    }
-  }
-  else
-  {
-    startRow[1] = TOKEN_ROW;
-    startCol[1] = TOKEN_COLUMN;
-    endRow[1] = TOKEN_ROW;
-    endCol[1] = TOKEN_COLUMN - spacesLeft;
-  }
+		if(!hitBarrier)
+		{
+			endRow[1] = TOKEN_ROW;
+			endCol[1] = TOKEN_COLUMN + spacesLeft;
+		}
+	}
+	else
+	{
+		startRow[1] = TOKEN_ROW;
+		startCol[1] = TOKEN_COLUMN;
+		endRow[1] = TOKEN_ROW;
+		endCol[1] = TOKEN_COLUMN - spacesLeft;
+	}
 
-  if(!hitBarrier && !(startCol[0] == endCol[1] && startCol[1] == endCol[0] || startCol[0] == startCol[1] && endCol[0] == endCol[1]))
-  {
-    score += scorePoints(playerToken, sum);
-  }
+	if(!hitBarrier && !(startCol[0] == endCol[1] && startCol[1] == endCol[0] || startCol[0] == startCol[1] && endCol[0] == endCol[1]))
+	{
+		score += scorePoints(playerToken, sum);
+	}
 
-  return score;
+	return score;
 
 }
 
 int verticalCheck(int *columnHeights, int columnOfMove, int playerToken, int oppoToken)
 {
-  int score = 0;
+	int score = 0;
 
-  const int TOKEN_ROW = BOARD_ROWS - columnHeights[columnOfMove];
-  const int TOKEN_COLUMN = columnOfMove;
+	const int TOKEN_ROW = BOARD_ROWS - columnHeights[columnOfMove];
+	const int TOKEN_COLUMN = columnOfMove;
 
-  int startRow[2] = {-1, -2};
-  int startCol[2] = {-3, -4}; //can maybe intialize with token column for vertical...
-  int endRow[2] = {-5, -6};
-  int endCol[2] = {-7, -8};
+	int startRow[2] = {-1, -2};
+	int startCol[2] = {-3, -4}; //can maybe intialize with token column for vertical...
+	int endRow[2] = {-5, -6};
+	int endCol[2] = {-7, -8};
 
-  bool hitBarrier = false;
-  int sum = 1;
-  int spacesLeft = 3;
+	bool hitBarrier = false;
+	int sum = 1;
+	int spacesLeft = 3;
 
-  for(int rowOffset = 1; rowOffset <= spacesLeft && !hitBarrier; rowOffset++)
-  {
-    int currentToken = boardArray[TOKEN_ROW - rowOffset][TOKEN_COLUMN];
+	for(int rowOffset = 1; rowOffset <= spacesLeft && !hitBarrier; rowOffset++)
+	{
+		int currentToken = boardArray[TOKEN_ROW - rowOffset][TOKEN_COLUMN];
 
-    if(currentToken == oppoToken || TOKEN_ROW - rowOffset == -1)
-    {
-      hitBarrier = true;
-      startRow[0] = TOKEN_ROW - rowOffset + 1;
-      startCol[0] = TOKEN_COLUMN;
-      spacesLeft -= (rowOffset - 1);
-    }
-    else if(currentToken == playerToken)
-    {
-      sum++;
-    }
-  }
+		if(currentToken == oppoToken || TOKEN_ROW - rowOffset == -1)
+		{
+			hitBarrier = true;
+			startRow[0] = TOKEN_ROW - rowOffset + 1;
+			startCol[0] = TOKEN_COLUMN;
+			spacesLeft -= (rowOffset - 1);
+		}
+		else if(currentToken == playerToken)
+		{
+			sum++;
+		}
+	}
 
-  if(hitBarrier)
-  {
-    hitBarrier = false;
+	if(hitBarrier)
+	{
+		hitBarrier = false;
 
-    for(int rowOffset = 1; rowOffset <= spacesLeft && !hitBarrier; rowOffset++)
-    {
-      int currentToken = boardArray[TOKEN_ROW + rowOffset][TOKEN_COLUMN];
+		for(int rowOffset = 1; rowOffset <= spacesLeft && !hitBarrier; rowOffset++)
+		{
+			int currentToken = boardArray[TOKEN_ROW + rowOffset][TOKEN_COLUMN];
 
-      if(currentToken == oppoToken || TOKEN_ROW + rowOffset == BOARD_ROWS)
-      {
-        hitBarrier = true;
-        startRow[0] = -1;
-        startCol[0] = -3;
-      }
-      else if(currentToken == playerToken)
-      {
-        sum++;
-      }
-    }
+			if(currentToken == oppoToken || TOKEN_ROW + rowOffset == BOARD_ROWS)
+			{
+				hitBarrier = true;
+				startRow[0] = -1;
+				startCol[0] = -3;
+			}
+			else if(currentToken == playerToken)
+			{
+				sum++;
+			}
+		}
 
-    if(!hitBarrier)
-    {
-      endRow[0] = TOKEN_ROW + spacesLeft;
-      endCol[0] = TOKEN_COLUMN;
-    }
-  }
-  else
-  {
-    startRow[0] = TOKEN_ROW;
-    startCol[0] = TOKEN_COLUMN;
-    endRow[0] = TOKEN_ROW - spacesLeft;
-    endCol[0] = TOKEN_COLUMN;
-  }
+		if(!hitBarrier)
+		{
+			endRow[0] = TOKEN_ROW + spacesLeft;
+			endCol[0] = TOKEN_COLUMN;
+		}
+	}
+	else
+	{
+		startRow[0] = TOKEN_ROW;
+		startCol[0] = TOKEN_COLUMN;
+		endRow[0] = TOKEN_ROW - spacesLeft;
+		endCol[0] = TOKEN_COLUMN;
+	}
 
-  if(!hitBarrier)
-  {
-    score += scorePoints(playerToken, sum);
-  }
+	if(!hitBarrier)
+	{
+		score += scorePoints(playerToken, sum);
+	}
 
-  hitBarrier = false;
-  sum = 1;
-  spacesLeft = 3;
+	hitBarrier = false;
+	sum = 1;
+	spacesLeft = 3;
 
-  for(int rowOffset = 1; rowOffset <= spacesLeft && !hitBarrier; rowOffset++)
-  {
-    int currentToken = boardArray[TOKEN_ROW + rowOffset][TOKEN_COLUMN];
+	for(int rowOffset = 1; rowOffset <= spacesLeft && !hitBarrier; rowOffset++)
+	{
+		int currentToken = boardArray[TOKEN_ROW + rowOffset][TOKEN_COLUMN];
 
-    if(currentToken == oppoToken || TOKEN_ROW + rowOffset == BOARD_ROWS)
-    {
-      hitBarrier = true;
-      startRow[1] = TOKEN_ROW + rowOffset - 1;
-      startCol[1] = TOKEN_COLUMN;
-      spacesLeft -= (rowOffset - 1);
-    }
-    else if(currentToken == playerToken)
-    {
-      sum++;
-    }
-  }
+		if(currentToken == oppoToken || TOKEN_ROW + rowOffset == BOARD_ROWS)
+		{
+			hitBarrier = true;
+			startRow[1] = TOKEN_ROW + rowOffset - 1;
+			startCol[1] = TOKEN_COLUMN;
+			spacesLeft -= (rowOffset - 1);
+		}
+		else if(currentToken == playerToken)
+		{
+			sum++;
+		}
+	}
 
-  if(hitBarrier)
-  {
-    hitBarrier = false;
+	if(hitBarrier)
+	{
+		hitBarrier = false;
 
-    for(int rowOffset = 1; rowOffset <= spacesLeft && !hitBarrier; rowOffset++)
-    {
-      int currentToken = boardArray[TOKEN_ROW - rowOffset][TOKEN_COLUMN];
+		for(int rowOffset = 1; rowOffset <= spacesLeft && !hitBarrier; rowOffset++)
+		{
+			int currentToken = boardArray[TOKEN_ROW - rowOffset][TOKEN_COLUMN];
 
-      if(currentToken == oppoToken || TOKEN_ROW - rowOffset == -1)
-      {
-        hitBarrier = true;
-        startRow[1] = -2;
-        startCol[1] = -4;
-      }
-      else if(currentToken == playerToken)
-      {
-        sum++;
-      }
-    }
+			if(currentToken == oppoToken || TOKEN_ROW - rowOffset == -1)
+			{
+				hitBarrier = true;
+				startRow[1] = -2;
+				startCol[1] = -4;
+			}
+			else if(currentToken == playerToken)
+			{
+				sum++;
+			}
+		}
 
-    if(!hitBarrier)
-    {
-      endRow[1] = TOKEN_ROW - spacesLeft;
-      endCol[1] = TOKEN_COLUMN;
-    }
-  }
-  else
-  {
-    startRow[1] = TOKEN_ROW;
-    startCol[1] = TOKEN_COLUMN;
-    endRow[1] = TOKEN_ROW + spacesLeft;
-    endCol[1] = TOKEN_COLUMN;
-  }
+		if(!hitBarrier)
+		{
+			endRow[1] = TOKEN_ROW - spacesLeft;
+			endCol[1] = TOKEN_COLUMN;
+		}
+	}
+	else
+	{
+		startRow[1] = TOKEN_ROW;
+		startCol[1] = TOKEN_COLUMN;
+		endRow[1] = TOKEN_ROW + spacesLeft;
+		endCol[1] = TOKEN_COLUMN;
+	}
 
-  if(!hitBarrier && !(startRow[0] == endRow[1] && startRow[1] == endRow[0] || startRow[0] == startRow[1] && endRow[0] == endRow[1]))
-  {
-    score += scorePoints(playerToken, sum);
-  }
+	if(!hitBarrier && !(startRow[0] == endRow[1] && startRow[1] == endRow[0] || startRow[0] == startRow[1] && endRow[0] == endRow[1]))
+	{
+		score += scorePoints(playerToken, sum);
+	}
 
-  return score;
+	return score;
 
 }
 
 int positiveSlopeCheck(int *columnHeights, int columnOfMove, int playerToken, int oppoToken)
 {
-  int score = 0;
+	int score = 0;
 
-  const int TOKEN_ROW = BOARD_ROWS - columnHeights[columnOfMove];
-  const int TOKEN_COLUMN = columnOfMove;
+	const int TOKEN_ROW = BOARD_ROWS - columnHeights[columnOfMove];
+	const int TOKEN_COLUMN = columnOfMove;
 
-  int startRow[2] = {-1, -2};
-  int startCol[2] = {-3, -4};
-  int endRow[2] = {-5, -6};
-  int endCol[2] = {-7, -8};
+	int startRow[2] = {-1, -2};
+	int startCol[2] = {-3, -4};
+	int endRow[2] = {-5, -6};
+	int endCol[2] = {-7, -8};
 
-  bool hitBarrier = false;
-  int sum = 1;
-  int spacesLeft = 3;
+	bool hitBarrier = false;
+	int sum = 1;
+	int spacesLeft = 3;
 
-  for(int slopeOffset = 1; slopeOffset <= spacesLeft && !hitBarrier; slopeOffset++)
-  {
-    int currentToken = boardArray[TOKEN_ROW - slopeOffset][TOKEN_COLUMN + slopeOffset];
+	for(int slopeOffset = 1; slopeOffset <= spacesLeft && !hitBarrier; slopeOffset++)
+	{
+		int currentToken = boardArray[TOKEN_ROW - slopeOffset][TOKEN_COLUMN + slopeOffset];
 
-    if(currentToken == oppoToken || TOKEN_ROW - slopeOffset == -1 || TOKEN_COLUMN + slopeOffset == BOARD_COLUMNS)
-    {
-      hitBarrier = true;
-      startRow[0] = TOKEN_ROW - slopeOffset + 1;
-      startCol[0] = TOKEN_COLUMN + slopeOffset - 1;
-      spacesLeft -= (slopeOffset - 1);
-    }
-    else if(currentToken == playerToken)
-    {
-      sum++;
-    }
-  }
+		if(currentToken == oppoToken || TOKEN_ROW - slopeOffset == -1 || TOKEN_COLUMN + slopeOffset == BOARD_COLUMNS)
+		{
+			hitBarrier = true;
+			startRow[0] = TOKEN_ROW - slopeOffset + 1;
+			startCol[0] = TOKEN_COLUMN + slopeOffset - 1;
+			spacesLeft -= (slopeOffset - 1);
+		}
+		else if(currentToken == playerToken)
+		{
+			sum++;
+		}
+	}
 
-  if(hitBarrier)
-  {
-    hitBarrier = false;
+	if(hitBarrier)
+	{
+		hitBarrier = false;
 
-    for(int slopeOffset = 1; slopeOffset <= spacesLeft && !hitBarrier; slopeOffset++)
-    {
-      int currentToken = boardArray[TOKEN_ROW + slopeOffset][TOKEN_COLUMN - slopeOffset];
+		for(int slopeOffset = 1; slopeOffset <= spacesLeft && !hitBarrier; slopeOffset++)
+		{
+			int currentToken = boardArray[TOKEN_ROW + slopeOffset][TOKEN_COLUMN - slopeOffset];
 
-      if(currentToken == oppoToken || TOKEN_ROW + slopeOffset == BOARD_ROWS || TOKEN_COLUMN - slopeOffset == -1)
-      {
-        hitBarrier = true;
-        startRow[0] = -1;
-        startCol[0] = -3;
-      }
-      else if(currentToken == playerToken)
-      {
-        sum++;
-      }
-    }
+			if(currentToken == oppoToken || TOKEN_ROW + slopeOffset == BOARD_ROWS || TOKEN_COLUMN - slopeOffset == -1)
+			{
+				hitBarrier = true;
+				startRow[0] = -1;
+				startCol[0] = -3;
+			}
+			else if(currentToken == playerToken)
+			{
+				sum++;
+			}
+		}
 
-    if(!hitBarrier)
-    {
-      endRow[0] = TOKEN_ROW + spacesLeft;
-      endCol[0] = TOKEN_COLUMN - spacesLeft;
-    }
-  }
-  else
-  {
-    startRow[0] = TOKEN_ROW;
-    startCol[0] = TOKEN_COLUMN;
-    endRow[0] = TOKEN_ROW - spacesLeft;
-    endCol[0] = TOKEN_COLUMN + spacesLeft;
-  }
+		if(!hitBarrier)
+		{
+			endRow[0] = TOKEN_ROW + spacesLeft;
+			endCol[0] = TOKEN_COLUMN - spacesLeft;
+		}
+	}
+	else
+	{
+		startRow[0] = TOKEN_ROW;
+		startCol[0] = TOKEN_COLUMN;
+		endRow[0] = TOKEN_ROW - spacesLeft;
+		endCol[0] = TOKEN_COLUMN + spacesLeft;
+	}
 
-  if(!hitBarrier)
-  {
-    score += scorePoints(playerToken, sum);
-  }
+	if(!hitBarrier)
+	{
+		score += scorePoints(playerToken, sum);
+	}
 
-  hitBarrier = false;
-  sum = 1;
-  spacesLeft = 3;
+	hitBarrier = false;
+	sum = 1;
+	spacesLeft = 3;
 
-  for(int slopeOffset = 1; slopeOffset <= spacesLeft && !hitBarrier; slopeOffset++)
-  {
-    int currentToken = boardArray[TOKEN_ROW + slopeOffset][TOKEN_COLUMN - slopeOffset];
+	for(int slopeOffset = 1; slopeOffset <= spacesLeft && !hitBarrier; slopeOffset++)
+	{
+		int currentToken = boardArray[TOKEN_ROW + slopeOffset][TOKEN_COLUMN - slopeOffset];
 
-    if(currentToken == oppoToken || TOKEN_ROW + slopeOffset == BOARD_ROWS || TOKEN_COLUMN - slopeOffset == -1)
-    {
-      hitBarrier = true;
-      startRow[1] = TOKEN_ROW + slopeOffset - 1;
-      startCol[1] = TOKEN_COLUMN - slopeOffset + 1;
-      spacesLeft -= (slopeOffset - 1);
-    }
-    else if(currentToken == playerToken)
-    {
-      sum++;
-    }
-  }
+		if(currentToken == oppoToken || TOKEN_ROW + slopeOffset == BOARD_ROWS || TOKEN_COLUMN - slopeOffset == -1)
+		{
+			hitBarrier = true;
+			startRow[1] = TOKEN_ROW + slopeOffset - 1;
+			startCol[1] = TOKEN_COLUMN - slopeOffset + 1;
+			spacesLeft -= (slopeOffset - 1);
+		}
+		else if(currentToken == playerToken)
+		{
+			sum++;
+		}
+	}
 
-  if(hitBarrier)
-  {
-    hitBarrier = false;
+	if(hitBarrier)
+	{
+		hitBarrier = false;
 
-    for(int slopeOffset = 1; slopeOffset <= spacesLeft && !hitBarrier; slopeOffset++)
-    {
-      int currentToken = boardArray[TOKEN_ROW - slopeOffset][TOKEN_COLUMN + slopeOffset];
+		for(int slopeOffset = 1; slopeOffset <= spacesLeft && !hitBarrier; slopeOffset++)
+		{
+			int currentToken = boardArray[TOKEN_ROW - slopeOffset][TOKEN_COLUMN + slopeOffset];
 
-      if(currentToken == oppoToken || TOKEN_ROW - slopeOffset == -1 || TOKEN_COLUMN + slopeOffset == BOARD_COLUMNS)
-      {
-        hitBarrier = true;
-        startRow[1] = -2;
-        startCol[1] = -4;
-      }
-      else if(currentToken == playerToken)
-      {
-        sum++;
-      }
-    }
+			if(currentToken == oppoToken || TOKEN_ROW - slopeOffset == -1 || TOKEN_COLUMN + slopeOffset == BOARD_COLUMNS)
+			{
+				hitBarrier = true;
+				startRow[1] = -2;
+				startCol[1] = -4;
+			}
+			else if(currentToken == playerToken)
+			{
+				sum++;
+			}
+		}
 
-    if(!hitBarrier)
-    {
-      endRow[1] = TOKEN_ROW - spacesLeft;
-      endCol[1] = TOKEN_COLUMN + spacesLeft;
-    }
-  }
-  else
-  {
-    startRow[1] = TOKEN_ROW;
-    startCol[1] = TOKEN_COLUMN;
-    endRow[1] = TOKEN_ROW + spacesLeft;
-    endCol[1] = TOKEN_COLUMN - spacesLeft;
-  }
+		if(!hitBarrier)
+		{
+			endRow[1] = TOKEN_ROW - spacesLeft;
+			endCol[1] = TOKEN_COLUMN + spacesLeft;
+		}
+	}
+	else
+	{
+		startRow[1] = TOKEN_ROW;
+		startCol[1] = TOKEN_COLUMN;
+		endRow[1] = TOKEN_ROW + spacesLeft;
+		endCol[1] = TOKEN_COLUMN - spacesLeft;
+	}
 
-  if(!hitBarrier && !((startRow[0] == endRow[1] && startCol[0] == endCol[1] && endRow[0] == startRow[1] && endCol[0] == startCol[1]) || (startRow[0] == startRow[1] && startCol[0] == startCol[1] && endRow[0] == endRow[1] && endCol[0] == endCol[1])))
-  {
-    score += scorePoints(playerToken, sum);
-  }
+	if(!hitBarrier && !((startRow[0] == endRow[1] && startCol[0] == endCol[1] && endRow[0] == startRow[1] && endCol[0] == startCol[1]) || (startRow[0] == startRow[1] && startCol[0] == startCol[1] && endRow[0] == endRow[1] && endCol[0] == endCol[1])))
+	{
+		score += scorePoints(playerToken, sum);
+	}
 
-  return score;
+	return score;
 
 }
 
 int negativeSlopeCheck(int *columnHeights, int columnOfMove, int playerToken, int oppoToken)
 {
-  int score = 0;
+	int score = 0;
 
-  const int TOKEN_ROW = BOARD_ROWS - columnHeights[columnOfMove];
-  const int TOKEN_COLUMN = columnOfMove;
+	const int TOKEN_ROW = BOARD_ROWS - columnHeights[columnOfMove];
+	const int TOKEN_COLUMN = columnOfMove;
 
-  int startRow[2] = {-1, -2};
-  int startCol[2] = {-3, -4};
-  int endRow[2] = {-5, -6};
-  int endCol[2] = {-7, -8};
+	int startRow[2] = {-1, -2};
+	int startCol[2] = {-3, -4};
+	int endRow[2] = {-5, -6};
+	int endCol[2] = {-7, -8};
 
-  bool hitBarrier = false;
-  int sum = 1;
-  int spacesLeft = 3;
+	bool hitBarrier = false;
+	int sum = 1;
+	int spacesLeft = 3;
 
-  for(int slopeOffset = 1; slopeOffset <= spacesLeft && !hitBarrier; slopeOffset++)
-  {
-    int currentToken = boardArray[TOKEN_ROW - slopeOffset][TOKEN_COLUMN - slopeOffset];
+	for(int slopeOffset = 1; slopeOffset <= spacesLeft && !hitBarrier; slopeOffset++)
+	{
+		int currentToken = boardArray[TOKEN_ROW - slopeOffset][TOKEN_COLUMN - slopeOffset];
 
-    if(currentToken == oppoToken || TOKEN_ROW - slopeOffset == -1 || TOKEN_COLUMN - slopeOffset == -1)
-    {
-      hitBarrier = true;
-      startRow[0] = TOKEN_ROW - slopeOffset + 1;
-      startCol[0] = TOKEN_COLUMN - slopeOffset + 1;
-      spacesLeft -= (slopeOffset - 1);
-    }
-    else if(currentToken == playerToken)
-    {
-      sum++;
-    }
-  }
+		if(currentToken == oppoToken || TOKEN_ROW - slopeOffset == -1 || TOKEN_COLUMN - slopeOffset == -1)
+		{
+			hitBarrier = true;
+			startRow[0] = TOKEN_ROW - slopeOffset + 1;
+			startCol[0] = TOKEN_COLUMN - slopeOffset + 1;
+			spacesLeft -= (slopeOffset - 1);
+		}
+		else if(currentToken == playerToken)
+		{
+			sum++;
+		}
+	}
 
-  if(hitBarrier)
-  {
-    hitBarrier = false;
+	if(hitBarrier)
+	{
+		hitBarrier = false;
 
-    for(int slopeOffset = 1; slopeOffset <= spacesLeft && !hitBarrier; slopeOffset++)
-    {
-      int currentToken = boardArray[TOKEN_ROW + slopeOffset][TOKEN_COLUMN + slopeOffset];
+		for(int slopeOffset = 1; slopeOffset <= spacesLeft && !hitBarrier; slopeOffset++)
+		{
+			int currentToken = boardArray[TOKEN_ROW + slopeOffset][TOKEN_COLUMN + slopeOffset];
 
-      if(currentToken == oppoToken || TOKEN_ROW + slopeOffset == BOARD_ROWS || TOKEN_COLUMN + slopeOffset == BOARD_COLUMNS)
-      {
-        hitBarrier = true;
-        startRow[0] = -1;
-        startCol[0] = -3;
-      }
-      else if(currentToken == playerToken)
-      {
-        sum++;
-      }
-    }
+			if(currentToken == oppoToken || TOKEN_ROW + slopeOffset == BOARD_ROWS || TOKEN_COLUMN + slopeOffset == BOARD_COLUMNS)
+			{
+				hitBarrier = true;
+				startRow[0] = -1;
+				startCol[0] = -3;
+			}
+			else if(currentToken == playerToken)
+			{
+				sum++;
+			}
+		}
 
-    if(!hitBarrier)
-    {
-      endRow[0] = TOKEN_ROW + spacesLeft;
-      endCol[0] = TOKEN_COLUMN + spacesLeft;
-    }
-  }
-  else
-  {
-    startRow[0] = TOKEN_ROW;
-    startCol[0] = TOKEN_COLUMN;
-    endRow[0] = TOKEN_ROW - spacesLeft;
-    endCol[0] = TOKEN_COLUMN - spacesLeft;
-  }
+		if(!hitBarrier)
+		{
+			endRow[0] = TOKEN_ROW + spacesLeft;
+			endCol[0] = TOKEN_COLUMN + spacesLeft;
+		}
+	}
+	else
+	{
+		startRow[0] = TOKEN_ROW;
+		startCol[0] = TOKEN_COLUMN;
+		endRow[0] = TOKEN_ROW - spacesLeft;
+		endCol[0] = TOKEN_COLUMN - spacesLeft;
+	}
 
-  if(!hitBarrier)
-  {
-    score += scorePoints(playerToken, sum);
-  }
+	if(!hitBarrier)
+	{
+		score += scorePoints(playerToken, sum);
+	}
 
-  hitBarrier = false;
-  sum = 1;
-  spacesLeft = 3;
+	hitBarrier = false;
+	sum = 1;
+	spacesLeft = 3;
 
-  for(int slopeOffset = 1; slopeOffset <= spacesLeft && !hitBarrier; slopeOffset++)
-  {
-    int currentToken = boardArray[TOKEN_ROW + slopeOffset][TOKEN_COLUMN + slopeOffset];
+	for(int slopeOffset = 1; slopeOffset <= spacesLeft && !hitBarrier; slopeOffset++)
+	{
+		int currentToken = boardArray[TOKEN_ROW + slopeOffset][TOKEN_COLUMN + slopeOffset];
 
-    if(currentToken == oppoToken || TOKEN_ROW + slopeOffset == BOARD_ROWS || TOKEN_COLUMN + slopeOffset == BOARD_COLUMNS)
-    {
-      hitBarrier = true;
-      startRow[1] = TOKEN_ROW + slopeOffset - 1;
-      startCol[1] = TOKEN_COLUMN + slopeOffset - 1;
-      spacesLeft -= (slopeOffset - 1);
-    }
-    else if(currentToken == playerToken)
-    {
-      sum++;
-    }
-  }
+		if(currentToken == oppoToken || TOKEN_ROW + slopeOffset == BOARD_ROWS || TOKEN_COLUMN + slopeOffset == BOARD_COLUMNS)
+		{
+			hitBarrier = true;
+			startRow[1] = TOKEN_ROW + slopeOffset - 1;
+			startCol[1] = TOKEN_COLUMN + slopeOffset - 1;
+			spacesLeft -= (slopeOffset - 1);
+		}
+		else if(currentToken == playerToken)
+		{
+			sum++;
+		}
+	}
 
-  if(hitBarrier)
-  {
-    hitBarrier = false;
+	if(hitBarrier)
+	{
+		hitBarrier = false;
 
-    for(int slopeOffset = 1; slopeOffset <= spacesLeft && !hitBarrier; slopeOffset++)
-    {
-      int currentToken = boardArray[TOKEN_ROW - slopeOffset][TOKEN_COLUMN - slopeOffset];
+		for(int slopeOffset = 1; slopeOffset <= spacesLeft && !hitBarrier; slopeOffset++)
+		{
+			int currentToken = boardArray[TOKEN_ROW - slopeOffset][TOKEN_COLUMN - slopeOffset];
 
-      if(currentToken == oppoToken || TOKEN_ROW - slopeOffset == -1 || TOKEN_COLUMN - slopeOffset == -1)
-      {
-        hitBarrier = true;
-        startRow[1] = -2;
-        startCol[1] = -4;
-      }
-      else if(currentToken == playerToken)
-      {
-        sum++;
-      }
-    }
+			if(currentToken == oppoToken || TOKEN_ROW - slopeOffset == -1 || TOKEN_COLUMN - slopeOffset == -1)
+			{
+				hitBarrier = true;
+				startRow[1] = -2;
+				startCol[1] = -4;
+			}
+			else if(currentToken == playerToken)
+			{
+				sum++;
+			}
+		}
 
-    if(!hitBarrier)
-    {
-      endRow[1] = TOKEN_ROW - spacesLeft;
-      endCol[1] = TOKEN_COLUMN - spacesLeft;
-    }
-  }
-  else
-  {
-    startRow[1] = TOKEN_ROW;
-    startCol[1] = TOKEN_COLUMN;
-    endRow[1] = TOKEN_ROW + spacesLeft;
-    endCol[1] = TOKEN_COLUMN + spacesLeft;
-  }
+		if(!hitBarrier)
+		{
+			endRow[1] = TOKEN_ROW - spacesLeft;
+			endCol[1] = TOKEN_COLUMN - spacesLeft;
+		}
+	}
+	else
+	{
+		startRow[1] = TOKEN_ROW;
+		startCol[1] = TOKEN_COLUMN;
+		endRow[1] = TOKEN_ROW + spacesLeft;
+		endCol[1] = TOKEN_COLUMN + spacesLeft;
+	}
 
-  if(!hitBarrier && !((startRow[0] == endRow[1] && startCol[0] == endCol[1] && endRow[0] == startRow[1] && endCol[0] == startCol[1]) || (startRow[0] == startRow[1] && startCol[0] == startCol[1] && endRow[0] == endRow[1] && endCol[0] == endCol[1])))
-  {
-    score += scorePoints(playerToken, sum);
-  }
+	if(!hitBarrier && !((startRow[0] == endRow[1] && startCol[0] == endCol[1] && endRow[0] == startRow[1] && endCol[0] == startCol[1]) || (startRow[0] == startRow[1] && startCol[0] == startCol[1] && endRow[0] == endRow[1] && endCol[0] == endCol[1])))
+	{
+		score += scorePoints(playerToken, sum);
+	}
 
-  return score;
+	return score;
 
 }
 
 int scoreBoard(int *columnHeights, int columnOfMove, int playerToken, int oppoToken)
 {
-  int score = 0;
+	int score = 0;
 
-  for(int colDropIndex = 0; colDropIndex < BOARD_COLUMNS; colDropIndex++)
-  {
-    const int emptyTokenRow = (BOARD_ROWS - 1) - columnHeights[colDropIndex];
-    if(emptyTokenRow > -1 && boardArray[emptyTokenRow][colDropIndex] == 0)
-    {
-      addTokenToArray(columnHeights, emptyTokenRow, colDropIndex, oppoToken);
+	for(int colDropIndex = 0; colDropIndex < BOARD_COLUMNS; colDropIndex++)
+	{
+		const int emptyTokenRow = (BOARD_ROWS - 1) - columnHeights[colDropIndex];
+		if(emptyTokenRow > -1 && boardArray[emptyTokenRow][colDropIndex] == 0)
+		{
+			addTokenToArray(columnHeights, emptyTokenRow, colDropIndex, oppoToken);
 
-      /*cout << "(" << emptyTokenRow << ", " << colDropIndex << "): "
-           << horizontalCheck(boardArray, columnHeights, colDropIndex, oppoToken, playerToken) << ", "
-           << verticalCheck(boardArray, columnHeights, colDropIndex, oppoToken, playerToken) << ", "
-           << positiveSlopeCheck(boardArray, columnHeights, colDropIndex, oppoToken, playerToken) << ", "
-           << negativeSlopeCheck(boardArray, columnHeights, colDropIndex, oppoToken, playerToken) << endl;*/
+			/*cout << "(" << emptyTokenRow << ", " << colDropIndex << "): "
+			<< horizontalCheck(boardArray, columnHeights, colDropIndex, oppoToken, playerToken) << ", "
+			<< verticalCheck(boardArray, columnHeights, colDropIndex, oppoToken, playerToken) << ", "
+			<< positiveSlopeCheck(boardArray, columnHeights, colDropIndex, oppoToken, playerToken) << ", "
+			<< negativeSlopeCheck(boardArray, columnHeights, colDropIndex, oppoToken, playerToken) << endl;*/
 
-      if(colDropIndex == columnOfMove)
-      {
-        score += horizontalCheck(columnHeights, columnOfMove, oppoToken, playerToken);
-        score += positiveSlopeCheck(columnHeights, columnOfMove, oppoToken, playerToken);
-        score += negativeSlopeCheck(columnHeights, columnOfMove, oppoToken, playerToken);
-      }
-      else if(horizontalCheck(columnHeights, colDropIndex, oppoToken, playerToken) <= -100 || verticalCheck( columnHeights, colDropIndex, oppoToken, playerToken) <= -100 || positiveSlopeCheck( columnHeights, colDropIndex, oppoToken, playerToken) <= -100 || negativeSlopeCheck(columnHeights, colDropIndex, oppoToken, playerToken) <= -100)
-      {
-        //displayScore(boardArray, colDropIndex, -100);
-        removeTokenInArray( columnHeights, emptyTokenRow, colDropIndex);
-        return -100;
-      }
+			if(colDropIndex == columnOfMove)
+			{
+				score += horizontalCheck(columnHeights, columnOfMove, oppoToken, playerToken);
+				score += positiveSlopeCheck(columnHeights, columnOfMove, oppoToken, playerToken);
+				score += negativeSlopeCheck(columnHeights, columnOfMove, oppoToken, playerToken);
+			}
+			else if(horizontalCheck(columnHeights, colDropIndex, oppoToken, playerToken) <= -100 || verticalCheck( columnHeights, colDropIndex, oppoToken, playerToken) <= -100 || positiveSlopeCheck( columnHeights, colDropIndex, oppoToken, playerToken) <= -100 || negativeSlopeCheck(columnHeights, colDropIndex, oppoToken, playerToken) <= -100)
+			{
+				//displayScore(boardArray, colDropIndex, -100);
+				removeTokenInArray( columnHeights, emptyTokenRow, colDropIndex);
+				return -100;
+			}
 
-      removeTokenInArray( columnHeights, emptyTokenRow, colDropIndex);
-    }
-  }
+			removeTokenInArray( columnHeights, emptyTokenRow, colDropIndex);
+		}
+	}
 
-  if(columnOfMove == 3)
-  {
-    if(playerToken == ROBOT_TOKEN_TYPE)
-    {
-      score += 4;
-    }
-    else
-    {
-      score -= 2;
-    }
-  }
+	if(columnOfMove == 3)
+	{
+		if(playerToken == ROBOT_TOKEN_TYPE)
+		{
+			score += 4;
+		}
+		else
+		{
+			score -= 2;
+		}
+	}
 
-  score += horizontalCheck( columnHeights, columnOfMove, playerToken, oppoToken);
-  score += verticalCheck( columnHeights, columnOfMove, playerToken, oppoToken);
-  score += positiveSlopeCheck( columnHeights, columnOfMove, playerToken, oppoToken);
-  score += negativeSlopeCheck( columnHeights, columnOfMove, playerToken, oppoToken);
+	score += horizontalCheck( columnHeights, columnOfMove, playerToken, oppoToken);
+	score += verticalCheck( columnHeights, columnOfMove, playerToken, oppoToken);
+	score += positiveSlopeCheck( columnHeights, columnOfMove, playerToken, oppoToken);
+	score += negativeSlopeCheck( columnHeights, columnOfMove, playerToken, oppoToken);
 
-  //displayScore(boardArray, columnOfMove, score);
+	//displayScore(boardArray, columnOfMove, score);
 
-  return score;
+	return score;
 
 
 
@@ -1245,99 +1305,99 @@ int scoreBoard(int *columnHeights, int columnOfMove, int playerToken, int oppoTo
 minimaxReturns* minimaxAlg(int *columnHeights, int depth, bool maxPlayer, int columnOfMove)
 {
 
-  if(depth == 0) //add gamestate
-  {
-    minimaxReturns scoreValue;
-    if(maxPlayer)
-    {
-      scoreValue.score = scoreBoard(columnHeights, columnOfMove, HUMAN_TOKEN_TYPE, ROBOT_TOKEN_TYPE);
-    }
-    else
-    {
-      scoreValue.score = scoreBoard(columnHeights, columnOfMove, ROBOT_TOKEN_TYPE, HUMAN_TOKEN_TYPE);
-    }
+	if(depth == 0) //add gamestate
+	{
+		minimaxReturns scoreValue;
+		if(maxPlayer)
+		{
+			scoreValue.score = scoreBoard(columnHeights, columnOfMove, HUMAN_TOKEN_TYPE, ROBOT_TOKEN_TYPE);
+		}
+		else
+		{
+			scoreValue.score = scoreBoard(columnHeights, columnOfMove, ROBOT_TOKEN_TYPE, HUMAN_TOKEN_TYPE);
+		}
 
-    return scoreValue;
-  }
+		return scoreValue;
+	}
 
-  if(maxPlayer)
-  {
-    minimaxReturns maxValues;
-    maxValues.score = -9999;
-    maxValues.columnOfMove = 1;
+	if(maxPlayer)
+	{
+		minimaxReturns maxValues;
+		maxValues.score = -9999;
+		maxValues.columnOfMove = 1;
 
-    for(int colDropIndex = 0; colDropIndex < BOARD_COLUMNS; colDropIndex++) //Drops a token in each column to score that potential move
-    {
-      const int emptyTokenRow = (BOARD_ROWS - 1) - columnHeights[colDropIndex]; //Checks if a column is not full
+		for(int colDropIndex = 0; colDropIndex < BOARD_COLUMNS; colDropIndex++) //Drops a token in each column to score that potential move
+		{
+			const int emptyTokenRow = (BOARD_ROWS - 1) - columnHeights[colDropIndex]; //Checks if a column is not full
 
-      if(emptyTokenRow > -1)
-      {
-        addTokenToArray(columnHeights, emptyTokenRow, colDropIndex, ROBOT_TOKEN_TYPE);
+			if(emptyTokenRow > -1)
+			{
+				addTokenToArray(columnHeights, emptyTokenRow, colDropIndex, ROBOT_TOKEN_TYPE);
 
-        minimaxReturns* possibleMoveScore = minimaxAlg(columnHeights, depth - 1, false, colDropIndex);
+				minimaxReturns* possibleMoveScore = minimaxAlg(columnHeights, depth - 1, false, colDropIndex);
 
-      if (possibleMoveScore->score > maxValues.score /* && possibleMoveScore->score != maxValues->score */)
-{
-    maxValues.score = possibleMoveScore->score;
-    maxValues.columnOfMove = colDropIndex + 1;
-}
-
-
-        removeTokenInArray( columnHeights, emptyTokenRow, colDropIndex);
-     }
-
-    }
-
-
-    return maxValues;
-
-  }
-  else
-  {
-    minimaxReturns minValues;
-    minValues.score = 9999;
-    minValues.columnOfMove = 1;
-
-    for(int colDropIndex = 0; colDropIndex < BOARD_COLUMNS; colDropIndex++) //Drops a token in each column to score that potential move
-    {
-      const int emptyTokenRow = (BOARD_ROWS - 1) - columnHeights[colDropIndex]; //Checks if a column is not full
-
-      if(emptyTokenRow > -1)
-      {
-        addTokenToArray( columnHeights, emptyTokenRow, colDropIndex, HUMAN_TOKEN_TYPE); //dont forget to do this in terms of min for human !!
-
-        minimaxReturns* possibleMoveScore = minimaxAlg( columnHeights, depth - 1, true, colDropIndex);
-
-        if (possibleMoveScore->score < minValues.score /* && possibleMoveScore->score != minValues->score */)
+				if (possibleMoveScore->score > maxValues.score /* && possibleMoveScore->score != maxValues->score */)
 				{
-    			minValues.score = possibleMoveScore->score;
-  		 		 minValues.columnOfMove = colDropIndex + 1;
+					maxValues.score = possibleMoveScore->score;
+					maxValues.columnOfMove = colDropIndex + 1;
 				}
 
-        removeTokenInArray(columnHeights, emptyTokenRow, colDropIndex);
-     }
 
-    }
+				removeTokenInArray( columnHeights, emptyTokenRow, colDropIndex);
+			}
+
+		}
 
 
-    return minValues;
+		return maxValues;
 
-  }
+	}
+	else
+	{
+		minimaxReturns minValues;
+		minValues.score = 9999;
+		minValues.columnOfMove = 1;
+
+		for(int colDropIndex = 0; colDropIndex < BOARD_COLUMNS; colDropIndex++) //Drops a token in each column to score that potential move
+		{
+			const int emptyTokenRow = (BOARD_ROWS - 1) - columnHeights[colDropIndex]; //Checks if a column is not full
+
+			if(emptyTokenRow > -1)
+			{
+				addTokenToArray( columnHeights, emptyTokenRow, colDropIndex, HUMAN_TOKEN_TYPE); //dont forget to do this in terms of min for human !!
+
+				minimaxReturns* possibleMoveScore = minimaxAlg( columnHeights, depth - 1, true, colDropIndex);
+
+				if (possibleMoveScore->score < minValues.score /* && possibleMoveScore->score != minValues->score */)
+				{
+					minValues.score = possibleMoveScore->score;
+					minValues.columnOfMove = colDropIndex + 1;
+				}
+
+				removeTokenInArray(columnHeights, emptyTokenRow, colDropIndex);
+			}
+
+		}
+
+
+		return minValues;
+
+	}
 
 }
 
 void addTokenToArray(int *columnHeights, int row, int column, int tokenType)
 {
-  boardArray[row][column] = tokenType;
-  columnHeights[column] += 1;
+	boardArray[row][column] = tokenType;
+	columnHeights[column] += 1;
 
-  return;
+	return;
 }
 
 void removeTokenInArray( int *columnHeights, int row, int column)
 {
-  boardArray[row][column] = 0;
-  columnHeights[column] -= 1;
+	boardArray[row][column] = 0;
+	columnHeights[column] -= 1;
 
-  return;
+	return;
 }
