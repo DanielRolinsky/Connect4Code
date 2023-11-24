@@ -210,7 +210,7 @@ int scorePoints(int sum, bool oppoCheck)
     }
   }
   
-  return 0;
+  return 0;  // Default case
 }
 
 int horizontalCheck(int boardArray[BOARD_ROWS][BOARD_COLUMNS], int columnHeights[BOARD_COLUMNS], int columnOfMove, int playerToken, int oppoToken, bool oppoCheck)

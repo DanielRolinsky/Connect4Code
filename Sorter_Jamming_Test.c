@@ -9,12 +9,13 @@ void sortTokens(){
 	int previousMotor = 100;
 	int nextEncoder = 0;
 
-	while(time1[T3] < 7000){
+	while(SensorValue[T1] == 0){
   		if(SensorValue[S2] == 4) {
   			motor[motorB] = -35;
   			while(nMotorEncoder[motorB] > -55){}
   			motor[motorB] = 0;
   			time1[T3] = 0;
+  			displayBigTextLine(3, "%f", nMotorEncoder[motorB]);
 		}
 
 		else if(SensorValue[S2] == 5) {
@@ -40,12 +41,17 @@ void sortTokens(){
 
 
 }
-	motor[motorB] = 50;
-  	while(nMotorEncoder[motorB] < -10)
+	MSMotorStop(mmotor_S4_1);
+	motor[motorB] = 35;
+  	while(nMotorEncoder[motorB] < 0)
   		{}
-  	MSMotorStop(mmotor_S4_1);
+
   	motor[motorB] = 0;
+  	displayBigTextLine(3, "%f", nMotorEncoder[motorB]);
+  	wait1Msec(5000);
 }
+
+
 
 task main(){
 	MSMMUXinit();
