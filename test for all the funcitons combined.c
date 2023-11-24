@@ -550,12 +550,19 @@ task main()
 		columnHeights[choiceCol] += 1;
 
 		motor[motorA] = -15;
-		motor[motorD] = -15;
+//	motor[motorD] = -13;
+		setMotorBrakeMode(motorD, motorCoast);
 		while(nMotorEncoder[motorA] <= 0)
 		{}
+		setMotorBrakeMode(motorD, motorBrake);
 		motor[motorA] = 0;
 		motor[motorD] = 0;
-
+		clearTimer(T4);
+		while(time1(T4) < 500){
+			motorHold(0);
+		}
+		motor[motorA] = 0;
+		motor[motorD] = 0;
 		return;
 
 	}
@@ -760,9 +767,9 @@ task main()
 
 		for(int slopeOffset = 1; slopeOffset < 4; slopeOffset++)
 		{
-			int currentToken = boardArray[START_ROW - slopeOffset][START_COLUMN - slopeOffset];
+			int currentToken = boardArray[START_ROW + slopeOffset][START_COLUMN + slopeOffset];
 
-			if(currentToken == oppoToken || START_ROW - slopeOffset == -1 || START_COLUMN - slopeOffset == -1)
+			if(currentToken == oppoToken || START_ROW + slopeOffset == BOARD_ROWS || START_COLUMN + slopeOffset == BOARD_COLUMNS)
 			{
 				return 0;
 			}
