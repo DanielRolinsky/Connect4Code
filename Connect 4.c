@@ -177,16 +177,16 @@ task main()
 				eraseDisplay();
 
 
-				displayBigTextLine(DEFAULT_DISPLAY_LINE, "Press Enter To");
+				displayBigTextLine(DEFAULT_DISPLAY_LINE, "Press Up To");
 				displayBigTextLine(DEFAULT_DISPLAY_LINE +3 , "Play Again");
 				displayBigTextLine(DEFAULT_DISPLAY_LINE + 6, "Or Press");
-				displayBigTextLine(DEFAULT_DISPLAY_LINE + 9, "Up To Exit");
+				displayBigTextLine(DEFAULT_DISPLAY_LINE + 9, "Down To Exit");
 
 				bool choiceSelected = false;
 				while(!choiceSelected){
-					if(getButtonPress(buttonEnter))
+					if(getButtonPress(buttonUp))
 					{
-						while(getButtonPress(buttonEnter)){}
+						while(getButtonPress(buttonUp)){}
 						playAgain = true;
 						choiceSelected = true;
 						for(int row = 0; row < BOARD_ROWS; row ++)
@@ -197,9 +197,9 @@ task main()
 							}
 						}
 					}
-					else if(getButtonPress(buttonUp))
+					else if(getButtonPress(buttonDown))
 					{
-						while(getButtonPress(buttonUp)){}
+						while(getButtonPress(buttonDown)){}
 						playAgain = false;
 						choiceSelected = true;
 					}
