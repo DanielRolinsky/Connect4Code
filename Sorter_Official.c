@@ -9,7 +9,7 @@ void sortTokens(){
 	while(SensorValue[T1] == 0){
   		if(SensorValue[S2] == 4) {
   			motor[motorB] = -35;
-  			while(nMotorEncoder[motorB] > -55){}
+  			while(nMotorEncoder[motorB] > -60){}
   			motor[motorB] = 0;
 
 		  }
