@@ -381,7 +381,7 @@ int robotMove(int *columnHeights)
 	displayBigTextLine(DEFAULT_DISPLAY_LINE +3 , "Current Column:");
 	displayBigTextLine(DEFAULT_DISPLAY_LINE +6 , "%d", values.columnOfMove);
 
-  dropToken(columnHeights, values.columnOfMove, ROBOT_TOKEN_TYPE);
+  dropToken(columnHeights, values.columnOfMove, false);
 
   return values.columnOfMove;
 }
@@ -488,17 +488,15 @@ bool legalCheck(int choiceCol)
 void spinnerMotor(bool isHumanPlaying){
 
 	if(isHumanPlaying){
-		motor[motorC] = 10;
-		while (nMotorEncoder[motorC] < 95)
-		{}
-		motor[motorC] = 0;
+		MSMMotor(mmotor_S4_2,2);//motor[motorC] = 10;
+		while (MSMMotorEncoder(mmotor_S4_2) < 95){}
+		MSMotorStop(mmotor_S4_2);
 	}
 
 	else{
-		motor[motorC] = -10;
-		while (nMotorEncoder[motorC] > -5)
-		{}
-		motor[motorC] = 0;
+		MSMMotor(mmotor_S4_2, -2);
+		while (MSMMotorEncoder(mmotor_S4_2) > -5){}
+		MSMotorStop(mmotor_S4_2);
 	}
 	return;
 }
