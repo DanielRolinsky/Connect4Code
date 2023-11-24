@@ -22,7 +22,7 @@ const int colAngle[7]=
 //Data Structs
 typedef struct
 {
-  int score, columnOfMove;
+	int score, columnOfMove;
 } minimaxReturns ;
 
 //Function Prototyping
@@ -47,47 +47,49 @@ void sensorConfig();
 void configureMotors();
 void waitButton(TEV3Buttons buttonName);
 void motorHold(int column);
-void playGame(int & currentPlayer);
+void playGame(int & currentPlayer, bool playerTwo, bool & exitProgram);
 void dropToken(int *columnHeights, int choiceCol, bool isHumanPlaying); // done
 void sortTokens();
+void humanMove(int *columnHeights, int currentCol, int currentPlayer, bool & exitProgram);
+void HumanMove2(int *columnHeights, int currentCol, int currentPlayer, bool & exitProgram);
 int gameWon(int currentPlayer);
-void humanMove(int *columnHeights, int currentCol);
 // void HumanMove2(int *columnHeights, int currentCol);
 void resetSpinner();
 
 //void gameReset(int currentCol);
-int moveSelect(int currentCol);
+int moveSelect(int currentCol, int currentPlayer, bool & exitProgram);
 void spinnerMotor(bool isHumanPlaying); // done
 bool legalCheck(int choiceCol);
 
 //2D Arrays
 int boardArray[BOARD_ROWS][BOARD_COLUMNS] =
-    {
-		{0,0,0,0,0,0,0},
-    {0,0,0,0,0,0,0},
-    {0,0,0,0,0,0,0},
-    {0,0,0,0,0,0,0},
-    {0,0,0,0,0,0,0},
-    {0,0,0,0,0,0,0}
-    };
+{
+	{0,0,0,0,0,0,0},
+	{0,0,0,0,0,0,0},
+	{0,0,0,0,0,0,0},
+	{0,0,0,0,0,0,0},
+	{0,0,0,0,0,0,0},
+	{0,0,0,0,0,0,0}
+};
 
 #include "mindsensors-motormux.h"
 task main()
 {
 	bool playAgain = true;
+	bool exitProgram = false;
 
-	while(playAgain == true)
+	while(playAgain == true && exitProgram == false)
 	{
 
-	MSMMUXinit();
-	SensorType[S4] = sensorI2CCustom;
-	//bool stillPlaying = false;
-	//while(stillPlaying)
+		MSMMUXinit();
+		SensorType[S4] = sensorI2CCustom;
+		//bool stillPlaying = false;
+		//while(stillPlaying)
 
 
 
 
-	int	currentPlayer = 0;
+		int	currentPlayer = 0;
 
 		sensorConfig();
 		configureMotors();
@@ -96,13 +98,44 @@ task main()
 		displayBigTextLine(DEFAULT_DISPLAY_LINE + 3, "On Top!");
 		displayBigTextLine(DEFAULT_DISPLAY_LINE + 6, "Then Press");
 		displayBigTextLine(DEFAULT_DISPLAY_LINE + 9, "Enter To Play!");
-
-	//	displayBigTextLine(DEFAULT_DISPLAY_LINE + 1, "Then press Enter to play!");
 		waitButton(buttonEnter);
 		eraseDisplay();
 
-		playGame(currentPlayer);
+		displayBigTextLine(DEFAULT_DISPLAY_LINE, "Select Mode:");
+		displayBigTextLine(DEFAULT_DISPLAY_LINE + 3, "Up Button: PvP");
+		displayBigTextLine(DEFAULT_DISPLAY_LINE + 6, "Enter Button:");
+		displayBigTextLine(DEFAULT_DISPLAY_LINE + 9, "Player V CPU");
 
+		bool playerTwo = false;
+		bool modeSelected = false;
+		while(!modeSelected){
+			if(getButtonPress(buttonEnter))
+			{
+				while(getButtonPress(buttonEnter)){}
+				playerTwo = true;
+				modeSelected = true;
+			}
+			else if(getButtonPress(buttonUp))
+			{
+				while(getButtonPress(buttonUp)){}
+				playerTwo = false;
+				modeSelected = true;
+			}
+
+		}
+
+
+
+
+
+		playGame(currentPlayer, playerTwo, exitProgram);
+//			if(exitProgramCondition(exitProgram) == true)
+			//	{
+
+			//	exitProgram = true;
+
+			//	}
+    if(!exitProgram){
 		eraseDisplay();
 		displayBigTextLine(DEFAULT_DISPLAY_LINE, "Put Cartridges");
 		displayBigTextLine(DEFAULT_DISPLAY_LINE + 3, "At The Bottom");
@@ -115,9 +148,9 @@ task main()
 
 		while(SensorValue[S1] == 0)
 		{}
-			eraseDisplay();
-			resetSpinner();
-			sortTokens();
+		eraseDisplay();
+		resetSpinner();
+		sortTokens();
 
 
 		displayBigTextLine(DEFAULT_DISPLAY_LINE, "Put Cartridges ");
@@ -134,12 +167,12 @@ task main()
 		displayBigTextLine(DEFAULT_DISPLAY_LINE + 6, "Or Press");
 		displayBigTextLine(DEFAULT_DISPLAY_LINE + 9, "Up To Exit");
 
-			bool choiceSelected = false;
+		bool choiceSelected = false;
 		while(!choiceSelected){
-		if(getButtonPress(buttonEnter))
+			if(getButtonPress(buttonEnter))
 			{
 				while(getButtonPress(buttonEnter)){}
-				 playAgain = true;
+				playAgain = true;
 				choiceSelected = true;
 				for(int row = 0; row < BOARD_ROWS; row ++)
 				{
@@ -149,48 +182,52 @@ task main()
 					}
 				}
 			}
-		else if(getButtonPress(buttonUp))
-		{
-			while(getButtonPress(buttonUp)){}
-			playAgain = false;
-			choiceSelected = true;
+			else if(getButtonPress(buttonUp))
+			{
+				while(getButtonPress(buttonUp)){}
+				playAgain = false;
+				choiceSelected = true;
+			}
+
 		}
 
-	}
-
-			eraseDisplay();
-
-	}
-
-
-
-
 		eraseDisplay();
-	time1[T2] =0;
-	displayString(DEFAULT_DISPLAY_LINE, "Thank You");
-	displayString(DEFAULT_DISPLAY_LINE +3 , "For Playing!");
 
-	while(time1[T2] < 7000){}
-	eraseDisplay();
+	}
+
+
+
+	if(exitProgram == false)
+	{
+		eraseDisplay();
+		time1[T2] =0;
+		displayString(DEFAULT_DISPLAY_LINE, "Thank You");
+		displayString(DEFAULT_DISPLAY_LINE +3 , "For Playing!");
+
+		while(time1[T2] < 7000){}
+		eraseDisplay();
+	}
+}
+
 
 }
 
 /*
 void gameReset(int currentCol){
-	//dropToken(currentConverPos, 1, )
-    displayString(DEFAULT_DISPLAY_LINE, "Press enter to continue playing");
-	displayString(DEFAULT_DISPLAY_LINE, "press any other to terminate program");
-	while(!getButtonPress(buttonAny)){}
-	eraseDisplay();
-	if(getButtonPress(buttonEnter)){
-		//stillPlaying = 1;
-		return;
-	}
+//dropToken(currentConverPos, 1, )
+displayString(DEFAULT_DISPLAY_LINE, "Press enter to continue playing");
+displayString(DEFAULT_DISPLAY_LINE, "press any other to terminate program");
+while(!getButtonPress(buttonAny)){}
+eraseDisplay();
+if(getButtonPress(buttonEnter)){
+//stillPlaying = 1;
+return;
+}
 
-	else{
-	//	stillPlaying = 0;
-		return;
-	}
+else{
+//	stillPlaying = 0;
+return;
+}
 }
 */
 
@@ -217,54 +254,54 @@ int gameWon(int currentPlayer)
 	{
 		for(int col = 0; col < 7; col++)
 		{
-				int row1 = row - 1;
-				int row2 = row - 2;
-				int row3 = row - 3;
+			int row1 = row - 1;
+			int row2 = row - 2;
+			int row3 = row - 3;
 			if(row > 2)
 			{
 
+				if(boardArray[row][col] == currentPlayer
+					&& boardArray[row1][col] == currentPlayer
+				&& boardArray[row2][col] == currentPlayer
+				&& boardArray[row3][col] == currentPlayer)
+				{
+					return win;
+				} // checks vertical
+
+				if(col < 4)
+				{
 					if(boardArray[row][col] == currentPlayer
-						&& boardArray[row1][col] == currentPlayer
-						&& boardArray[row2][col] == currentPlayer
-						&& boardArray[row3][col] == currentPlayer)
+						&& boardArray[row][col + 1] == currentPlayer
+					&& boardArray[row][col + 2] == currentPlayer
+					&& boardArray[row][col + 3] == currentPlayer)
 					{
 						return win;
-					} // checks vertical
+					} // checks horizontal
 
-					if(col < 4)
+					if(boardArray[row][col] == currentPlayer
+						&& boardArray[row1][col + 1] == currentPlayer
+					&& boardArray[row2][col + 2] == currentPlayer
+					&& boardArray[row3][col + 3] == currentPlayer)
 					{
-						if(boardArray[row][col] == currentPlayer
-							&& boardArray[row][col + 1] == currentPlayer
-							&& boardArray[row][col + 2] == currentPlayer
-							&& boardArray[row][col + 3] == currentPlayer)
-						{
-							return win;
-						} // checks horizontal
-
-						if(boardArray[row][col] == currentPlayer
-							&& boardArray[row1][col + 1] == currentPlayer
-							&& boardArray[row2][col + 2] == currentPlayer
-							&& boardArray[row3][col + 3] == currentPlayer)
-						{
-							return win;
-						} // checks +ve slope
-					}
+						return win;
+					} // checks +ve slope
+				}
 
 			}
 			else if(col < 4)
 			{
 				if(boardArray[row][col] == currentPlayer
 					&& boardArray[row][col + 1] == currentPlayer
-					&& boardArray[row][col + 2] == currentPlayer
-					&& boardArray[row][col + 3] == currentPlayer)
+				&& boardArray[row][col + 2] == currentPlayer
+				&& boardArray[row][col + 3] == currentPlayer)
 				{
 					return win;
 				} // checks horizontal
 
 				if(boardArray[row][col] == currentPlayer
 					&& boardArray[row + 1][col + 1] == currentPlayer
-					&& boardArray[row + 2][col + 2] == currentPlayer
-					&& boardArray[row + 3][col + 3] == currentPlayer)
+				&& boardArray[row + 2][col + 2] == currentPlayer
+				&& boardArray[row + 3][col + 3] == currentPlayer)
 				{
 					return win;
 				} // checks -ve slope
@@ -278,31 +315,58 @@ int gameWon(int currentPlayer)
 
 
 
-void playGame(int &currentPlayer){
+void playGame(int &currentPlayer, bool playerTwo, bool &exitProgram){
+
 	currentPlayer = 1;
 	int columnHeights[BOARD_COLUMNS] = {0,0,0,0,0,0,0};
 	int currentCol = 1;
 
-	while(gameWon(currentPlayer) == 0)
+	while(gameWon(currentPlayer) == 0 && exitProgram == false)
 	{
+
+		//exitProgramCondition(exitProgram);
+		//if(exitProgramCondition(exitProgram) == true)
+			//	{
+				//  writeDebugStreamLine("Exiting playGame due to exitProgram.");
+			//		return;
+			//	}
 		currentPlayer = 1;
-		humanMove(columnHeights, currentCol);
-		if(gameWon(currentPlayer) == 0)
+		humanMove(columnHeights, currentCol, currentPlayer, exitProgram);
+
+			//exitProgramCondition(exitProgram);
+
+		if(gameWon(currentPlayer) == 0 && exitProgram == false)
 		{
-			currentPlayer = 2;
-			robotMove(columnHeights);
+
+			if(playerTwo == true)
+			{
+
+				currentPlayer = 2;
+				robotMove(columnHeights);
+
+
+			}
+			else
+		{
+				currentPlayer = 2;
+				HumanMove2(columnHeights, currentCol, currentPlayer, exitProgram);
+
+			}
 		}
-}
-	nMotorEncoder[motorA] = 0;
+//		nMotorEncoder[motorA] = 0;
+	}
+
 	return;
-
 }
 
-void humanMove(int *columnHeights, int currentCol){
+void humanMove(int *columnHeights, int currentCol, int currentPlayer, bool &exitProgram){
+
 	int choiceCol = 1;
 	do {
-		choiceCol = moveSelect(choiceCol);
-	} while(!legalCheck(choiceCol));
+		choiceCol = moveSelect(choiceCol, currentPlayer, exitProgram);
+	} while(!legalCheck(choiceCol) && exitProgram == false);
+	if(exitProgram == true)
+		return;
 
 	dropToken(columnHeights, choiceCol, true); // means human is playing
 	return;
@@ -313,6 +377,9 @@ int robotMove(int *columnHeights)
 {
   minimaxReturns values;
   minimaxAlg(columnHeights, 2, true, values);
+	displayBigTextLine(DEFAULT_DISPLAY_LINE, "Robot Move");
+	displayBigTextLine(DEFAULT_DISPLAY_LINE +3 , "Current Column:");
+	displayBigTextLine(DEFAULT_DISPLAY_LINE +6 , "%d", values.columnOfMove);
 
   dropToken(columnHeights, values.columnOfMove, ROBOT_TOKEN_TYPE);
 
@@ -320,27 +387,42 @@ int robotMove(int *columnHeights)
 }
 
 
-/*
-void HumanMove2(int *columnHeights, int currentCol){
+
+void HumanMove2(int *columnHeights, int currentCol, int currentPlayer, bool &exitProgram){
+
 	int choiceCol = 1;
 	do {
-		choiceCol = moveSelect(currentCol);
-	} while(!legalCheck(choiceCol));
+		choiceCol = moveSelect(currentCol, currentPlayer, exitProgram);
+	} while(!legalCheck(choiceCol) && exitProgram == false);
 
+	if(exitProgram == true)
+		return;
 	dropToken(columnHeights, choiceCol, false); // means human is playing
 
+	return;
 }
-*/
-int moveSelect(int currentCol)
+
+int moveSelect(int currentCol, int currentPlayer, bool &exitProgram)
 {
+
 	int selectCol = currentCol;
+  time1[T1] = 0;
+
 	eraseDisplay();
-	displayBigTextLine(DEFAULT_DISPLAY_LINE, "Current Column:");
-	displayBigTextLine(DEFAULT_DISPLAY_LINE +3 , "%d", selectCol);
+	displayBigTextLine(DEFAULT_DISPLAY_LINE, "Player: %d", currentPlayer);
+	displayBigTextLine(DEFAULT_DISPLAY_LINE +3, "Current Column:");
+	displayBigTextLine(DEFAULT_DISPLAY_LINE +6 , "%d", selectCol);
 
 
-	while(!getButtonPress(buttonEnter))
+	while(!getButtonPress(buttonEnter) && !exitProgram)
 	{
+		if(SensorValue[S1] == 1 && time1[T1] > 1500){
+		  exitProgram = true;
+	  }
+   	else if(SensorValue[S1] == 0){
+	  	time1[T1] = 0;
+	  }
+
 		if(getButtonPress(buttonUp))
 		{
 			while(getButtonPress(buttonUp))
@@ -356,8 +438,9 @@ int moveSelect(int currentCol)
 			}
 
 			eraseDisplay();
-			displayBigTextLine(DEFAULT_DISPLAY_LINE, "Current Column:");
-			displayBigTextLine(DEFAULT_DISPLAY_LINE +3 , "%d", selectCol);
+			displayBigTextLine(DEFAULT_DISPLAY_LINE, "Player: %d", currentPlayer);
+			displayBigTextLine(DEFAULT_DISPLAY_LINE +3 , "Current Column:");
+			displayBigTextLine(DEFAULT_DISPLAY_LINE +6 , "%d", selectCol);
 
 
 			wait1Msec(500);
@@ -377,10 +460,13 @@ int moveSelect(int currentCol)
 			}
 
 			eraseDisplay();
-			displayString(DEFAULT_DISPLAY_LINE, "Current Column: %d", selectCol);
+			displayBigTextLine(DEFAULT_DISPLAY_LINE, "Player: %d", currentPlayer);
+			displayBigTextLine(DEFAULT_DISPLAY_LINE +3 , "Current Column:");
+			displayBigTextLine(DEFAULT_DISPLAY_LINE +6 , "%d", selectCol);
 
 			wait1Msec(500);
 		}
+
 	}
 	while(getButtonPress(buttonEnter))
 	{}
@@ -391,10 +477,10 @@ int moveSelect(int currentCol)
 bool legalCheck(int choiceCol)
 {
 	if(boardArray[0][choiceCol - 1] == 0 && choiceCol >= 1 && choiceCol <= 7)
-  {
-    return true;
-  }
-  return false;
+	{
+		return true;
+	}
+	return false;
 }
 
 
@@ -462,8 +548,8 @@ void dropToken(int *columnHeights, int choiceCol, bool isHumanPlaying)
 		}
 
 	}
-		motor[motorA] = motor[motorD] = 0;
-		wait1Msec(500);
+	motor[motorA] = motor[motorD] = 0;
+	wait1Msec(500);
 
 
 
@@ -475,8 +561,8 @@ void dropToken(int *columnHeights, int choiceCol, bool isHumanPlaying)
 	}
 	int emptyTokenRow = (BOARD_ROWS - 1) - columnHeights[choiceCol];
 
-  boardArray[emptyTokenRow][choiceCol] = tokenType;
-  columnHeights[choiceCol] += 1;
+	boardArray[emptyTokenRow][choiceCol] = tokenType;
+	columnHeights[choiceCol] += 1;
 
 	motor[motorA] = -15;
 	motor[motorD] = -15;
@@ -492,40 +578,20 @@ void dropToken(int *columnHeights, int choiceCol, bool isHumanPlaying)
 
 void motorHold(int column)
 {
-		while(nMotorEncoder[motorA] < colAngle[column])
-		{
-			motor[motorD] = -1;
-			motor[motorA] = -2;
-		}
-		while(nMotorEncoder[motorA] > colAngle[column])
-		{
-			motor[motorD] = 2;
-			motor[motorA] = 1;
-		}
-		motor[motorD] = 1;
-		motor[motorA] = -1;
+	while(nMotorEncoder[motorA] < colAngle[column])
+	{
+		motor[motorD] = -1;
+		motor[motorA] = -2;
+	}
+	while(nMotorEncoder[motorA] > colAngle[column])
+	{
+		motor[motorD] = 2;
+		motor[motorA] = 1;
+	}
+	motor[motorD] = 1;
+	motor[motorA] = -1;
 
 }
-
-/*
-void gameReset(int currentCol){
-	//dropToken(currentConverPos, 1, )
-    displayString(DEFAULT_DISPLAY_LINE, "Press enter to continue playing");
-	displayString(DEFAULT_DISPLAY_LINE, "press any other to terminate program");
-	while(!getButtonPress(buttonAny)){}
-	eraseDisplay();
-	if(getButtonPress(buttonEnter)){
-		stillPlaying = 1;
-		return;
-	}
-
-	else{
-		stillPlaying = 0;
-		return;
-	}
-}
-*/
-
 
 
 void sortTokens(){
@@ -535,43 +601,43 @@ void sortTokens(){
 	wait1Msec(100);
 	time1[T4] = 0;
 	int previousMotor = 100;
-	int nextEncoder = 0;
+
 
 	while(time1[T3] < 30000 || SensorValue[S1] == 0 ){
-  		if(SensorValue[S2] == 4) {
-  			motor[motorB] = -35;
-  			while(nMotorEncoder[motorB] > -55){}
-  			motor[motorB] = 0;
-  			time1[T3] = 0;
+		if(SensorValue[S2] == 4) {
+			motor[motorB] = -35;
+			while(nMotorEncoder[motorB] > -55){}
+			motor[motorB] = 0;
+			time1[T3] = 0;
 		}
 
 		else if(SensorValue[S2] == 5) {
-	 		wait1Msec(500);
-	    	motor[motorB] = 35;
-  			while(nMotorEncoder[motorB] < 0){}
-  			motor[motorB] = 0;
-  			time1[T3] = 0;
+			wait1Msec(500);
+			motor[motorB] = 35;
+			while(nMotorEncoder[motorB] < 0){}
+			motor[motorB] = 0;
+			time1[T3] = 0;
 
 		}
 
 		if(time1[T4] >= 1000){
 
-				if(previousMotor == MSMMotorEncoder(mmotor_S4_1)){
-						MSMMotor(mmotor_S4_1, 1);
-						wait1Msec(1000);
-						MSMMotor(mmotor_S4_1, -1);
-						}
+			if(previousMotor == MSMMotorEncoder(mmotor_S4_1)){
+				MSMMotor(mmotor_S4_1, 1);
+				wait1Msec(1000);
+				MSMMotor(mmotor_S4_1, -1);
+			}
 
-						previousMotor = MSMMotorEncoder(mmotor_S4_1);
-						time1[T4] = 0;
-					}
-    }
+			previousMotor = MSMMotorEncoder(mmotor_S4_1);
+			time1[T4] = 0;
+		}
+	}
 
 	motor[motorB] = 30;
-  	while(nMotorEncoder[motorB] < 0)
-  		{}
-  	MSMotorStop(mmotor_S4_1);
-  	motor[motorB] = 0;
+	while(nMotorEncoder[motorB] < 0)
+	{}
+	MSMotorStop(mmotor_S4_1);
+	motor[motorB] = 0;
 }
 
 void waitButton(TEV3Buttons buttonName)
@@ -585,16 +651,11 @@ void waitButton(TEV3Buttons buttonName)
 }
 
 
-
-
-
-
-
 void resetSpinner()
 {
 	motor[motorC] = 20;
 	while(nMotorEncoder[motorC] < 360)
-{}
+	{}
 	motor[motorC] = 0;
 
 }
@@ -622,12 +683,12 @@ int scorePoints(int sum, bool oppoCheck)
     }
   }
 
-  return 0;
+	return 0;
 }
 
 int horizontalCheck(int row, int column, int playerToken, int oppoToken, bool oppoCheck)
 {
-  int score = 0;
+	int score = 0;
 
   const int START_ROW = row;
   const int START_COLUMN = column;
@@ -650,13 +711,13 @@ int horizontalCheck(int row, int column, int playerToken, int oppoToken, bool op
 
   score += scorePoints(sum, oppoCheck);
 
-  return score;
+	return score;
 
 }
 
 int verticalCheck(int row, int column, int playerToken, int oppoToken, bool oppoCheck)
 {
-  int score = 0;
+	int score = 0;
 
   const int START_ROW = row;
   const int START_COLUMN = column;
@@ -679,13 +740,13 @@ int verticalCheck(int row, int column, int playerToken, int oppoToken, bool oppo
 
   score += scorePoints(sum, oppoCheck);
 
-  return score;
+	return score;
 
 }
 
 int positiveSlopeCheck(int row, int column, int playerToken, int oppoToken, bool oppoCheck)
 {
-  int score = 0;
+	int score = 0;
 
   const int START_ROW = row;
   const int START_COLUMN = column;
@@ -708,13 +769,13 @@ int positiveSlopeCheck(int row, int column, int playerToken, int oppoToken, bool
 
   score += scorePoints(sum, oppoCheck);
 
-  return score;
+	return score;
 
 }
 
 int negativeSlopeCheck(int row, int column, int playerToken, int oppoToken, bool oppoCheck)
 {
-  int score = 0;
+	int score = 0;
 
   const int START_ROW = row;
   const int START_COLUMN = column;
@@ -737,7 +798,7 @@ int negativeSlopeCheck(int row, int column, int playerToken, int oppoToken, bool
 
   score += scorePoints(sum, oppoCheck);
 
-  return score;
+	return score;
 
 }
 
@@ -811,7 +872,7 @@ int scoreBoard(int columnOfMove, int playerToken, int oppoToken)
 
   score *= scoreCoefficient;
 
-  return score;
+	return score;
 
 }
 
@@ -868,19 +929,19 @@ void minimaxAlg(int *columnHeights, int depth, bool maxPlayer, minimaxReturns &v
     return;
   }
 
-  if(maxPlayer)
-  {
-    minimaxReturns maxValues;
-    maxValues.score = -9999;
-    maxValues.columnOfMove = 1;
+	if(maxPlayer)
+	{
+		minimaxReturns maxValues;
+		maxValues.score = -9999;
+		maxValues.columnOfMove = 1;
 
-    for(int colDropIndex = 0; colDropIndex < BOARD_COLUMNS; colDropIndex++) //Drops a token in each column to score that potential move
-    {
-      const int emptyTokenRow = (BOARD_ROWS - 1) - columnHeights[colDropIndex]; //Checks if a column is not full
+		for(int colDropIndex = 0; colDropIndex < BOARD_COLUMNS; colDropIndex++) //Drops a token in each column to score that potential move
+		{
+			const int emptyTokenRow = (BOARD_ROWS - 1) - columnHeights[colDropIndex]; //Checks if a column is not full
 
-      if(emptyTokenRow > -1)
-      {
-        addTokenToArray(columnHeights, emptyTokenRow, colDropIndex, ROBOT_TOKEN_TYPE);
+			if(emptyTokenRow > -1)
+			{
+				addTokenToArray(columnHeights, emptyTokenRow, colDropIndex, ROBOT_TOKEN_TYPE);
 
         minimaxReturns possibleMoveScore;
         minimaxAlg(columnHeights, depth - 1, false, possibleMoveScore, colDropIndex);
@@ -930,10 +991,11 @@ void minimaxAlg(int *columnHeights, int depth, bool maxPlayer, minimaxReturns &v
           minValues.columnOfMove = colDropIndex + 1;
         }
 
-        removeTokenInArray(columnHeights, emptyTokenRow, colDropIndex);
-     }
 
-    }
+				removeTokenInArray( columnHeights, emptyTokenRow, colDropIndex);
+			}
+
+		}
 
     //cout << depth << ": "<< minValues.score << endl;
     //cout << "FinalMove: " << minValues.columnOfMove - 1 << endl;
@@ -941,24 +1003,24 @@ void minimaxAlg(int *columnHeights, int depth, bool maxPlayer, minimaxReturns &v
     values.columnOfMove = minValues.columnOfMove;
     return;
 
-  }
+	}
 
 }
 
 void addTokenToArray(int *columnHeights, int row, int column, int tokenType)
 {
-  boardArray[row][column] = tokenType;
-  columnHeights[column] += 1;
+	boardArray[row][column] = tokenType;
+	columnHeights[column] += 1;
 
-  return;
+	return;
 }
 
 void removeTokenInArray(int *columnHeights, int row, int column)
 {
-  boardArray[row][column] = 0;
-  columnHeights[column] -= 1;
+	boardArray[row][column] = 0;
+	columnHeights[column] -= 1;
 
-  return;
+	return;
 }
 
 int max(int num1, int num2)
