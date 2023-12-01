@@ -1,3 +1,14 @@
+/*
+Vicente III Hernandez
+
+Acknowledgements:
+The criteria for the scoring system were based on the scoring system from the video:
+https://www.youtube.com/watch?v=y7AKtWGOPAE&list=PLFCB5Dp81iNV_inzM-R9AKkZZlePCZdtV
+
+The minimax algorithm was modelled after the pseudocode presented in the video:
+https://www.youtube.com/watch?v=l-hh51ncgDI
+*/
+
 //Libraries
 #include <iostream>
 #include <cstdlib>
@@ -15,6 +26,8 @@ const int TWO_LINE = 2;
 const int THREE_LINE = 5;
 const int OPPO_THREE_LINE = 4;
 const int FOUR_LINE = 900;
+
+const int DEPTH = 2; //default: 2
 
 //Type Structs
 typedef struct
@@ -410,7 +423,7 @@ int robotMove(int boardArray[BOARD_ROWS][BOARD_COLUMNS], int columnHeights[BOARD
 {
   
   minimaxReturns values;
-  minimaxAlg(boardArray, columnHeights, 2, true, values);
+  minimaxAlg(boardArray, columnHeights, DEPTH, true, values);
   
   dropToken(boardArray, columnHeights, values.columnOfMove, ROBOT_TOKEN_TYPE);
   
